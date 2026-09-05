@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - C语言编程学院</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html" class="active">个人中心</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="profile-page">
+        <div class="container">
+            <div class="profile-header card">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-info">
+                    <h2 id="profileUsername">用户名</h2>
+                    <p class="bio" id="profileLevel">Lv.1</p>
+                    <p class="bio" id="profileExp">经验: 0 / 200</p>
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <div class="num">3</div>
+                            <div class="label">学习课程</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="num">12</div>
+                            <div class="label">完成课时</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="num">5</div>
+                            <div class="label">获得成就</div>
+                        </div>
+                        <div class="profile-stat">
+                            <div class="num">85%</div>
+                            <div class="label">正确率</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-sections">
+                <div class="profile-section">
+                    <h3>📚 正在学习</h3>
+                    <div id="learningList">
+                        <!-- JS动态渲染 -->
+                    </div>
+                </div>
+
+                <div>
+                    <div class="profile-section card" style="margin-bottom: 24px;">
+                        <h3>🏆 最新成就</h3>
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <div style="text-align: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px;">🚀</div>
+                                <span style="font-size: 11px; color: var(--text-muted);">初来乍到</span>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px;">📚</div>
+                                <span style="font-size: 11px; color: var(--text-muted);">学习入门</span>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px; opacity: 0.4;">🏆</div>
+                                <span style="font-size: 11px; color: var(--text-muted);">答题达人</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section card">
+                        <h3>📊 学习数据</h3>
+                        <div style="color: var(--text-secondary); font-size: 14px; line-height: 2.2;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>累计学习时长</span>
+                                <span style="color: var(--primary); font-weight: 600;">12.5 小时</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>连续学习</span>
+                                <span style="color: var(--success); font-weight: 600;">7 天</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>完成习题</span>
+                                <span style="color: var(--warning); font-weight: 600;">86 道</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>代码行数</span>
+                                <span style="color: var(--accent); font-weight: 600;">1,240 行</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2024 C-Learn 编程学院. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

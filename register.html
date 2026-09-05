@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册 - C语言编程学院</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="auth-page">
+    <div class="auth-card card">
+        <div class="auth-header">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
+            </a>
+            <h2>创建账号</h2>
+            <p>开启你的C语言编程学习之旅</p>
+        </div>
+
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="regUsername">用户名</label>
+                <input type="text" id="regUsername" placeholder="请输入用户名" required>
+            </div>
+
+            <div class="form-group">
+                <label for="regEmail">邮箱</label>
+                <input type="email" id="regEmail" placeholder="请输入邮箱地址" required>
+            </div>
+
+            <div class="form-group">
+                <label for="regPassword">设置密码</label>
+                <input type="password" id="regPassword" placeholder="请设置6-20位密码" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">确认密码</label>
+                <input type="password" id="confirmPassword" placeholder="请再次输入密码" required>
+            </div>
+
+            <div class="form-row">
+                <label class="remember-me">
+                    <input type="checkbox" required> 我已阅读并同意用户协议
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary auth-btn">注 册</button>
+        </form>
+
+        <div class="auth-footer">
+            已有账号？<a href="login.html">立即登录</a>
+        </div>
+    </div>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

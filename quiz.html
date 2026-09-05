@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>在线小测 - C语言编程学院</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="quiz.html" class="active">在线小测</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html">个人中心</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
+                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
+                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="quiz-page">
+        <div class="container quiz-container" id="quizContainer">
+            <div class="quiz-header">
+                <h2>C语言基础小测</h2>
+                <p style="color: var(--text-secondary);">测试你对C语言基础知识的掌握程度</p>
+            </div>
+
+            <div class="quiz-progress">
+                <span id="questionNumber" style="font-size: 14px; color: var(--text-secondary); min-width: 80px;">第 1 / 5 题</span>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="quizProgress" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <div class="question-card card">
+                <span class="question-number">单选题</span>
+                <h3 class="question-text" id="questionText">题目内容</h3>
+                
+                <div class="code-block" id="codeBlock" style="display: none;">
+                    // 代码示例
+                </div>
+
+                <div class="options-list" id="optionsList">
+                    <!-- 选项动态渲染 -->
+                </div>
+            </div>
+
+            <div class="quiz-actions">
+                <button class="btn btn-outline" id="prevBtn">上一题</button>
+                <div>
+                    <button class="btn btn-primary" id="nextBtn">下一题</button>
+                    <button class="btn btn-primary" id="submitBtn" style="display: none;">提交答卷</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2024 C-Learn 编程学院. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

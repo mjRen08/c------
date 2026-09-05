@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>制作团队 - C语言编程学院</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="team.html" class="active">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
+                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
+                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <section style="padding: 140px 0 80px;">
+        <div class="container">
+            <div style="text-align: center; margin-bottom: 60px;">
+                <h2 class="section-title">关于制作团队</h2>
+                <p class="section-subtitle">来自北京理工大学的五位大学生，用代码创造编程学习的无限可能</p>
+            </div>
+
+            <div class="card" style="max-width: 800px; margin: 0 auto 60px; text-align: center; padding: 40px;">
+                <h3 style="font-size: 24px; margin-bottom: 16px; color: var(--text-primary);">项目背景</h3>
+                <p style="color: var(--text-secondary); line-height: 1.9;">
+                    C-Learn 编程学院诞生于北京理工大学的课程项目。我们发现传统的编程教学方式枯燥乏味，
+                    初学者往往难以入门。因此我们希望打造一个集课程教学、在线测验、游戏化学习于一体的平台，
+                    让C语言学习变得有趣、高效、触手可及。团队五位成员各司其职，
+                    从产品设计、前端开发到内容策划，共同打磨出这个作品。
+                </p>
+            </div>
+
+            <h3 style="text-align: center; font-size: 24px; margin-bottom: 40px; color: var(--text-primary);">团队成员</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto;">
+                <!-- 成员1 -->
+                <div class="card" style="text-align: center;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff, #7b2cbf); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
+                        张
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">张明宇</h4>
+                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">队长 / 全栈开发</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        北京理工大学计算机学院<br>
+                        负责项目架构设计与核心功能开发
+                    </p>
+                </div>
+
+                <!-- 成员2 -->
+                <div class="card" style="text-align: center;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #feca57); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
+                        李
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">李思涵</h4>
+                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">前端开发 / UI设计</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        北京理工大学设计与艺术学院<br>
+                        负责界面设计与交互体验优化
+                    </p>
+                </div>
+
+                <!-- 成员3 -->
+                <div class="card" style="text-align: center;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #00b894, #55efc4); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
+                        王
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">王浩然</h4>
+                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">游戏开发 / 算法</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        北京理工大学计算机学院<br>
+                        负责编程游戏引擎与答题系统
+                    </p>
+                </div>
+
+                <!-- 成员4 -->
+                <div class="card" style="text-align: center;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #a29bfe, #6c5ce7); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
+                        陈
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">陈晓彤</h4>
+                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">课程内容策划</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        北京理工大学信息与电子学院<br>
+                        负责课程体系设计与题库建设
+                    </p>
+                </div>
+
+                <!-- 成员5 -->
+                <div class="card" style="text-align: center; margin: 0 auto;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #fd79a8, #e84393); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
+                        刘
+                    </div>
+                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">刘子阳</h4>
+                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">剧情策划 / 测试</p>
+                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+                        北京理工大学人文与社会科学学院<br>
+                        负责游戏世界观剧情与产品测试
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" style="max-width: 800px; margin: 60px auto 0; padding: 32px; text-align: center;">
+                <h3 style="font-size: 20px; margin-bottom: 16px; color: var(--text-primary);">联系我们</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 8px;">📧 邮箱：team@c-learn.edu.cn</p>
+                <p style="color: var(--text-secondary); margin-bottom: 8px;">🏫 学校：北京理工大学</p>
+                <p style="color: var(--text-secondary);">📍 地址：北京市海淀区中关村南大街5号</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>© 2024 C-Learn 编程学院 · 北理工大学生制作团队</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Master - 从零开始学C语言</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">Cm</div>
+                <span>Code Master</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
+                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
+                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero区域 -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <div class="hero-badge">
+                    <span>🚀</span>
+                    <span>全新交互式学习体验</span>
+                </div>
+                <h1>
+                    从零开始<br>
+                    <span>掌握C语言编程</span>
+                </h1>
+                <p>
+                    通过趣味游戏、实战练习和即时反馈，让C语言学习不再枯燥。
+                    从基础语法到高级算法，系统化课程体系助你成为编程高手。
+                </p>
+                <div class="hero-buttons">
+                    <a href="list.html" class="btn btn-primary">开始学习 →</a>
+                    <a href="game.html" class="btn btn-outline">体验编程游戏</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <h3>50+</h3>
+                        <p>精品课程</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>200+</h3>
+                        <p>实战练习</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>10万+</h3>
+                        <p>学员信赖</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 特色功能 -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">为什么选择我们</h2>
+            <p class="section-subtitle">打造沉浸式编程学习体验</p>
+            <div class="features-grid">
+                <div class="feature-card card">
+                    <div class="feature-icon">🎮</div>
+                    <h3>游戏化学习</h3>
+                    <p>通过闯关游戏的方式学习编程知识，边玩边学，让学习充满乐趣和成就感</p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">📝</div>
+                    <h3>即时小测</h3>
+                    <p>每章节配套智能测验，即时反馈学习效果，查漏补缺巩固知识点</p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>成就系统</h3>
+                    <p>丰富的徽章和等级体系，记录你的每一步成长，解锁专属成就奖励</p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">📱</div>
+                    <h3>响应式设计</h3>
+                    <p>完美适配电脑、平板和手机，随时随地都能学习，支持打包为Android App</p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>系统化课程</h3>
+                    <p>从入门到精通，循序渐进的课程体系，零基础也能轻松学会C语言</p>
+                </div>
+                <div class="feature-card card">
+                    <div class="feature-icon">💡</div>
+                    <h3>实战导向</h3>
+                    <p>大量真实编程案例和项目实战，学以致用，真正掌握编程思维</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 热门课程 -->
+    <section class="courses">
+        <div class="container">
+            <h2 class="section-title">热门课程</h2>
+            <p class="section-subtitle">精选优质内容，开启编程之旅</p>
+            <div class="courses-grid">
+                <div class="course-card card" onclick="location.href='detail.html'">
+                    <div class="course-cover">
+                        <span class="course-level">入门</span>
+                        📘
+                    </div>
+                    <h3>C语言基础入门</h3>
+                    <p class="course-desc">从零开始学习C语言，掌握变量、数据类型、运算符等核心基础知识</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="course-meta">
+                        <span>12 课时</span>
+                        <span>⭐ 4.9</span>
+                    </div>
+                </div>
+                <div class="course-card card" onclick="location.href='detail.html'">
+                    <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">
+                        <span class="course-level">进阶</span>
+                        🔧
+                    </div>
+                    <h3>指针与内存管理</h3>
+                    <p class="course-desc">深入理解指针概念，掌握动态内存分配，写出更高效的C语言代码</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="course-meta">
+                        <span>8 课时</span>
+                        <span>⭐ 4.8</span>
+                    </div>
+                </div>
+                <div class="course-card card" onclick="location.href='detail.html'">
+                    <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
+                        <span class="course-level">高级</span>
+                        🌲
+                    </div>
+                    <h3>数据结构与算法</h3>
+                    <p class="course-desc">链表、栈、队列、树、排序算法，夯实计算机科学核心基础</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div class="course-meta">
+                        <span>15 课时</span>
+                        <span>⭐ 4.9</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 成就预览 -->
+    <section class="achievements">
+        <div class="container">
+            <h2 class="section-title">成就徽章</h2>
+            <p class="section-subtitle">收集徽章，见证你的成长之路</p>
+            <div class="achievement-grid" id="achievementGrid">
+                <!-- JS动态渲染 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">{ }</div>
+                        <span>C-Learn</span>
+                    </div>
+                    <p>专注于C语言编程教育，致力于打造最优质的在线学习体验。让每一位学员都能享受编程的乐趣。</p>
+                </div>
+                <div class="footer-col">
+                    <h4>课程学习</h4>
+                    <ul>
+                        <li><a href="list.html">全部课程</a></li>
+                        <li><a href="#">基础入门</a></li>
+                        <li><a href="#">进阶提升</a></li>
+                        <li><a href="#">实战项目</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>互动学习</h4>
+                    <ul>
+                        <li><a href="quiz.html">在线小测</a></li>
+                        <li><a href="game.html">编程游戏</a></li>
+                        <li><a href="#">代码挑战</a></li>
+                        <li><a href="#">学习社区</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="team.html">制作团队</a></li>
+                        <li><a href="#">关于平台</a></li>
+                        <li><a href="#">联系方式</a></li>
+                        <li><a href="#">帮助中心</a></li>
+                        <li><a href="#">意见反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 C-Learn 编程学院. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
