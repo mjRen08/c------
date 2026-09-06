@@ -576,6 +576,35 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
         }
 
+    .password-field {
+        position: relative;
+    }
+
+    .password-field input {
+        padding-right: 48px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        width: 28px;
+        height: 28px;
+        padding: 0;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 17px;
+        line-height: 28px;
+        cursor: pointer;
+    }
+
+    .password-toggle:hover,
+    .password-toggle:focus {
+        color: var(--primary);
+    }
+
 .form-error {
     min-height: 18px;
     margin-top: 6px;

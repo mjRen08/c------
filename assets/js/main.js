@@ -18,12 +18,34 @@ function $$(selector) {
 
 // 模拟本地存储
 function saveToStorage(key, data) {
-    localStorage.setItem(key, JSON.stringify(data));
+    const value = JSON.stringify(data);
+    try {
+        localStorage.setItem(key, value);
+        return;
+    } catch (error) {
+    }
+    document.cookie = encodeURIComponent('cm_' + key) + '=' + encodeURIComponent(value) + '; path=/; max-age=31536000';
 }
 
 function getFromStorage(key) {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : null;
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        const cookieName = encodeURIComponent('cm_' + key) + '=';
+        const cookie = document.cookie.split('; ').find(function (item) {
+            return item.indexOf(cookieName) === 0;
+        });
+        return cookie ? JSON.parse(decodeURIComponent(cookie.slice(cookieName.length))) : null;
+    }
+}
+
+function removeFromStorage(key) {
+    try {
+        localStorage.removeItem(key);
+    } catch (error) {
+        document.cookie = encodeURIComponent('cm_' + key) + '=; path=/; max-age=0';
+    }
 }
 
 // ========== 初始化 ==========
@@ -90,6 +112,16 @@ function initAuth() {
         const passwordInput = $('#regPassword');
         const passwordHint = $('#passwordHint');
 
+        $$('.password-toggle').forEach(function (toggle) {
+            toggle.addEventListener('click', function () {
+                const target = document.getElementById(toggle.getAttribute('data-password-target'));
+                const isPassword = target.type === 'password';
+                target.type = isPassword ? 'text' : 'password';
+                toggle.setAttribute('aria-label', isPassword ? '隐藏密码' : '显示密码');
+                toggle.setAttribute('title', isPassword ? '隐藏密码' : '显示密码');
+            });
+        });
+
         function validatePassword() {
             const passwordLength = passwordInput.value.length;
             const isValid = passwordLength >= 6 && passwordLength <= 20;
@@ -97,7 +129,11 @@ function initAuth() {
             passwordHint.textContent = isValid || passwordLength === 0
                 ? ''
                 : '密码长度必须为6-20位';
-            passwordInput.classList.toggle('input-error', !isValid && passwordLength > 0);
+            if (!isValid && passwordLength > 0) {
+                passwordInput.classList.add('input-error');
+            } else {
+                passwordInput.classList.remove('input-error');
+            }
             return isValid;
         }
 
@@ -109,6 +145,11 @@ function initAuth() {
             const email = $('#regEmail').value;
             const password = passwordInput.value;
             const confirmPassword = $('#confirmPassword').value;
+
+            if (!username || !email || !password || !confirmPassword) {
+                showToast('请填写完整注册信息', 'error');
+                return;
+            }
 
             if (!validatePassword()) {
                 passwordHint.textContent = '密码长度必须为6-20位';
@@ -150,7 +191,7 @@ function initAuth() {
     const logoutBtn = $('#logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
-            localStorage.removeItem('currentUser');
+            removeFromStorage('currentUser');
             showToast('已退出登录', 'info');
             setTimeout(() => {
                 window.location.href = 'login.html';
