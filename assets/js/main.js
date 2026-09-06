@@ -86,28 +86,88 @@ function saveToStorage(key, data) {
 }
 
 function getFromStorage(key) {
-    let data = null;
-    try {
-        data = localStorage.getItem(key);
-    } catch (error) {
-    }
-
-    if (data) {
-        return JSON.parse(data);
-    }
-
     const cookieName = encodeURIComponent('cm_' + key) + '=';
     const cookie = document.cookie.split('; ').find(function (item) {
         return item.indexOf(cookieName) === 0;
     });
-    return cookie ? JSON.parse(decodeURIComponent(cookie.slice(cookieName.length))) : null;
+    let cookieData = null;
+    let localData = null;
+    if (cookie) {
+        try {
+            cookieData = JSON.parse(decodeURIComponent(cookie.slice(cookieName.length)));
+        } catch (error) {
+        }
+    }
+    try {
+        const data = localStorage.getItem(key);
+        localData = data ? JSON.parse(data) : null;
+    } catch (error) {
+    }
+
+    if (key === 'currentUser') {
+        const currentUser = mergeUserRecords(localData, cookieData);
+        if (currentUser && currentUser.username) {
+            const savedUser = getFromStorage('userProgress_' + currentUser.username);
+            return mergeUserRecords(currentUser, savedUser);
+        }
+        return currentUser;
+    }
+    if (key === 'users') {
+        return mergeUserLists(localData, cookieData);
+    }
+    return cookieData || localData;
+}
+
+function mergeUserRecords(first, second) {
+    if (!first) return second;
+    if (!second) return first;
+
+    const merged = Object.assign({}, first, second);
+    merged.level = Math.max(first.level || 0, second.level || 0);
+    merged.exp = Math.max(first.exp || 0, second.exp || 0);
+    merged.onlineSeconds = Math.max(first.onlineSeconds || 0, second.onlineSeconds || 0);
+    merged.achievements = Array.from(new Set((first.achievements || []).concat(second.achievements || [])));
+    merged.completedCourses = Array.from(new Set((first.completedCourses || []).concat(second.completedCourses || [])));
+    merged.courseLessons = {};
+    const courseIds = Object.keys(first.courseLessons || {}).concat(Object.keys(second.courseLessons || {}));
+    courseIds.forEach(function (courseId) {
+        merged.courseLessons[courseId] = Array.from(new Set(
+            (first.courseLessons && first.courseLessons[courseId] || []).concat(
+                second.courseLessons && second.courseLessons[courseId] || []
+            )
+        ));
+    });
+    return merged;
+}
+
+function mergeUserLists(first, second) {
+    const users = {};
+    (first || []).concat(second || []).forEach(function (user) {
+        users[user.username] = mergeUserRecords(users[user.username], user);
+    });
+    return Object.keys(users).map(function (username) {
+        return users[username];
+    });
 }
 
 function removeFromStorage(key) {
     try {
         localStorage.removeItem(key);
     } catch (error) {
-        document.cookie = encodeURIComponent('cm_' + key) + '=; path=/; max-age=0';
+    }
+    document.cookie = encodeURIComponent('cm_' + key) + '=; path=/; max-age=0';
+}
+
+function saveUserData(user) {
+    saveToStorage('userProgress_' + user.username, user);
+    saveToStorage('currentUser', user);
+    const users = getFromStorage('users') || [];
+    const userIndex = users.findIndex(function (item) {
+        return item.username === user.username;
+    });
+    if (userIndex !== -1) {
+        users[userIndex] = user;
+        saveToStorage('users', users);
     }
 }
 
@@ -117,6 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initNavigation();
     initQuiz();
     checkLoginStatus();
+    evaluateAchievements();
     initOnlineTimeTracker();
     loadAchievements();
     initCourseFeatures();
@@ -161,6 +222,7 @@ function initAuth() {
             if (user || (username === 'admin' && password === 'admin')) {
                 const currentUser = user || { username: 'admin', level: 5, exp: 1200 };
                 saveToStorage('currentUser', currentUser);
+                evaluateAchievements();
                 showToast('登录成功！', 'success');
                 setTimeout(() => {
                     window.location.href = 'index.html';
@@ -563,6 +625,31 @@ function loadAchievements() {
     }).join('');
 }
 
+function evaluateAchievements() {
+    const user = getFromStorage('currentUser');
+    if (!user) return;
+    normalizeUserCourseProgress(user);
+    syncCompletedCourses(user);
+    saveUserData(user);
+
+    const completedLessons = Object.keys(user.courseLessons || {}).reduce(function (total, courseId) {
+        return total + (user.courseLessons[courseId] || []).length;
+    }, 0);
+    const completedCourses = user.completedCourses || [];
+
+    if (!user.achievements || user.achievements.indexOf('first_login') === -1) {
+        unlockAchievement('first_login');
+    }
+    if (completedLessons > 0) {
+        unlockAchievement('first_course');
+    }
+    if (['basics', 'control-flow', 'io-array'].every(function (id) {
+        return completedCourses.indexOf(id) !== -1;
+    })) {
+        unlockAchievement('all_basic');
+    }
+}
+
 function unlockAchievement(id) {
     const user = getFromStorage('currentUser');
     if (!user) return;
@@ -571,20 +658,13 @@ function unlockAchievement(id) {
     if (user.achievements.includes(id)) return;
 
     user.achievements.push(id);
-    saveToStorage('currentUser', user);
-
-    // 更新用户列表中的数据
-    const users = getFromStorage('users') || [];
-    const idx = users.findIndex(u => u.username === user.username);
-    if (idx !== -1) {
-        users[idx] = user;
-        saveToStorage('users', users);
-    }
+    saveUserData(user);
 
     const achievement = achievementList.find(a => a.id === id);
     if (achievement) {
         showToast(`🏆 解锁成就：${achievement.name}`, 'success');
     }
+    loadAchievements();
 }
 
 // ========== 经验与等级系统 ==========
@@ -592,28 +672,20 @@ function addExp(amount) {
     const user = getFromStorage('currentUser');
     if (!user) return;
 
+    user.level = user.level || 1;
     user.exp = (user.exp || 0) + amount;
 
-    // 计算等级
-    const expNeeded = user.level * 200;
-    if (user.exp >= expNeeded) {
-        user.level++;
+    while (user.exp >= user.level * 200) {
+        const expNeeded = user.level * 200;
         user.exp -= expNeeded;
+        user.level++;
         showToast(`🎉 升级了！当前等级：${user.level}`, 'success');
 
         if (user.level >= 5) unlockAchievement('level_5');
         if (user.level >= 10) unlockAchievement('level_10');
     }
 
-    saveToStorage('currentUser', user);
-
-    // 更新用户列表
-    const users = getFromStorage('users') || [];
-    const idx = users.findIndex(u => u.username === user.username);
-    if (idx !== -1) {
-        users[idx] = user;
-        saveToStorage('users', users);
-    }
+    saveUserData(user);
 }
 
 // ========== Toast提示 ==========
@@ -666,6 +738,8 @@ function loadProfileData() {
         window.location.href = 'login.html';
         return;
     }
+    normalizeUserCourseProgress(user);
+    syncCompletedCourses(user);
 
     $('#profileUsername').textContent = user.username;
     $('#profileLevel').textContent = `Lv.${user.level}`;
@@ -675,6 +749,13 @@ function loadProfileData() {
             return achievement.id === id;
         });
     }).filter(Boolean);
+    const courses = getProfileCourses();
+    const completedCourses = user.completedCourses || [];
+    const completedLessons = Object.keys(user.courseLessons || {}).reduce(function (total, courseId) {
+        return total + (user.courseLessons[courseId] || []).length;
+    }, 0);
+    $('#profileSectionCount').textContent = completedCourses.length;
+    $('#profileLessonCount').textContent = completedLessons;
     $('#profileAchievementCount').textContent = unlockedAchievements.length;
     $('#achievementList').innerHTML = unlockedAchievements.length
         ? unlockedAchievements.map(function (achievement) {
@@ -685,8 +766,6 @@ function loadProfileData() {
         }).join('')
         : '<span class="empty-state">暂无已解锁成就</span>';
 
-    const courses = getProfileCourses();
-    const completedCourses = user.completedCourses || [];
     const completedCourseCount = completedCourses.length;
     const overallProgress = Math.round((completedCourseCount / courses.length) * 100);
 
@@ -726,11 +805,6 @@ function loadProfileData() {
                     </div>`;
                 }).join('')}</div>
             </div>`;
-        } else {
-            branchList.innerHTML = `<div class="course-branch-panel">
-                <h4>${course.name} · 课程分支</h4>
-                <p class="course-branch-placeholder">课程分支正在制作中，后续将在这里显示。</p>
-            </div>`;
         }
     }
 
@@ -755,7 +829,8 @@ function loadProfileData() {
         const lessonIndex = Number(button.getAttribute('data-lesson-index'));
         user.courseLessons = user.courseLessons || {};
         user.courseLessons[courseId] = user.courseLessons[courseId] || [];
-        if (user.courseLessons[courseId].indexOf(lessonIndex) === -1) {
+        const isNewLesson = user.courseLessons[courseId].indexOf(lessonIndex) === -1;
+        if (isNewLesson) {
             user.courseLessons[courseId].push(lessonIndex);
         }
 
@@ -764,15 +839,16 @@ function loadProfileData() {
         });
         if (course.branches.length === user.courseLessons[courseId].length && completedCourses.indexOf(courseId) === -1) {
             completedCourses.push(courseId);
+            if (courseId === 'basics') {
+                unlockAchievement('first_course');
+            }
         }
         user.completedCourses = completedCourses;
-        saveToStorage('currentUser', user);
-        const users = getFromStorage('users') || [];
-        const userIndex = users.findIndex(function (item) { return item.username === user.username; });
-        if (userIndex !== -1) {
-            users[userIndex] = user;
-            saveToStorage('users', users);
+        saveUserData(user);
+        if (isNewLesson) {
+            addExp(50);
         }
+        evaluateAchievements();
         loadProfileData();
         showCourseBranches(courseId);
     };
@@ -780,16 +856,73 @@ function loadProfileData() {
 
 function getProfileCourses() {
     return [
-        { id: 'c-basics', name: 'C语言基础入门', icon: '📘', branches: ['第1章：C语言概述', '第2章：开发环境搭建', '第3章：变量与数据类型', '第4章：运算符与表达式', '第5章：输入与输出', '第6章：选择结构', '第7章：循环结构', '第8章：综合练习'] },
-        { id: 'c-control', name: '循环与分支结构', icon: '🔄' },
-        { id: 'c-functions', name: '函数与模块化编程', icon: '📦' },
-        { id: 'c-pointers', name: '指针与内存管理', icon: '🔧' },
-        { id: 'c-arrays', name: '数组与字符串', icon: '📋' },
-        { id: 'c-structs', name: '结构体与共用体', icon: '🏗️' },
-        { id: 'c-algorithms', name: '数据结构与算法', icon: '🌲' },
-        { id: 'c-files', name: '文件操作与IO', icon: '📁' },
-        { id: 'c-project', name: '项目实战：学生管理系统', icon: '💻' }
-    ];
+        ['basics', '基础'], ['control-flow', '流程'], ['io-array', '输入输出'],
+        ['functions', '函数'], ['strings', '字符串'], ['pointers', '指针'],
+        ['algorithms', '算法'], ['file-io', '文件'], ['project', '项目']
+    ].map(function (entry) {
+        const id = entry[0];
+        const course = courseCatalog[id];
+        return {
+            id: id,
+            name: course.title,
+            icon: course.icon,
+            branches: course.chapters
+        };
+    });
+}
+
+function normalizeUserCourseProgress(user) {
+    const aliases = {
+        'c-basics': 'basics',
+        'c-control': 'control-flow',
+        'c-functions': 'functions',
+        'c-pointers': 'pointers',
+        'c-arrays': 'strings',
+        'c-algorithms': 'algorithms',
+        'c-files': 'file-io',
+        'c-project': 'project'
+    };
+    const lessons = user.courseLessons || {};
+    const completedCourses = user.completedCourses || [];
+    let changed = false;
+
+    Object.keys(aliases).forEach(function (oldId) {
+        const newId = aliases[oldId];
+        if (lessons[oldId]) {
+            lessons[newId] = Array.from(new Set((lessons[newId] || []).concat(lessons[oldId])));
+            delete lessons[oldId];
+            changed = true;
+        }
+        const oldIndex = completedCourses.indexOf(oldId);
+        if (oldIndex !== -1) {
+            if (completedCourses.indexOf(newId) === -1) completedCourses.push(newId);
+            completedCourses.splice(oldIndex, 1);
+            changed = true;
+        }
+    });
+
+    if (changed) {
+        user.courseLessons = lessons;
+        user.completedCourses = completedCourses;
+        saveUserData(user);
+    }
+}
+
+function syncCompletedCourses(user) {
+    const completedCourses = user.completedCourses || [];
+    const changed = getProfileCourses().some(function (course) {
+        const lessons = user.courseLessons && user.courseLessons[course.id] || [];
+        if (lessons.length >= course.branches.length && completedCourses.indexOf(course.id) === -1) {
+            completedCourses.push(course.id);
+            return true;
+        }
+        return false;
+    });
+
+    if (changed) {
+        user.completedCourses = completedCourses;
+        saveUserData(user);
+    }
 }
 
 function getCourseProgress(course, user) {
@@ -1816,6 +1949,24 @@ function initCourseFeatures() {
         renderCourseDetail();
     }
     renderCourseFavoriteButtons();
+    renderHomeCourseProgress();
     updateDetailFavoriteButton();
     renderProfileFavorites();
+}
+
+function renderHomeCourseProgress() {
+    const user = getFromStorage('currentUser');
+    if (user) normalizeUserCourseProgress(user);
+    $$('.course-card[data-course-id]').forEach(function (card) {
+        const courseId = card.getAttribute('data-course-id');
+        const course = courseCatalog[courseId];
+        const progress = user && course ? getCourseProgress({
+            id: courseId,
+            branches: course.chapters
+        }, user) : 0;
+        const progressFill = card.querySelector('.progress-fill');
+        const progressText = card.querySelector('.course-meta span');
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressText && progress === 100) progressText.textContent = '已完成';
+    });
 }
