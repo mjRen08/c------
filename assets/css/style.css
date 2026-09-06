@@ -576,6 +576,18 @@
             box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
         }
 
+.form-error {
+    min-height: 18px;
+    margin-top: 6px;
+    color: var(--danger);
+    font-size: 12px;
+}
+
+.form-group input.input-error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(255, 71, 87, 0.1);
+}
+
 .form-row {
     display: flex;
     justify-content: space-between;

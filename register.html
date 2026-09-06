@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>注册 - C语言编程学院</title>
+    <title>注册 - CodeMaster</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -11,8 +11,8 @@
     <div class="auth-card card">
         <div class="auth-header">
             <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span>C-Learn</span>
+                <div class="logo-icon">CM</div>
+                <span>CodeMaster</span>
             </a>
             <h2>创建账号</h2>
             <p>开启你的C语言编程学习之旅</p>
@@ -31,7 +31,8 @@
 
             <div class="form-group">
                 <label for="regPassword">设置密码</label>
-                <input type="password" id="regPassword" placeholder="请设置6-20位密码" required>
+                <input type="password" id="regPassword" placeholder="请设置6-20位密码" minlength="6" maxlength="20" required>
+                <p id="passwordHint" class="form-error" aria-live="polite"></p>
             </div>
 
             <div class="form-group">

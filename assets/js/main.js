@@ -87,12 +87,34 @@ function initAuth() {
     // 注册表单
     const registerForm = $('#registerForm');
     if (registerForm) {
+        const passwordInput = $('#regPassword');
+        const passwordHint = $('#passwordHint');
+
+        function validatePassword() {
+            const passwordLength = passwordInput.value.length;
+            const isValid = passwordLength >= 6 && passwordLength <= 20;
+
+            passwordHint.textContent = isValid || passwordLength === 0
+                ? ''
+                : '密码长度必须为6-20位';
+            passwordInput.classList.toggle('input-error', !isValid && passwordLength > 0);
+            return isValid;
+        }
+
+        passwordInput.addEventListener('input', validatePassword);
+
         registerForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const username = $('#regUsername').value;
             const email = $('#regEmail').value;
-            const password = $('#regPassword').value;
+            const password = passwordInput.value;
             const confirmPassword = $('#confirmPassword').value;
+
+            if (!validatePassword()) {
+                passwordHint.textContent = '密码长度必须为6-20位';
+                passwordInput.focus();
+                return;
+            }
 
             if (password !== confirmPassword) {
                 showToast('两次密码不一致', 'error');
