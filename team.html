@@ -103,6 +103,13 @@
             font-weight:700;
         }
 
+        .team-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
         .team-card-detail h4 {
             font-size:18px;
             margin-bottom:4px;
@@ -151,10 +158,16 @@
 
         .team-tip-text {
             text-align:center;
-            margin-top:12px;
+            margin-top:110px;
             font-size:17px;
             color:var(--text-secondary);
             min-height:40px;
+            transform: translateX(0);
+            transition: transform .45s ease;
+        }
+
+        .team-card-area.has-picked + .team-tip-text {
+            transform: translateX(-180px);
         }
         .team-tip-text strong {
             color:#fbbf24;
@@ -209,7 +222,7 @@
                     <div class="team-card team-card-0" data-name="张天艺" style="--card-color:#22d3ee;">
                         <div class="team-card-name">张天艺</div>
                         <div class="team-card-detail">
-                            <div class="team-avatar" style="background: linear-gradient(135deg, #00d4ff, #7b2cbf);">张</div>
+                            <div class="team-avatar"><img src="assets/images/张.jpg" alt="张天艺头像"></div>
                             <h4>张天艺&emsp;</h4>
                             <p class="role">队长/项目经理/技术总监/程序员&emsp;</p>
                             <p class="desc" style="text-align: left">
@@ -227,7 +240,7 @@
                     <div class="team-card team-card-1" data-name="任明捷" style="--card-color:#fb7185;">
                         <div class="team-card-name">任明捷</div>
                         <div class="team-card-detail">
-                            <div class="team-avatar" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">李</div>
+                            <div class="team-avatar"><img src="assets/images/任.jpg" alt="任明捷头像"></div>
                             <h4>任明捷&emsp;</h4>
                             <p class="role">程序员/测试员&emsp;</p>
                             <p class="desc" style="text-align: left">
@@ -243,7 +256,7 @@
                     <div class="team-card team-card-2" data-name="郑铭超" style="--card-color:#34d399;">
                         <div class="team-card-name">郑铭超</div>
                         <div class="team-card-detail">
-                            <div class="team-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">王</div>
+                            <div class="team-avatar"><img src="assets/images/郑.jpg" alt="郑铭超头像"></div>
                             <h4>郑铭超&emsp;</h4>
                             <p class="role">程序员/测试员&emsp;</p>
                             <p class="desc" style="text-align: left">
@@ -258,7 +271,7 @@
                     <div class="team-card team-card-3" data-name="李宜忱" style="--card-color:#a78bfa;">
                         <div class="team-card-name">李宜忱</div>
                         <div class="team-card-detail">
-                            <div class="team-avatar" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">陈</div>
+                            <div class="team-avatar"><img src="assets/images/李.jpg" alt="李宜忱头像"></div>
                             <h4>李宜忱&emsp;</h4>
                             <p class="role">UI设计/CIO&emsp;</p>
                             <p class="desc" style="text-align: left">
@@ -273,7 +286,7 @@
                     <div class="team-card team-card-4" data-name="严浩然" style="--card-color:#fbbf24;">
                         <div class="team-card-name">严浩然</div>
                         <div class="team-card-detail">
-                            <div class="team-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">刘</div>
+                            <div class="team-avatar"><img src="assets/images/严.jpg" alt="严浩然头像"></div>
                             <h4>严浩然&emsp;</h4>
                             <p class="role">文档编辑/网页编辑&emsp;</p>
                             <p class="desc" style="text-align: left">
@@ -313,24 +326,30 @@
         const teamCardArea = document.getElementById("teamCardArea");
         const teamTip = document.getElementById("teamTip");
 
+        function resetTeamCards() {
+            teamCards.forEach(c => c.classList.remove("picked"));
+            teamCardArea.classList.remove("has-picked");
+        }
+
         teamCards.forEach(card => {
             card.addEventListener("click", function (e) {
                 e.stopPropagation();
                 if(this.classList.contains("picked")){
                     //收回卡牌
-                    teamCards.forEach(c => c.classList.remove("picked"));
+                    resetTeamCards();
                     teamTip.textContent = "点击卡牌查看团队成员详情";
                 }else{
                     //抽选卡牌
-                    teamCards.forEach(c => c.classList.remove("picked"));
+                    resetTeamCards();
                     this.classList.add("picked");
+                    teamCardArea.classList.add("has-picked");
                     teamTip.innerHTML = `查看成员！选中：<strong>${this.dataset.name}</strong>，点击卡牌收回`;
                 }
             })
         })
         //点击空白区域收回
         teamCardArea.addEventListener("click", function (){
-            teamCards.forEach(c => c.classList.remove("picked"));
+            resetTeamCards();
             teamTip.textContent = "点击卡牌查看团队成员详情";
         })
     </script>
