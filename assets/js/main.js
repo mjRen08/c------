@@ -7,6 +7,63 @@ const AppState = {
     learningProgress: {}
 };
 
+const courseCatalog = {
+    basics: {
+        title: 'C语言基础入门', icon: '📘', duration: '约 3 小时', level: '入门',
+        description: '从程序结构和基本语法开始，逐步掌握变量、数据类型与简单表达式，建立完整的C语言编程基础。',
+        chapters: ['认识C语言与程序结构', '变量、常量与数据类型', '运算符与表达式', '基本输入与输出', '编写第一个完整程序'],
+        learn: ['C语言程序的基本组成', '变量声明与数据类型选择', '算术、关系和逻辑运算', 'printf/scanf基本用法', '独立完成简单控制台程序']
+    },
+    'control-flow': {
+        title: '循环与分支结构', icon: '🔄', duration: '约 2 小时', level: '入门',
+        description: '从条件判断到重复执行，循序学习程序流程控制，让代码能够根据不同情况做出决定并完成重复任务。',
+        chapters: ['条件表达式与if语句', '多分支与switch语句', 'for循环基础', 'while与do-while循环', '流程控制综合练习'],
+        learn: ['设计清晰的条件判断', '使用switch处理多分支逻辑', '掌握for循环的执行过程', '选择合适的循环结构', '解决基础流程控制问题']
+    },
+    'io-array': {
+        title: '输入输出与数组', icon: '📥', duration: '约 2.5 小时', level: '入门',
+        description: '学习更规范的数据输入输出方式，并从一维数组开始组织批量数据，为后续的字符串和算法学习做好准备。',
+        chapters: ['格式化输入输出', '一维数组的定义与访问', '数组遍历与统计', '二维数组与表格数据', '数组综合应用'],
+        learn: ['格式化输出和输入校验', '声明并初始化数组', '遍历数组完成数据统计', '处理二维表格数据', '使用数组解决实际问题']
+    },
+    functions: {
+        title: '函数与模块化编程', icon: '📦', duration: '约 2.5 小时', level: '进阶',
+        description: '通过函数拆分复杂任务，理解参数传递和返回值，逐步建立可复用、易维护的模块化编程习惯。',
+        chapters: ['函数声明与定义', '参数传递与返回值', '变量作用域与生命周期', '递归函数入门', '模块化程序设计'],
+        learn: ['设计函数接口', '理解值传递过程', '区分局部变量和全局变量', '分析简单递归问题', '拆分并组织多函数程序']
+    },
+    strings: {
+        title: '数组与字符串', icon: '📋', duration: '约 2.5 小时', level: '进阶',
+        description: '在数组基础上深入学习字符数组和字符串处理，掌握常见文本操作方法，提升批量数据处理能力。',
+        chapters: ['字符数组与字符串概念', '字符串输入与输出', '常用字符串处理函数', '多维数组与数据表', '字符串综合练习'],
+        learn: ['理解字符串结束标记', '安全读取字符串内容', '使用strlen和strcpy等函数', '组织二维数据', '完成文本处理小任务']
+    },
+    pointers: {
+        title: '指针与内存管理', icon: '🔧', duration: '约 3 小时', level: '进阶',
+        description: '从地址和指针的基本概念出发，逐步掌握指针运算、数组关系和动态内存分配，建立底层编程思维。',
+        chapters: ['地址与指针基础', '指针运算与数组', '指针作为函数参数', '动态内存分配', '指针综合应用与调试'],
+        learn: ['理解变量地址和解引用', '使用指针遍历数组', '通过指针修改函数外部数据', '正确申请和释放内存', '排查常见指针错误']
+    },
+    algorithms: {
+        title: '数据结构与算法', icon: '🌲', duration: '约 5 小时', level: '高级',
+        description: '从线性结构到树和排序算法，逐步训练数据组织、复杂度分析与问题拆解能力，夯实算法基础。',
+        chapters: ['复杂度与线性表', '栈、队列与应用', '链表的创建与操作', '树结构与遍历', '排序与查找算法'],
+        learn: ['分析算法时间复杂度', '实现栈和队列', '使用链表管理动态数据', '理解树的遍历方式', '比较常见排序和查找算法']
+    },
+    'file-io': {
+        title: '文件操作与IO', icon: '📁', duration: '约 1.5 小时', level: '高级',
+        description: '学习文件打开、读写、定位和关闭等操作，把程序中的数据保存到磁盘，完成可靠的数据持久化。',
+        chapters: ['文件指针与打开关闭', '文本文件读写', '二进制文件处理', '文件定位与错误处理', '持久化数据综合练习'],
+        learn: ['正确管理文件指针', '读写文本文件内容', '处理二进制数据', '判断文件操作错误', '设计简单数据存储格式']
+    },
+    project: {
+        title: '项目实战：学生管理系统', icon: '💻', duration: '约 4 小时', level: '高级',
+        description: '综合运用函数、结构体、文件和菜单交互，分阶段完成一个可运行的学生管理系统项目。',
+        chapters: ['需求分析与菜单设计', '结构体建模学生数据', '增删改查功能实现', '文件保存与加载', '项目测试与代码整理'],
+        learn: ['拆解真实项目需求', '使用结构体组织数据', '实现完整的增删改查', '保存并恢复项目数据', '进行功能测试和代码重构']
+    }
+};
+
 // ========== 工具函数 ==========
 function $(selector) {
     return document.querySelector(selector);
@@ -62,6 +119,7 @@ document.addEventListener('DOMContentLoaded', function () {
     checkLoginStatus();
     initOnlineTimeTracker();
     loadAchievements();
+    initCourseFeatures();
 
     // 如果是游戏页面，初始化游戏
     if (document.getElementById('gameCanvas')) {
@@ -1559,4 +1617,112 @@ function closeShop() {
 function updateHealthBar() {
     const pct = (player.health / player.maxHealth) * 100;
     document.getElementById('healthBar').style.width = pct + '%';
+}
+
+function getCourseFavorites() {
+    return getFromStorage('courseFavorites') || [];
+}
+
+function saveCourseFavorites(favorites) {
+    saveToStorage('courseFavorites', favorites);
+}
+
+function toggleCourseFavorite(courseId) {
+    const favorites = getCourseFavorites();
+    const index = favorites.indexOf(courseId);
+    if (index === -1) {
+        favorites.push(courseId);
+        showToast('已加入课程收藏', 'success');
+    } else {
+        favorites.splice(index, 1);
+        showToast('已取消课程收藏', 'info');
+    }
+    saveCourseFavorites(favorites);
+    renderCourseFavoriteButtons();
+    updateDetailFavoriteButton();
+    renderProfileFavorites();
+}
+
+function renderCourseFavoriteButtons() {
+    const favorites = getCourseFavorites();
+    $$('.course-favorite').forEach(function (button) {
+        const active = favorites.includes(button.dataset.courseId);
+        button.textContent = active ? '★' : '☆';
+        button.classList.toggle('active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+}
+
+function updateDetailFavoriteButton() {
+    const button = $('#detailFavoriteBtn');
+    if (!button) return;
+    const active = getCourseFavorites().includes(button.dataset.courseId);
+    button.textContent = active ? '★ 已收藏' : '☆ 加入收藏';
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-pressed', active ? 'true' : 'false');
+}
+
+function renderCourseDetail() {
+    const title = $('#detailTitle');
+    if (!title) return;
+    const params = new URLSearchParams(window.location.search);
+    const course = courseCatalog[params.get('course')] || courseCatalog.basics;
+    const detailId = params.get('course') || 'basics';
+    $('#detailBreadcrumb').textContent = course.title;
+    title.textContent = course.title;
+    $('#detailMeta').textContent = `${course.icon} ${course.level}课程 · ${course.chapters.length}章`;
+    $('#detailDuration').textContent = `⏱️ ${course.duration}`;
+    $('#detailDescription').textContent = course.description;
+    $('#detailFavoriteBtn').dataset.courseId = detailId;
+    $('#chapterList').innerHTML = course.chapters.map(function (chapter, index) {
+        const unlocked = index < 2;
+        return `<div class="chapter-item ${unlocked ? 'completed' : ''}">
+            <div class="chapter-title">${unlocked ? '✅' : '🔒'} 第${index + 1}章：${chapter}
+                <span class="chapter-status ${unlocked ? 'completed' : 'locked'}">${unlocked ? '可学习' : '未解锁'}</span>
+            </div>
+        </div>`;
+    }).join('');
+    $('#learningGoals').innerHTML = course.learn.map(function (item) {
+        return `<li>✓ ${item}</li>`;
+    }).join('');
+    updateDetailFavoriteButton();
+}
+
+function renderProfileFavorites() {
+    const list = $('#favoritesList');
+    if (!list) return;
+    const favorites = getCourseFavorites().map(function (id) {
+        return courseCatalog[id];
+    }).filter(Boolean);
+    const count = $('.favorites-count');
+    if (count) count.textContent = `${favorites.length} 项`;
+    list.classList.toggle('favorites-empty', favorites.length === 0);
+    list.innerHTML = favorites.length
+        ? favorites.map(function (course) {
+            const id = Object.keys(courseCatalog).find(key => courseCatalog[key] === course);
+            return `<a class="favorite-course-item" href="detail.html?course=${id}">
+                <span class="favorite-course-icon">${course.icon}</span>
+                <span><strong>${course.title}</strong><small>${course.level} · ${course.chapters.length}章</small></span>
+                <span class="favorite-course-star">★</span>
+            </a>`;
+        }).join('')
+        : '<div class="favorites-empty-icon">☆</div><p>暂时还没有收藏课程</p>';
+}
+
+function initCourseFeatures() {
+    $$('.course-favorite').forEach(function (button) {
+        button.addEventListener('click', function () {
+            toggleCourseFavorite(button.dataset.courseId);
+        });
+    });
+    const detailButton = $('#detailFavoriteBtn');
+    if (detailButton) {
+        detailButton.addEventListener('click', function () {
+            toggleCourseFavorite(detailButton.dataset.courseId);
+        });
+        renderCourseDetail();
+    }
+    renderCourseFavoriteButtons();
+    updateDetailFavoriteButton();
+    renderProfileFavorites();
 }

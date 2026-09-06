@@ -31,11 +31,13 @@
 
     <section class="courses" style="padding-top: 140px;">
         <div class="container">
-            <h2 class="section-title">全部课程</h2>
+            <h2 class="section-title">课程中心</h2>
             <p class="section-subtitle">系统化学习路径，从入门到精通</p>
 
-            <div class="courses-grid">
-                <div class="course-card card" onclick="location.href='detail.html'">
+            <div class="course-level-section">
+                <h3 class="course-level-title">入门</h3>
+                <div class="courses-grid">
+                <div class="course-card card" onclick="location.href='detail.html?course=basics'">
                     <div class="course-cover">
                         <span class="course-level">入门</span>
                         📘
@@ -44,11 +46,11 @@
                     <p class="course-desc">从零开始学习C语言，掌握变量、数据类型、运算符、流程控制等核心基础知识</p>
                     <div class="course-meta">
                         <span>12 课时 · 3小时</span>
-                        <span>⭐ 4.9</span>
+                        <button class="course-favorite" data-course-id="basics" aria-label="收藏 C语言基础入门" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
+                <div class="course-card card" onclick="location.href='detail.html?course=control-flow'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">
                         <span class="course-level">入门</span>
                         🔄
@@ -57,11 +59,29 @@
                     <p class="course-desc">深入学习if-else、switch、for、while等控制语句，掌握程序逻辑控制</p>
                     <div class="course-meta">
                         <span>8 课时 · 2小时</span>
-                        <span>⭐ 4.8</span>
+                        <button class="course-favorite" data-course-id="control-flow" aria-label="收藏 循环与分支结构" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
+                <div class="course-card card" onclick="location.href='detail.html?course=io-array'">
+                    <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #00cec9);">
+                        <span class="course-level">入门</span>
+                        📥
+                    </div>
+                    <h3>输入输出与数组</h3>
+                    <p class="course-desc">掌握printf、scanf和数组的基本用法，学会处理一组相关数据</p>
+                    <div class="course-meta">
+                        <span>9 课时 · 2.5小时</span>
+                        <button class="course-favorite" data-course-id="io-array" aria-label="收藏 输入输出与数组" onclick="event.stopPropagation()">☆</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="course-level-section">
+                <h3 class="course-level-title">进阶</h3>
+                <div class="courses-grid">
+                <div class="course-card card" onclick="location.href='detail.html?course=functions'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
                         <span class="course-level">进阶</span>
                         📦
@@ -70,24 +90,11 @@
                     <p class="course-desc">学习函数定义与调用、参数传递、递归调用，掌握模块化编程思想</p>
                     <div class="course-meta">
                         <span>10 课时 · 2.5小时</span>
-                        <span>⭐ 4.7</span>
+                        <button class="course-favorite" data-course-id="functions" aria-label="收藏 函数与模块化编程" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">
-                        <span class="course-level">进阶</span>
-                        🔧
-                    </div>
-                    <h3>指针与内存管理</h3>
-                    <p class="course-desc">深入理解指针概念，掌握动态内存分配，写出更高效的C语言代码</p>
-                    <div class="course-meta">
-                        <span>8 课时 · 3小时</span>
-                        <span>⭐ 4.8</span>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html'">
+                <div class="course-card card" onclick="location.href='detail.html?course=strings'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #00cec9);">
                         <span class="course-level">进阶</span>
                         📋
@@ -96,24 +103,29 @@
                     <p class="course-desc">一维数组、二维数组、字符数组与字符串处理，掌握批量数据处理</p>
                     <div class="course-meta">
                         <span>9 课时 · 2.5小时</span>
-                        <span>⭐ 4.6</span>
+                        <button class="course-favorite" data-course-id="strings" aria-label="收藏 数组与字符串" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">
-                        <span class="course-level">高级</span>
-                        🏗️
+                <div class="course-card card" onclick="location.href='detail.html?course=pointers'">
+                    <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">
+                        <span class="course-level">进阶</span>
+                        🔧
                     </div>
-                    <h3>结构体与共用体</h3>
-                    <p class="course-desc">自定义数据类型，结构体、枚举、共用体，构建复杂数据模型</p>
+                    <h3>指针与内存管理</h3>
+                    <p class="course-desc">深入理解指针概念，掌握动态内存分配，写出更高效的C语言代码</p>
                     <div class="course-meta">
-                        <span>7 课时 · 2小时</span>
-                        <span>⭐ 4.7</span>
+                        <span>8 课时 · 3小时</span>
+                        <button class="course-favorite" data-course-id="pointers" aria-label="收藏 指针与内存管理" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
+                </div>
+            </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
+            <div class="course-level-section">
+                <h3 class="course-level-title">高级</h3>
+                <div class="courses-grid">
+                <div class="course-card card" onclick="location.href='detail.html?course=algorithms'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
                         <span class="course-level">高级</span>
                         🌲
@@ -122,11 +134,11 @@
                     <p class="course-desc">链表、栈、队列、树、排序算法，夯实计算机科学核心基础</p>
                     <div class="course-meta">
                         <span>15 课时 · 5小时</span>
-                        <span>⭐ 4.9</span>
+                        <button class="course-favorite" data-course-id="algorithms" aria-label="收藏 数据结构与算法" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
+                <div class="course-card card" onclick="location.href='detail.html?course=file-io'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #fd79a8, #e84393);">
                         <span class="course-level">高级</span>
                         📁
@@ -135,11 +147,11 @@
                     <p class="course-desc">文件读写、缓冲IO、目录操作，掌握数据持久化存储技术</p>
                     <div class="course-meta">
                         <span>6 课时 · 1.5小时</span>
-                        <span>⭐ 4.5</span>
+                        <button class="course-favorite" data-course-id="file-io" aria-label="收藏 文件操作与IO" onclick="event.stopPropagation()">☆</button>
                     </div>
                 </div>
 
-                <div class="course-card card" onclick="location.href='detail.html'">
+                <div class="course-card card" onclick="location.href='detail.html?course=project'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #55efc4);">
                         <span class="course-level">实战</span>
                         💻
@@ -148,8 +160,9 @@
                     <p class="course-desc">综合运用所学知识，开发完整的C语言项目，提升实战能力</p>
                     <div class="course-meta">
                         <span>10 课时 · 4小时</span>
-                        <span>⭐ 4.9</span>
+                        <button class="course-favorite" data-course-id="project" aria-label="收藏 项目实战：学生管理系统" onclick="event.stopPropagation()">☆</button>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
