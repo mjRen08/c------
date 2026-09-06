@@ -643,6 +643,12 @@ function evaluateAchievements() {
     if (completedLessons > 0) {
         unlockAchievement('first_course');
     }
+    if ((user.level || 1) >= 5) {
+        unlockAchievement('level_5');
+    }
+    if ((user.level || 1) >= 10) {
+        unlockAchievement('level_10');
+    }
     if (['basics', 'control-flow', 'io-array'].every(function (id) {
         return completedCourses.indexOf(id) !== -1;
     })) {
@@ -680,12 +686,10 @@ function addExp(amount) {
         user.exp -= expNeeded;
         user.level++;
         showToast(`🎉 升级了！当前等级：${user.level}`, 'success');
-
-        if (user.level >= 5) unlockAchievement('level_5');
-        if (user.level >= 10) unlockAchievement('level_10');
     }
 
     saveUserData(user);
+    evaluateAchievements();
 }
 
 // ========== Toast提示 ==========
