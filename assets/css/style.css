@@ -496,6 +496,15 @@
     box-shadow: var(--shadow-glow);
 }
 
+.achievement-item.unlocked h4,
+.achievement-item.unlocked p {
+    color: var(--primary);
+}
+
+.achievement-item.unlocked {
+    border-color: var(--primary);
+}
+
 .achievement-item.locked .achievement-icon {
     opacity: 0.4;
     filter: grayscale(1);
