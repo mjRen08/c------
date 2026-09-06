@@ -685,25 +685,118 @@ function loadProfileData() {
         }).join('')
         : '<span class="empty-state">暂无已解锁成就</span>';
 
-    // 学习进度
-    const courses = [
-        { name: 'C语言基础入门', progress: 75, icon: '📘' },
-        { name: '指针与内存管理', progress: 30, icon: '🔧' },
-        { name: '数据结构与算法', progress: 10, icon: '🌲' }
-    ];
+    const courses = getProfileCourses();
+    const completedCourses = user.completedCourses || [];
+    const completedCourseCount = completedCourses.length;
+    const overallProgress = Math.round((completedCourseCount / courses.length) * 100);
 
-    $('#learningList').innerHTML = courses.map(c => `
-        <div class="learning-item">
-            <div class="learning-icon">${c.icon}</div>
+    $('#courseProgressSummary').textContent = `已完成 ${completedCourseCount}/${courses.length} 门课程 · ${overallProgress}%`;
+    $('#courseOverallProgress').style.width = `${overallProgress}%`;
+    $('#learningList').innerHTML = courses.map(function (course) {
+        const progress = getCourseProgress(course, user);
+        return `<div class="learning-item" data-course-id="${course.id}" role="button" tabindex="0">
+            <div class="learning-icon">${course.icon}</div>
             <div class="learning-info">
-                <h4>${c.name}</h4>
-                <div class="progress-text">进度: ${c.progress}%</div>
+                <h4>${course.name}</h4>
+                <div class="progress-text">进度: ${progress}%</div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${c.progress}%"></div>
+                    <div class="progress-fill" style="width: ${progress}%"></div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
+
+    const learningList = $('#learningList');
+    const branchList = $('#courseBranchList');
+    function showCourseBranches(courseId) {
+        const course = courses.find(function (item) {
+            return item.id === courseId;
+        });
+        if (!course) return;
+
+        if (course.branches) {
+            const completedLessons = user.courseLessons && user.courseLessons[course.id] || [];
+            branchList.innerHTML = `<div class="course-branch-panel">
+                <h4>${course.name} · 课程分支</h4>
+                <div class="course-branch-items">${course.branches.map(function (branch, index) {
+                    const isCompleted = completedLessons.indexOf(index) !== -1;
+                    return `<div class="course-branch-item ${isCompleted ? 'completed' : ''}">
+                        <span>${isCompleted ? '✅' : '▶️'} ${branch}</span>
+                        <button type="button" data-lesson-index="${index}" data-course-id="${course.id}">${isCompleted ? '已完成' : '完成本节'}</button>
+                    </div>`;
+                }).join('')}</div>
+            </div>`;
+        } else {
+            branchList.innerHTML = `<div class="course-branch-panel">
+                <h4>${course.name} · 课程分支</h4>
+                <p class="course-branch-placeholder">课程分支正在制作中，后续将在这里显示。</p>
+            </div>`;
+        }
+    }
+
+    learningList.onclick = function (event) {
+        const item = event.target.closest('.learning-item');
+        if (item) showCourseBranches(item.getAttribute('data-course-id'));
+    };
+    learningList.onkeydown = function (event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            const item = event.target.closest('.learning-item');
+            if (item) {
+                event.preventDefault();
+                showCourseBranches(item.getAttribute('data-course-id'));
+            }
+        }
+    };
+    branchList.onclick = function (event) {
+        const button = event.target.closest('button[data-lesson-index]');
+        if (!button) return;
+
+        const courseId = button.getAttribute('data-course-id');
+        const lessonIndex = Number(button.getAttribute('data-lesson-index'));
+        user.courseLessons = user.courseLessons || {};
+        user.courseLessons[courseId] = user.courseLessons[courseId] || [];
+        if (user.courseLessons[courseId].indexOf(lessonIndex) === -1) {
+            user.courseLessons[courseId].push(lessonIndex);
+        }
+
+        const course = courses.find(function (item) {
+            return item.id === courseId;
+        });
+        if (course.branches.length === user.courseLessons[courseId].length && completedCourses.indexOf(courseId) === -1) {
+            completedCourses.push(courseId);
+        }
+        user.completedCourses = completedCourses;
+        saveToStorage('currentUser', user);
+        const users = getFromStorage('users') || [];
+        const userIndex = users.findIndex(function (item) { return item.username === user.username; });
+        if (userIndex !== -1) {
+            users[userIndex] = user;
+            saveToStorage('users', users);
+        }
+        loadProfileData();
+        showCourseBranches(courseId);
+    };
+}
+
+function getProfileCourses() {
+    return [
+        { id: 'c-basics', name: 'C语言基础入门', icon: '📘', branches: ['第1章：C语言概述', '第2章：开发环境搭建', '第3章：变量与数据类型', '第4章：运算符与表达式', '第5章：输入与输出', '第6章：选择结构', '第7章：循环结构', '第8章：综合练习'] },
+        { id: 'c-control', name: '循环与分支结构', icon: '🔄' },
+        { id: 'c-functions', name: '函数与模块化编程', icon: '📦' },
+        { id: 'c-pointers', name: '指针与内存管理', icon: '🔧' },
+        { id: 'c-arrays', name: '数组与字符串', icon: '📋' },
+        { id: 'c-structs', name: '结构体与共用体', icon: '🏗️' },
+        { id: 'c-algorithms', name: '数据结构与算法', icon: '🌲' },
+        { id: 'c-files', name: '文件操作与IO', icon: '📁' },
+        { id: 'c-project', name: '项目实战：学生管理系统', icon: '💻' }
+    ];
+}
+
+function getCourseProgress(course, user) {
+    if (user.completedCourses && user.completedCourses.indexOf(course.id) !== -1) return 100;
+    if (!course.branches) return 0;
+    const completedLessons = user.courseLessons && user.courseLessons[course.id] || [];
+    return Math.round((completedLessons.length / course.branches.length) * 100);
 }
 
 // ==================================================

@@ -60,10 +60,20 @@
 
             <div class="profile-sections">
                 <div class="profile-section">
-                    <h3>📚 正在学习</h3>
-                    <div id="learningList">
-                        <!-- JS动态渲染 -->
+                    <div class="learning-heading">
+                        <div>
+                            <h3>📚 全部课程</h3>
+                            <p class="learning-summary" id="courseProgressSummary">已完成 0/9 门课程 · 0%</p>
+                        </div>
+                        <div class="course-overall-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="courseOverallProgress" style="width: 0%"></div>
+                            </div>
+                        </div>
                     </div>
+                    <div id="learningList" class="learning-list-scroll">
+                    </div>
+                    <div id="courseBranchList" class="course-branch-list"></div>
                 </div>
 
                 <div>
@@ -103,7 +113,7 @@
     <footer class="footer">
         <div class="container">
             <div class="footer-bottom">
-                <p>© 2024 C-Learn 编程学院. All rights reserved.</p>
+                <p>© 2026 CodeMaster. All rights reserved.</p>
             </div>
         </div>
     </footer>
