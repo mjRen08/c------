@@ -414,7 +414,7 @@ function updateUserUI(user) {
 }
 
 // ========== 小测系统 ==========
-const quizData = [
+let quizData = [
     {
         question: '以下哪个是C语言的正确主函数入口？',
         code: null,
