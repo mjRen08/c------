@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initNavigation();
     initQuiz();
     checkLoginStatus();
+    initOnlineTimeTracker();
     loadAchievements();
 
     // 如果是游戏页面，初始化游戏
@@ -212,6 +213,71 @@ function checkLoginStatus() {
         AppState.currentUser = user;
         updateUserUI(user);
     }
+}
+
+function formatOnlineTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours > 0) {
+        return `${hours} 小时 ${remainingMinutes} 分钟`;
+    }
+    return `${minutes} 分钟`;
+}
+
+function updateOnlineTimeDisplay(seconds) {
+    const onlineTime = $('#onlineTime');
+    if (onlineTime) {
+        onlineTime.textContent = formatOnlineTime(seconds);
+    }
+}
+
+function initOnlineTimeTracker() {
+    const user = getFromStorage('currentUser');
+    if (!user) return;
+
+    let totalSeconds = user.onlineSeconds || 0;
+    let activeSince = document.hidden ? null : Date.now();
+
+    function saveOnlineTime() {
+        if (activeSince === null) return;
+
+        const elapsedSeconds = Math.floor((Date.now() - activeSince) / 1000);
+        if (elapsedSeconds < 1) return;
+
+        totalSeconds += elapsedSeconds;
+        activeSince += elapsedSeconds * 1000;
+        user.onlineSeconds = totalSeconds;
+        saveToStorage('currentUser', user);
+
+        const users = getFromStorage('users') || [];
+        const userIndex = users.findIndex(function (item) {
+            return item.username === user.username;
+        });
+        if (userIndex !== -1) {
+            users[userIndex] = user;
+            saveToStorage('users', users);
+        }
+        updateOnlineTimeDisplay(totalSeconds);
+    }
+
+    updateOnlineTimeDisplay(totalSeconds);
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            saveOnlineTime();
+            activeSince = null;
+        } else {
+            activeSince = Date.now();
+        }
+    });
+    window.addEventListener('pagehide', saveOnlineTime);
+    window.setInterval(function () {
+        saveOnlineTime();
+        if (activeSince !== null) {
+            updateOnlineTimeDisplay(totalSeconds + Math.floor((Date.now() - activeSince) / 1000));
+        }
+    }, 1000);
 }
 
 function updateUserUI(user) {
@@ -546,6 +612,20 @@ function loadProfileData() {
     $('#profileUsername').textContent = user.username;
     $('#profileLevel').textContent = `Lv.${user.level}`;
     $('#profileExp').textContent = `经验: ${user.exp || 0} / ${user.level * 200}`;
+    const unlockedAchievements = (user.achievements || []).map(function (id) {
+        return achievementList.find(function (achievement) {
+            return achievement.id === id;
+        });
+    }).filter(Boolean);
+    $('#profileAchievementCount').textContent = unlockedAchievements.length;
+    $('#achievementList').innerHTML = unlockedAchievements.length
+        ? unlockedAchievements.map(function (achievement) {
+            return `<div class="profile-achievement-item" title="${achievement.desc}">
+                <div class="achievement-icon">${achievement.icon}</div>
+                <span>${achievement.name}</span>
+            </div>`;
+        }).join('')
+        : '<span class="empty-state">暂无已解锁成就</span>';
 
     // 学习进度
     const courses = [

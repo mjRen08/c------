@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人中心 - C语言编程学院</title>
+    <title>个人中心 - Code master</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -11,8 +11,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span>C-Learn</span>
+                <div class="logo-icon">CM</div>
+                <span>Code master</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
@@ -20,6 +20,7 @@
                 <li><a href="quiz.html">在线小测</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html" class="active">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
             </ul>
             <div class="nav-actions">
                 <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
@@ -46,7 +47,7 @@
                             <div class="label">完成课时</div>
                         </div>
                         <div class="profile-stat">
-                            <div class="num">5</div>
+                            <div class="num" id="profileAchievementCount">0</div>
                             <div class="label">获得成就</div>
                         </div>
                         <div class="profile-stat">
@@ -68,45 +69,34 @@
                 <div>
                     <div class="profile-section card" style="margin-bottom: 24px;">
                         <h3>🏆 最新成就</h3>
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <div style="text-align: center;">
-                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px;">🚀</div>
-                                <span style="font-size: 11px; color: var(--text-muted);">初来乍到</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px;">📚</div>
-                                <span style="font-size: 11px; color: var(--text-muted);">学习入门</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 20px; margin: 0 auto 4px; opacity: 0.4;">🏆</div>
-                                <span style="font-size: 11px; color: var(--text-muted);">答题达人</span>
-                            </div>
-                        </div>
+                        <div id="achievementList" class="profile-achievement-grid"></div>
                     </div>
 
                     <div class="profile-section card">
                         <h3>📊 学习数据</h3>
                         <div style="color: var(--text-secondary); font-size: 14px; line-height: 2.2;">
                             <div style="display: flex; justify-content: space-between;">
-                                <span>累计学习时长</span>
-                                <span style="color: var(--primary); font-weight: 600;">12.5 小时</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>连续学习</span>
-                                <span style="color: var(--success); font-weight: 600;">7 天</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>完成习题</span>
-                                <span style="color: var(--warning); font-weight: 600;">86 道</span>
-                            </div>
-                            <div style="display: flex; justify-content: space-between;">
-                                <span>代码行数</span>
-                                <span style="color: var(--accent); font-weight: 600;">1,240 行</span>
+                                <span>累计在线时长</span>
+                                <span id="onlineTime" style="color: var(--primary); font-weight: 600;">0 分钟</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <section class="profile-section card favorites-section" aria-labelledby="favoritesTitle">
+                <div class="favorites-header">
+                    <div>
+                        <h3 id="favoritesTitle">⭐ 我的收藏夹</h3>
+                        <p class="favorites-description">收藏的在线小测和学习内容会显示在这里</p>
+                    </div>
+                    <span class="favorites-count">0 项</span>
+                </div>
+                <div class="favorites-empty" id="favoritesList">
+                    <div class="favorites-empty-icon">☆</div>
+                    <p>暂时还没有收藏内容</p>
+                </div>
+            </section>
         </div>
     </section>
 
