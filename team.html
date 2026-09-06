@@ -6,24 +6,180 @@
     <title>制作团队 - C语言编程学院</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ========== 团队抽卡组件局部样式（不污染全局） ========== */
+        .team-card-area {
+            position: relative;
+            width: 820px;
+            height: 420px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            cursor: default;
+        }
+
+        .team-card-stack {
+            position: relative;
+            width: 520px;
+            height: 320px;
+            transition: transform .45s cubic-bezier(0.34,1.56,0.64,1);
+        }
+
+        /* 卡牌区域局部网格背景，不修改页面body */
+        .team-card-stack::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .team-card {
+            position: absolute;
+            width: 300px;
+            height: 400px;
+            background: #0f172a;
+            border: 3px solid var(--card-color); /* 加粗边框 */
+            border-radius: 14px;
+            cursor: pointer;
+            transition:
+                transform .45s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow .3s,
+                left .45s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 4px 12px rgba(0,0,0,.4);
+            user-select: none;
+            overflow: hidden;
+            color:#fff;
+        }
+
+        .team-card-0 { left: 0;   z-index: 1; }
+        .team-card-1 { left: 40px; z-index: 2; }
+        .team-card-2 { left: 80px; z-index: 3; }
+        .team-card-3 { left: 120px; z-index: 4; }
+        .team-card-4 { left: 160px; z-index: 5; }
+
+        /* 卡片内部左侧竖排名字，颜色取自卡片变量 */
+        .team-card-name {
+            position: absolute;
+            left:16px;
+            top: 50%;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing:5px;
+            font-size:19px;
+            color:var(--card-color);
+            text-shadow: 0 0 8px var(--card-color);
+            z-index:2;
+            transition: opacity 0.45s ease;
+            pointer-events:none;
+        }
+
+        /* 成员详情面板，默认透明 */
+        .team-card-detail {
+            width:100%;
+            height:100%;
+            padding:28px 20px 28px 68px;
+            text-align:center;
+            opacity:0;
+            transition: opacity 0.6s ease;
+            pointer-events:none;
+        }
+
+        .team-avatar {
+            width:76px;
+            height:76px;
+            margin:0 auto 14px;
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:30px;
+            font-weight:700;
+        }
+
+        .team-card-detail h4 {
+            font-size:18px;
+            margin-bottom:4px;
+        }
+        .team-card-detail .role {
+            color:#22d3ee;
+            font-size:13px;
+            margin-bottom:12px;
+        }
+        .team-card-detail .desc {
+            color:#cbd5e1;
+            font-size: 10px;
+            line-height:1.6;
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px) translateX(3px);
+            box-shadow:
+                0 12px 24px rgba(0,0,0,.5),
+                0 0 0 4px var(--card-color); /* hover外发光同步加粗 */
+        }
+
+        /* 抽中放大状态：保留卡片自身颜色，不再强制金色 */
+        .team-card.picked {
+            left:600px !important;
+            top:50% !important;
+            transform: translateY(-50%) scale(2.1) !important;
+            z-index:999;
+            box-shadow:
+                0 20px 60px rgba(0,0,0,.6),
+                0 0 30px var(--card-color); /* 光晕使用卡片自身颜色 */
+        }
+        .team-card.picked .team-card-name {
+            opacity:0;
+        }
+        .team-card.picked .team-card-detail {
+    opacity: 1;
+    padding-left: 20px;
+    transform: translateX(8px);
+}
+
+
+        .team-card-area:has(.picked) .team-card-stack {
+            transform: translateX(-80px);
+        }
+
+        .team-tip-text {
+            text-align:center;
+            margin-top:12px;
+            font-size:17px;
+            color:var(--text-secondary);
+            min-height:40px;
+        }
+        .team-tip-text strong {
+            color:#fbbf24;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <div class="logo-icon">Cm</div>
-                <span>CodeMaster</span>
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
                 <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html">个人中心</a></li>
                 <li><a href="team.html" class="active">制作团队</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
-                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
+                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
+                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
+                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
             </div>
         </div>
     </nav>
@@ -46,73 +202,94 @@
             </div>
 
             <h3 style="text-align: center; font-size: 24px; margin-bottom: 40px; color: var(--text-primary);">团队成员</h3>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; max-width: 1000px; margin: 0 auto;">
-                <!-- 成员1 -->
-                <div class="card" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #00d4ff, #7b2cbf); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
-                        张
-                    </div>
-                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">张明宇</h4>
-                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">队长 / 全栈开发</p>
-                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-                        北京理工大学计算机学院<br>
-                        负责项目架构设计与核心功能开发
-                    </p>
-                </div>
 
-                <!-- 成员2 -->
-                <div class="card" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #feca57); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
-                        李
+            <!-- ========== 抽卡交互组件开始 ========== -->
+            <div class="team-card-area" id="teamCardArea">
+                <div class="team-card-stack">
+                    <!-- 张天艺：青蓝色 -->
+                    <div class="team-card team-card-0" data-name="张天艺" style="--card-color:#22d3ee;">
+                        <div class="team-card-name">张天艺</div>
+                        <div class="team-card-detail">
+                            <div class="team-avatar" style="background: linear-gradient(135deg, #00d4ff, #7b2cbf);">张</div>
+                            <h4>张天艺&emsp;</h4>
+                            <p class="role">队长/项目经理/技术总监/程序员&emsp;</p>
+                            <p class="desc" style="text-align: left">
+                                &emsp;&emsp;作为整个小组的负责人，全程把控项目推进节奏，规划每个阶段的开发任务，组织小组交流讨论。
+                                同时制定统一的代码编写规范，审核组员完成的代码，攻克开发中的技术难题。
+                                主要负责网站首页、在线测验以及趣味小游戏等难度较高的核心页面开发。
+                                平时爱好FPS游戏、篮球和魂类游戏，长期游玩锻炼了大局意识与抗压能力。
+                                遇到代码bug或者项目进度受阻时，会积极寻找解决办法，合理分配任务，
+                                带领团队稳步完成整个C语言教学网站的开发工作。同时制定统一的代码编写规范，
+                                审核组员完成的代码，攻克开发中的技术难题。
+                            </p>
+                        </div>
                     </div>
-                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">李思涵</h4>
-                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">前端开发 / UI设计</p>
-                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-                        北京理工大学设计与艺术学院<br>
-                        负责界面设计与交互体验优化
-                    </p>
-                </div>
-
-                <!-- 成员3 -->
-                <div class="card" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #00b894, #55efc4); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
-                        王
+                    <!-- 任明捷：玫瑰红 -->
+                    <div class="team-card team-card-1" data-name="任明捷" style="--card-color:#fb7185;">
+                        <div class="team-card-name">任明捷</div>
+                        <div class="team-card-detail">
+                            <div class="team-avatar" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">李</div>
+                            <h4>任明捷&emsp;</h4>
+                            <p class="role">程序员/测试员&emsp;</p>
+                            <p class="desc" style="text-align: left">
+                                &emsp;&emsp;在团队中承担开发与测试两项工作，主要完成知识点列表、教程详情、团队介绍页面的搭建，
+                                编写HTML结构和CSS样式，调整页面布局，优化基础展示效果。页面开发完成之后参与网站测试，
+                                逐一浏览各个板块，记录布局错乱、交互异常等各类问题并及时反馈修改。课余时间喜欢打乒乓球和篮球，
+                                团体运动让我十分看重团队协作。写代码时注重整洁规范，遇到页面显示问题会反复调试，主动和组员沟通想法，
+                                认真做好分配的开发和测试工作。
+                            </p>
+                        </div>
                     </div>
-                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">王浩然</h4>
-                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">游戏开发 / 算法</p>
-                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-                        北京理工大学计算机学院<br>
-                        负责编程游戏引擎与答题系统
-                    </p>
-                </div>
-
-                <!-- 成员4 -->
-                <div class="card" style="text-align: center;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #a29bfe, #6c5ce7); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
-                        陈
+                    <!-- 郑铭超：翠绿色 -->
+                    <div class="team-card team-card-2" data-name="郑铭超" style="--card-color:#34d399;">
+                        <div class="team-card-name">郑铭超</div>
+                        <div class="team-card-detail">
+                            <div class="team-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">王</div>
+                            <h4>郑铭超&emsp;</h4>
+                            <p class="role">程序员/测试员&emsp;</p>
+                            <p class="desc" style="text-align: left">
+                                &emsp;&emsp;负责登录、注册、个人主页模块的代码开发，利用JavaScript实现表单输入校验、信息弹窗等交互功能。
+                                网站大体完工后开展多浏览器兼容性测试，仔细体验每一项交互效果，不放过细微漏洞，整理完整Bug清单，配合开发人员修复缺陷。
+                                闲暇时喜欢游玩Celeste和各类FPS游戏，养成了细心、有耐心的做事风格。排查问题时善于多角度寻找故障原因，
+                                积极和团队交流，持续优化网站的稳定性与使用体验。
+                            </p>
+                        </div>
                     </div>
-                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">陈晓彤</h4>
-                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">课程内容策划</p>
-                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-                        北京理工大学信息与电子学院<br>
-                        负责课程体系设计与题库建设
-                    </p>
-                </div>
-
-                <!-- 成员5 -->
-                <div class="card" style="text-align: center; margin: 0 auto;">
-                    <div style="width: 80px; height: 80px; margin: 0 auto 16px; border-radius: 50%; background: linear-gradient(135deg, #fd79a8, #e84393); display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: 700;">
-                        刘
+                    <!-- 李宜忱：淡紫色 -->
+                    <div class="team-card team-card-3" data-name="李宜忱" style="--card-color:#a78bfa;">
+                        <div class="team-card-name">李宜忱</div>
+                        <div class="team-card-detail">
+                            <div class="team-avatar" style="background: linear-gradient(135deg, #a29bfe, #6c5ce7);">陈</div>
+                            <h4>李宜忱&emsp;</h4>
+                            <p class="role">UI设计/CIO&emsp;</p>
+                            <p class="desc" style="text-align: left">
+                                &emsp;&emsp;主要工作是网站视觉设计，确定整套页面的配色风格，挑选合适的图片素材，不断调整页面布局与细节，
+                                提升网站美观度。项目进入收尾阶段后，汇总全部源代码、网页截图，整理各类交付材料，
+                                完成文档配图与排版，并且负责最终作业提交。日常爱好乒乓球与篮球，运动经历让他习惯站在使用者的角度设计界面。
+                                虽然不负责大量代码编写，但专注优化视觉感受，配合其他成员完善网站，整理全套交付资料。
+                            </p>
+                        </div>
                     </div>
-                    <h4 style="font-size: 18px; margin-bottom: 4px; color: var(--text-primary);">刘子阳</h4>
-                    <p style="color: var(--primary); font-size: 13px; margin-bottom: 12px;">剧情策划 / 测试</p>
-                    <p style="color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
-                        北京理工大学人文与社会科学学院<br>
-                        负责游戏世界观剧情与产品测试
-                    </p>
+                    <!-- 严浩然：琥珀黄 -->
+                    <div class="team-card team-card-4" data-name="严浩然" style="--card-color:#fbbf24;">
+                        <div class="team-card-name">严浩然</div>
+                        <div class="team-card-detail">
+                            <div class="team-avatar" style="background: linear-gradient(135deg, #fd79a8, #e84393);">刘</div>
+                            <h4>严浩然&emsp;</h4>
+                            <p class="role">文档编辑/网页编辑&emsp;</p>
+                            <p class="desc" style="text-align: left">
+                                &emsp;&emsp;主要负责项目文档的撰写、修改和校对，同时收集整理C语言教学资料，搜集课程知识点与配套练习题，
+                                录入到网站当中，仔细审核网页全部文字内容，修正语句错误，保证文案通顺易懂。
+                                业余爱好打篮球和CS，组队游戏的经历让我懂得沟通配合的重要性。相比代码开发，
+                                更擅长文字整理与素材归档，踏实完成文案校对、资料汇总等任务，不断完善网站教学内容，
+                                为项目交付做好文字方面的保障。
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div class="team-tip-text" id="teamTip">点击卡牌查看团队成员详情</div>
+            <!-- ========== 抽卡交互组件结束 ========== -->
 
             <div class="card" style="max-width: 800px; margin: 60px auto 0; padding: 32px; text-align: center;">
                 <h3 style="font-size: 20px; margin-bottom: 16px; color: var(--text-primary);">联系我们</h3>
@@ -131,6 +308,33 @@
         </div>
     </footer>
 
+    <script>
+        /* 团队抽卡交互脚本 */
+        const teamCards = document.querySelectorAll(".team-card");
+        const teamCardArea = document.getElementById("teamCardArea");
+        const teamTip = document.getElementById("teamTip");
+
+        teamCards.forEach(card => {
+            card.addEventListener("click", function (e) {
+                e.stopPropagation();
+                if(this.classList.contains("picked")){
+                    //收回卡牌
+                    teamCards.forEach(c => c.classList.remove("picked"));
+                    teamTip.textContent = "点击卡牌查看团队成员详情";
+                }else{
+                    //抽选卡牌
+                    teamCards.forEach(c => c.classList.remove("picked"));
+                    this.classList.add("picked");
+                    teamTip.innerHTML = `查看成员！选中：<strong>${this.dataset.name}</strong>，点击卡牌收回`;
+                }
+            })
+        })
+        //点击空白区域收回
+        teamCardArea.addEventListener("click", function (){
+            teamCards.forEach(c => c.classList.remove("picked"));
+            teamTip.textContent = "点击卡牌查看团队成员详情";
+        })
+    </script>
     <script src="assets/js/main.js"></script>
 </body>
 </html>

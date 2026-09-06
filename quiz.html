@@ -6,13 +6,143 @@
     <title>在线小测 - C语言编程学院</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Microsoft Yahei",sans-serif;
+}
+body{
+    padding:0;
+    min-height:100vh;
+    /* 让页面纵向排列：导航 + 主体内容 + footer */
+    display:flex;
+    flex-direction:column;
+}
+
+#home-page{
+    display:block;
+    /* 占满剩余高度，用来垂直居中专题列表 */
+    flex: 1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.wrap{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    /* =========删除原来的absolute定位！========= */
+    /* position: absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%); */
+}
+
+.item{
+    position:relative;
+    width:280px;
+    height:52px;
+    background:linear-gradient(135deg, rgba(30,40,70,0.95), rgba(20,30,60,0.95));
+    border:1px solid rgba(100,210,255,0.6);
+    border-radius:26px;
+    box-shadow:
+        0 0 12px rgba(0,0,0,0.35),
+        inset 0 0 18px rgba(100,210,255,0.08);
+    cursor:pointer;
+    transition: all 0.32s ease;
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    overflow:visible;
+}
+
+.item:hover{
+    width:420px;
+    transform: translateX(-80px);
+    border-color:rgba(100,210,255,0.9);
+    background:linear-gradient(135deg, rgba(45,60,100,0.98), rgba(30,45,90,0.98));
+    box-shadow:
+        0 0 18px rgba(100,210,255,0.55),
+        inset 0 0 22px rgba(100,210,255,0.12);
+}
+
+.item.active{
+    width:420px;
+    transform: translateX(-80px);
+    border-color:#64d2ff;
+    background:linear-gradient(135deg, rgba(50,70,120,1), rgba(35,55,110,1));
+    box-shadow:
+        0 0 22px rgba(100,210,255,0.7),
+        inset 0 0 24px rgba(100,210,255,0.18);
+}
+
+.item-text{
+    font-size:16px;
+    color:#eaf6ff;
+    white-space:nowrap;
+    letter-spacing:0.5px;
+    text-shadow:0 0 8px rgba(100,210,255,0.45);
+}
+
+.dot-box{
+    position:absolute;
+    right:18px;
+    display:flex;
+    gap:14px;
+    opacity:0;
+    visibility:hidden;
+    transition:0.25s ease;
+}
+
+.item:hover .dot-box,
+.item.active .dot-box{
+    opacity:1;
+    visibility:visible;
+}
+
+.dot-box a{
+    display:flex;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #7be4ff, #36a2eb);
+    color:#08111f;
+    text-decoration:none;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:600;
+    transition:0.2s;
+    box-shadow:
+        0 0 12px rgba(100,210,255,0.65),
+        inset 0 0 10px rgba(255,255,255,0.35);
+}
+
+.dot-box a.done{
+    background:radial-gradient(circle at 35% 35%, #69ff9a, #27ae60);
+    color:#0f2f1a;
+    box-shadow:
+        0 0 12px rgba(39,174,96,0.65),
+        inset 0 0 10px rgba(255,255,255,0.35);
+}
+
+.dot-box a:hover{
+    transform:scale(1.15);
+    box-shadow:
+        0 0 16px rgba(100,210,255,0.9),
+        inset 0 0 12px rgba(255,255,255,0.45);
+}
+    </style>
 </head>
 <body>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <div class="logo-icon">Cm</div>
-                <span>CodeMaster</span>
+                <div class="logo-icon">{ }</div>
+                <span>C-Learn</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
@@ -20,47 +150,81 @@
                 <li><a href="quiz.html" class="active">在线小测</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
-                <li><a href="team.html">制作团队</a></li>
             </ul>
             <div class="nav-actions">
-                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
-                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
+                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
+                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
+                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
             </div>
         </div>
     </nav>
 
     <section class="quiz-page">
-        <div class="container quiz-container" id="quizContainer">
-            <div class="quiz-header">
-                <h2>C语言基础小测</h2>
-                <p style="color: var(--text-secondary);">测试你对C语言基础知识的掌握程度</p>
-            </div>
-
-            <div class="quiz-progress">
-                <span id="questionNumber" style="font-size: 14px; color: var(--text-secondary); min-width: 80px;">第 1 / 5 题</span>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="quizProgress" style="width: 20%"></div>
+        <div id="home-page">
+            <div class="wrap">
+                <div class="item" data-topic="0">
+                    <span class="item-text">C语言基础编程</span>
+                    <div class="dot-box">
+                        <a href="quiz1-s.html">简</a>
+                        <a href="quiz1-m.html">中</a>
+                        <a href="quiz1-h.html">难</a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="question-card card">
-                <span class="question-number">单选题</span>
-                <h3 class="question-text" id="questionText">题目内容</h3>
-                
-                <div class="code-block" id="codeBlock" style="display: none;">
-                    // 代码示例
+                <div class="item" data-topic="1">
+                    <span class="item-text">循环与分支结构</span>
+                    <div class="dot-box">
+                        <a href="quiz2-s.html">简</a>
+                        <a href="quiz2-m.html">中</a>
+                        <a href="quiz2-h.html">难</a>
+                    </div>
                 </div>
-
-                <div class="options-list" id="optionsList">
-                    <!-- 选项动态渲染 -->
+                <div class="item" data-topic="2">
+                    <span class="item-text">函数与模块化数据</span>
+                    <div class="dot-box">
+                        <a href="quiz3-s.html">简</a>
+                        <a href="quiz3-m.html">中</a>
+                        <a href="quiz3-h.html">难</a>
+                    </div>
                 </div>
-            </div>
-
-            <div class="quiz-actions">
-                <button class="btn btn-outline" id="prevBtn">上一题</button>
-                <div>
-                    <button class="btn btn-primary" id="nextBtn">下一题</button>
-                    <button class="btn btn-primary" id="submitBtn" style="display: none;">提交答卷</button>
+                <div class="item" data-topic="3">
+                    <span class="item-text">指针与内存管理</span>
+                    <div class="dot-box">
+                        <a href="quiz4-s.html">简</a>
+                        <a href="quiz4-m.html">中</a>
+                        <a href="quiz4-h.html">难</a>
+                    </div>
+                </div>
+                <div class="item" data-topic="4">
+                    <span class="item-text">数组与字符串</span>
+                    <div class="dot-box">
+                        <a href="quiz5-s.html">简</a>
+                        <a href="quiz5-m.html">中</a>
+                        <a href="quiz5-h.html">难</a>
+                    </div>
+                </div>
+                <div class="item" data-topic="5">
+                    <span class="item-text">结构体与共同体</span>
+                    <div class="dot-box">
+                        <a href="quiz6-s.html">简</a>
+                        <a href="quiz6-m.html">中</a>
+                        <a href="quiz6-h.html">难</a>
+                    </div>
+                </div>
+                <div class="item" data-topic="6">
+                    <span class="item-text">数据结构与算法</span>
+                    <div class="dot-box">
+                        <a href="quiz7-s.html">简</a>
+                        <a href="quiz7-m.html">中</a>
+                        <a href="quiz7-h.html">难</a>
+                    </div>
+                </div>
+                <div class="item" data-topic="7">
+                    <span class="item-text">文件操作与IO</span>
+                    <div class="dot-box">
+                        <a href="quiz8-s.html">简</a>
+                        <a href="quiz8-m.html">中</a>
+                        <a href="quiz8-h.html">难</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -75,5 +239,17 @@
     </footer>
 
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/quiz.js"></script>
+    <script>
+const items = document.querySelectorAll('.item');
+items.forEach(el=>{
+    el.addEventListener('click',function(e){
+        if(e.target.tagName === 'A') return;
+        items.forEach(i=>i.classList.remove('active'));
+        this.classList.add('active');
+    })
+})
+refreshHomeMark();
+</script>
 </body>
 </html>
