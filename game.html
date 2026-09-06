@@ -12,9 +12,80 @@
         /* 游戏专用样式 */
         #gameCanvas {
             display: block;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(180deg, #0a0e1a 0%, #1a1a2e 50%, #16213e 100%);
             border-radius: 12px;
             image-rendering: pixelated;
+        }
+
+        #snakeCanvas {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: #08131c;
+            border-radius: 12px;
+            image-rendering: pixelated;
+        }
+
+        .game-picker {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            max-width: 960px;
+            margin: 0 auto 24px;
+        }
+
+        .game-stage {
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .game-choice {
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .game-choice:hover, .game-choice.active {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .game-choice strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .game-choice span {
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .game-picker {
+                gap: 10px;
+            }
+
+            .game-choice {
+                padding: 14px;
+            }
+
+            .game-choice strong {
+                font-size: 15px;
+            }
+
+            .game-choice span {
+                font-size: 11px;
+            }
         }
 
         .game-hud {
@@ -434,21 +505,33 @@
     <section class="game-page">
         <div class="container">
             <div class="quiz-header">
-                <h2>⚔️ 代码勇者：C语言传说</h2>
-                <p style="color: var(--text-secondary);">横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界</p>
+                <h2 id="gamePageTitle">🎮 编程游戏</h2>
+                <p id="gamePageSubtitle" style="color: var(--text-secondary);">选择一个游戏，开始你的编程冒险</p>
             </div>
 
-            <div style="position: relative; max-width: 960px; margin: 0 auto;">
+            <div class="game-picker">
+                <button class="game-choice active" id="heroChoice" onclick="selectGame('hero')">
+                    <strong>⚔️ 代码勇者</strong>
+                    <span>横板闯关 · 答题战斗 · 探索收集</span>
+                </button>
+                <button class="game-choice" id="snakeChoice" onclick="selectGame('snake')">
+                    <strong>🐍 贪吃蛇</strong>
+                    <span>方向键移动 · 收集代码 · 挑战高分</span>
+                </button>
+            </div>
+
+            <div class="game-stage" style="position: relative; max-width: 960px; margin: 0 auto;">
                 <canvas id="gameCanvas" width="960" height="540"></canvas>
+                <canvas id="snakeCanvas" width="960" height="540"></canvas>
 
                 <!-- HUD -->
                 <div class="game-hud">
                     <div class="hud-left">
-                        <div class="hud-item">
+                        <div class="hud-item" id="healthHud">
                             ❤️ <div class="health-bar"><div class="health-fill" id="healthBar" style="width: 100%"></div></div>
                         </div>
                         <div class="hud-item">
-                            🪙 <span id="coinCount">0</span>
+                            <span id="scoreIcon">🪙</span> <span id="coinCount">0</span>
                         </div>
                     </div>
                     <div class="hud-right">
@@ -463,8 +546,7 @@
                     <div class="game-subtitle">C语言传说 · 用代码净化Bug病毒</div>
                     <div class="start-menu">
                         <button class="btn btn-primary" onclick="showLevelSelect()">开始冒险</button>
-                        <button class="btn btn-outline" onclick="showStory()">世界观剧情</button>
-                        <button class="btn btn-ghost" onclick="showControls()">操作说明</button>
+                        <button class="btn btn-ghost" onclick="scrollToInstructions()">操作说明</button>
                     </div>
                     <div class="level-select" id="levelSelect">
                         <div class="level-btn" onclick="startLevel(0)">
@@ -482,6 +564,18 @@
                     </div>
                     <div class="controls-hint">
                         ← → 移动 · 空格 跳跃 · E 交互 · ESC 暂停
+                    </div>
+                </div>
+
+                <div class="start-screen" id="snakeStartScreen" style="display: none;">
+                    <div class="game-title">贪吃蛇</div>
+                    <div class="game-subtitle">收集代码块，持续变强，挑战最高分</div>
+                    <div class="start-menu">
+                        <button class="btn btn-primary" onclick="startSnakeGame()">开始游戏</button>
+                        <button class="btn btn-ghost" onclick="scrollToInstructions()">操作说明</button>
+                    </div>
+                    <div class="controls-hint">
+                        方向键 / WASD 移动 · ESC 暂停
                     </div>
                 </div>
 
@@ -551,8 +645,8 @@
 
             <!-- 游戏说明 -->
             <div class="card" style="max-width: 960px; margin: 40px auto 0;">
-                <h3 style="color: var(--text-primary); margin-bottom: 16px;">📖 游戏说明</h3>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; color: var(--text-secondary); font-size: 14px;">
+                <h3 id="instructionsTitle" style="color: var(--text-primary); margin-bottom: 16px;">📖 代码勇者说明</h3>
+                <div id="instructionsGrid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; color: var(--text-secondary); font-size: 14px;">
                     <div>
                         <h4 style="color: var(--primary); margin-bottom: 8px;">🎮 基础操作</h4>
                         <p>← → 方向键移动<br>空格键跳跃<br>E键与NPC/物品交互<br>ESC键暂停游戏</p>
@@ -580,9 +674,21 @@
 
     <script src="assets/js/main.js"></script>
     <script>
+    {
         // ========== 游戏引擎 ==========
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        const snakeCanvas = document.getElementById('snakeCanvas');
+        const snakeCtx = snakeCanvas.getContext('2d');
+
+        const snakeBoard = { columns: 32, rows: 18, cellSize: 30 };
+        let selectedGame = 'hero';
+        let snake = [];
+        let snakeFood = { x: 0, y: 0 };
+        let snakeDirection = { x: 1, y: 0 };
+        let nextSnakeDirection = { x: 1, y: 0 };
+        let snakeScore = 0;
+        let snakeTimer = null;
 
         // 游戏状态
         const GameState = {
@@ -824,6 +930,23 @@
         document.addEventListener('keydown', (e) => {
             keys[e.code] = true;
 
+            if (selectedGame === 'snake' && gameState === GameState.PLAYING) {
+                const directions = {
+                    ArrowUp: [0, -1],
+                    KeyW: [0, -1],
+                    ArrowDown: [0, 1],
+                    KeyS: [0, 1],
+                    ArrowLeft: [-1, 0],
+                    KeyA: [-1, 0],
+                    ArrowRight: [1, 0],
+                    KeyD: [1, 0]
+                };
+                if (directions[e.code]) {
+                    e.preventDefault();
+                    setSnakeDirection(...directions[e.code]);
+                }
+            }
+
             if (e.code === 'Escape') {
                 if (gameState === GameState.PLAYING) pauseGame();
                 else if (gameState === GameState.PAUSED) resumeGame();
@@ -844,19 +967,81 @@
         });
 
         // ========== 游戏流程 ==========
-        function showLevelSelect() {
-            document.getElementById('levelSelect').style.display = 'grid';
+        function selectGame(game) {
+            selectedGame = game;
+            gameState = GameState.MENU;
+            clearInterval(snakeTimer);
+
+            const isSnake = game === 'snake';
+            document.getElementById('gameCanvas').style.display = isSnake ? 'none' : 'block';
+            document.getElementById('snakeCanvas').style.display = isSnake ? 'block' : 'none';
+            document.getElementById('startScreen').style.display = isSnake ? 'none' : 'flex';
+            document.getElementById('snakeStartScreen').style.display = isSnake ? 'flex' : 'none';
+            document.getElementById('healthHud').style.display = isSnake ? 'none' : 'flex';
+            document.getElementById('heroChoice').classList.toggle('active', !isSnake);
+            document.getElementById('snakeChoice').classList.toggle('active', isSnake);
+            document.getElementById('gamePageTitle').textContent = isSnake ? '🐍 贪吃蛇' : '⚔️ 代码勇者：C语言传说';
+            document.getElementById('gamePageSubtitle').textContent = isSnake ? '收集代码块，挑战你的最高分' : '横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界';
+            document.getElementById('levelName').textContent = isSnake ? '贪吃蛇 · 等待开始' : '第一关：变量草原';
+            document.getElementById('scoreIcon').textContent = isSnake ? '🏆' : '🪙';
+            document.getElementById('coinCount').textContent = '0';
+            updateInstructions(isSnake);
+            if (!isSnake) {
+                document.querySelector('#startScreen .start-menu').style.display = 'flex';
+                document.querySelector('#startScreen .controls-hint').style.display = 'block';
+                document.getElementById('levelSelect').style.display = 'none';
+                document.querySelector('#levelComplete h2').textContent = '🎉 关卡完成！';
+                document.querySelector('#levelComplete .btn-primary').textContent = '下一关';
+                document.querySelector('#levelComplete .stat-col:nth-child(1) .label').textContent = '收集金币';
+                document.querySelector('#levelComplete .stat-col:nth-child(2) .label').textContent = '击败敌人';
+                document.querySelector('#levelComplete .stat-col:nth-child(3) .label').textContent = '开启宝箱';
+                document.getElementById('completeMessage').textContent = '你成功净化了这片区域的Bug！';
+            }
         }
 
-        function showStory() {
-            showDialogBox('旁白', [
-                '在遥远的代码王国，一切都由纯净的C语言代码构成。',
-                '然而，邪恶的Bug病毒悄然入侵，腐蚀了这片土地的每一寸代码。',
-                '变量错乱，循环失控，整个王国陷入了混乱...',
-                '传说中，只有掌握C语言之力的勇者，才能净化Bug病毒，拯救代码王国。',
-                '而你，就是那位被选中的勇者。你的冒险，即将开始！'
-            ], () => {
-                // 剧情结束
+        function showLevelSelect() {
+            document.getElementById('levelSelect').style.display = 'grid';
+            document.querySelector('#startScreen .start-menu').style.display = 'none';
+            document.querySelector('#startScreen .controls-hint').style.display = 'none';
+        }
+
+        function updateInstructions(isSnake) {
+            const title = document.getElementById('instructionsTitle');
+            const grid = document.getElementById('instructionsGrid');
+            title.textContent = isSnake ? '📖 贪吃蛇说明' : '📖 代码勇者说明';
+            grid.innerHTML = isSnake ? `
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">🎮 操作方式</h4>
+                    <p>使用键盘方向键或WASD控制移动<br>ESC键暂停游戏</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">🎯 游戏规则</h4>
+                    <p>吃到代码块可以得分并变长<br>撞到边界或蛇身后游戏结束</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">🏆 得分目标</h4>
+                    <p>每吃到一个代码块获得10分<br>尽可能获得更高分数</p>
+                </div>
+            ` : `
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">🎮 基础操作</h4>
+                    <p>← → 方向键移动<br>空格键跳跃<br>E键与NPC/物品交互<br>ESC键暂停游戏</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">⚔️ 战斗系统</h4>
+                    <p>接触敌人触发答题战斗<br>答对题目击败敌人获得金币<br>答错会损失生命值<br>宝箱也需要答题才能开启</p>
+                </div>
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 8px;">🛒 收集与商店</h4>
+                    <p>地图中散落金币可收集<br>找到神秘商人兑换道具<br>道具有各种特殊效果<br>每关对应不同C语言知识点</p>
+                </div>
+            `;
+        }
+
+        function scrollToInstructions() {
+            document.getElementById('instructionsTitle').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
             });
         }
 
@@ -871,6 +1056,7 @@
         }
 
         function startLevel(index) {
+            selectedGame = 'hero';
             currentLevelIndex = index;
             currentLevel = JSON.parse(JSON.stringify(levels[index]));
 
@@ -912,23 +1098,31 @@
         function resumeGame() {
             gameState = GameState.PLAYING;
             document.getElementById('pauseMenu').style.display = 'none';
-            gameLoop();
+            if (selectedGame === 'snake') startSnakeLoop();
+            else gameLoop();
         }
 
         function restartLevel() {
             document.getElementById('pauseMenu').style.display = 'none';
-            startLevel(currentLevelIndex);
+            if (selectedGame === 'snake') startSnakeGame();
+            else startLevel(currentLevelIndex);
         }
 
         function backToMenu() {
             gameState = GameState.MENU;
+            clearInterval(snakeTimer);
             document.getElementById('pauseMenu').style.display = 'none';
             document.getElementById('levelComplete').style.display = 'none';
-            document.getElementById('startScreen').style.display = 'flex';
-            document.getElementById('levelSelect').style.display = 'none';
+            selectGame(selectedGame);
+            document.getElementById(selectedGame === 'snake' ? 'snakeStartScreen' : 'startScreen').style.display = 'flex';
+            if (selectedGame === 'hero') document.getElementById('levelSelect').style.display = 'none';
         }
 
         function nextLevel() {
+            if (selectedGame === 'snake') {
+                startSnakeGame();
+                return;
+            }
             if (currentLevelIndex < levels.length - 1) {
                 startLevel(currentLevelIndex + 1);
             } else {
@@ -937,6 +1131,7 @@
         }
 
         function completeLevel() {
+            if (selectedGame === 'snake') return;
             gameState = GameState.COMPLETE;
             document.getElementById('statCoins').textContent = stats.coins;
             document.getElementById('statEnemies').textContent = stats.enemies;
@@ -945,6 +1140,113 @@
 
             // 加经验
             addExp(stats.coins + stats.enemies * 10);
+        }
+
+        function startSnakeGame() {
+            clearInterval(snakeTimer);
+            snake = [
+                { x: 7, y: 9 },
+                { x: 6, y: 9 },
+                { x: 5, y: 9 }
+            ];
+            snakeDirection = { x: 1, y: 0 };
+            nextSnakeDirection = { x: 1, y: 0 };
+            snakeScore = 0;
+            placeSnakeFood();
+            selectedGame = 'snake';
+            gameState = GameState.PLAYING;
+            document.getElementById('snakeStartScreen').style.display = 'none';
+            document.getElementById('levelComplete').style.display = 'none';
+            document.getElementById('pauseMenu').style.display = 'none';
+            document.getElementById('levelName').textContent = '贪吃蛇 · 进行中';
+            document.getElementById('coinCount').textContent = snakeScore;
+            startSnakeLoop();
+        }
+
+        function startSnakeLoop() {
+            clearInterval(snakeTimer);
+            renderSnake();
+            snakeTimer = setInterval(updateSnake, 130);
+        }
+
+        function setSnakeDirection(x, y) {
+            if (x === -snakeDirection.x && y === -snakeDirection.y) return;
+            nextSnakeDirection = { x, y };
+        }
+
+        function placeSnakeFood() {
+            do {
+                snakeFood = {
+                    x: Math.floor(Math.random() * snakeBoard.columns),
+                    y: Math.floor(Math.random() * snakeBoard.rows)
+                };
+            } while (snake.some(segment => segment.x === snakeFood.x && segment.y === snakeFood.y));
+        }
+
+        function updateSnake() {
+            if (gameState !== GameState.PLAYING || selectedGame !== 'snake') return;
+
+            snakeDirection = nextSnakeDirection;
+            const head = {
+                x: snake[0].x + snakeDirection.x,
+                y: snake[0].y + snakeDirection.y
+            };
+            const hitWall = head.x < 0 || head.x >= snakeBoard.columns || head.y < 0 || head.y >= snakeBoard.rows;
+            const hitSelf = snake.some(segment => segment.x === head.x && segment.y === head.y);
+
+            if (hitWall || hitSelf) {
+                endSnakeGame();
+                return;
+            }
+
+            snake.unshift(head);
+            if (head.x === snakeFood.x && head.y === snakeFood.y) {
+                snakeScore += 10;
+                document.getElementById('coinCount').textContent = snakeScore;
+                placeSnakeFood();
+            } else {
+                snake.pop();
+            }
+            renderSnake();
+        }
+
+        function renderSnake() {
+            snakeCtx.fillStyle = '#08131c';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+            snakeCtx.strokeStyle = 'rgba(0, 212, 255, 0.08)';
+            for (let x = 0; x <= snakeBoard.columns; x++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(x * snakeBoard.cellSize, 0);
+                snakeCtx.lineTo(x * snakeBoard.cellSize, snakeCanvas.height);
+                snakeCtx.stroke();
+            }
+            for (let y = 0; y <= snakeBoard.rows; y++) {
+                snakeCtx.beginPath();
+                snakeCtx.moveTo(0, y * snakeBoard.cellSize);
+                snakeCtx.lineTo(snakeCanvas.width, y * snakeBoard.cellSize);
+                snakeCtx.stroke();
+            }
+
+            snakeCtx.fillStyle = '#ffcc00';
+            snakeCtx.fillRect(snakeFood.x * snakeBoard.cellSize + 7, snakeFood.y * snakeBoard.cellSize + 7, 16, 16);
+            snake.forEach((segment, index) => {
+                snakeCtx.fillStyle = index === 0 ? '#00d4ff' : '#00ff88';
+                snakeCtx.fillRect(segment.x * snakeBoard.cellSize + 3, segment.y * snakeBoard.cellSize + 3, 24, 24);
+            });
+        }
+
+        function endSnakeGame() {
+            clearInterval(snakeTimer);
+            gameState = GameState.COMPLETE;
+            document.getElementById('completeMessage').textContent = '代码块收集完成，继续挑战更高分吧！';
+            document.getElementById('statCoins').textContent = snakeScore;
+            document.getElementById('statEnemies').textContent = snake.length;
+            document.getElementById('statChests').textContent = '0';
+            document.querySelector('#levelComplete h2').textContent = '🎉 游戏结束！';
+            document.querySelector('#levelComplete .btn-primary').textContent = '再玩一次';
+            document.querySelector('#levelComplete .stat-col:nth-child(1) .label').textContent = '本局得分';
+            document.querySelector('#levelComplete .stat-col:nth-child(2) .label').textContent = '蛇身长度';
+            document.getElementById('levelComplete').style.display = 'flex';
         }
 
         // ========== 游戏主循环 ==========
@@ -1487,6 +1789,14 @@
             const pct = (player.health / player.maxHealth) * 100;
             document.getElementById('healthBar').style.width = pct + '%';
         }
+
+        Object.assign(window, {
+            selectGame, showLevelSelect, showControls, startLevel,
+            pauseGame, resumeGame, restartLevel, backToMenu, nextLevel,
+            startSnakeGame, setSnakeDirection, advanceDialog, answerBattle,
+            answerChest, buyItem, closeShop
+        });
+    }
     </script>
 </body>
 </html>

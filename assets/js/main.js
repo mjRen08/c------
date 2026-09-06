@@ -19,25 +19,31 @@ function $$(selector) {
 // 模拟本地存储
 function saveToStorage(key, data) {
     const value = JSON.stringify(data);
+
     try {
         localStorage.setItem(key, value);
-        return;
     } catch (error) {
     }
+
     document.cookie = encodeURIComponent('cm_' + key) + '=' + encodeURIComponent(value) + '; path=/; max-age=31536000';
 }
 
 function getFromStorage(key) {
+    let data = null;
     try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : null;
+        data = localStorage.getItem(key);
     } catch (error) {
-        const cookieName = encodeURIComponent('cm_' + key) + '=';
-        const cookie = document.cookie.split('; ').find(function (item) {
-            return item.indexOf(cookieName) === 0;
-        });
-        return cookie ? JSON.parse(decodeURIComponent(cookie.slice(cookieName.length))) : null;
     }
+
+    if (data) {
+        return JSON.parse(data);
+    }
+
+    const cookieName = encodeURIComponent('cm_' + key) + '=';
+    const cookie = document.cookie.split('; ').find(function (item) {
+        return item.indexOf(cookieName) === 0;
+    });
+    return cookie ? JSON.parse(decodeURIComponent(cookie.slice(cookieName.length))) : null;
 }
 
 function removeFromStorage(key) {
