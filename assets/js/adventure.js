@@ -311,7 +311,8 @@
                 maxHp: 120, arenaX: 200, arenaWidth: 1200,
                 triggerX: 700,
                 waveVariants: ['basic', 'multi'],
-                barrageTypes: ['ring', 'sector', 'tracking']
+                barrageTypes: ['ring', 'sector', 'tracking'],
+                nextDoor: { to: 'castle', label: '→ 代码城堡' }
             }
         },
 
@@ -319,67 +320,95 @@
             name: '代码城堡', icon: '🏰',
             bgImage: 'assets/images/scenes/castle.png',
             bgColor1: '#1a0e2e', bgColor2: '#0a0618',
-            width: 6500, groundColor: '#3a2847', shopMode: 'upgrade',
+            width: 7200, groundColor: '#3a2847', shopMode: 'upgrade',
             platforms: [
-                { x: 0, y: 460, w: 800, h: 80 }, { x: 900, y: 460, w: 500, h: 80 },
-                { x: 1500, y: 460, w: 500, h: 80 }, { x: 2100, y: 460, w: 500, h: 80 },
-                { x: 2700, y: 460, w: 500, h: 80 }, { x: 3300, y: 460, w: 500, h: 80 },
-                { x: 3900, y: 460, w: 500, h: 80 }, { x: 4500, y: 460, w: 500, h: 80 },
-                { x: 5100, y: 460, w: 1400, h: 80 },
+                { x: 0, y: 460, w: 700, h: 80 }, { x: 850, y: 460, w: 500, h: 80 },
+                { x: 1500, y: 460, w: 500, h: 80 }, { x: 2150, y: 460, w: 500, h: 80 },
+                { x: 2800, y: 460, w: 500, h: 80 }, { x: 3450, y: 460, w: 500, h: 80 },
+                { x: 4100, y: 460, w: 500, h: 80 }, { x: 4750, y: 460, w: 500, h: 80 },
+                { x: 5400, y: 460, w: 500, h: 80 }, { x: 6000, y: 460, w: 1200, h: 80 },
+                // 高空平台
                 { x: 250, y: 360, w: 120, h: 20 }, { x: 500, y: 300, w: 100, h: 20 }, { x: 750, y: 240, w: 100, h: 20 },
                 { x: 1050, y: 340, w: 120, h: 20 }, { x: 1250, y: 280, w: 100, h: 20 },
                 { x: 1600, y: 340, w: 120, h: 20 }, { x: 1800, y: 260, w: 120, h: 20 },
                 { x: 2200, y: 360, w: 140, h: 20 }, { x: 2400, y: 280, w: 120, h: 20 },
-                { x: 2800, y: 340, w: 140, h: 20 }, { x: 3000, y: 260, w: 120, h: 20 },
-                { x: 3400, y: 340, w: 140, h: 20 }, { x: 3600, y: 260, w: 120, h: 20 },
-                { x: 4000, y: 340, w: 140, h: 20 }, { x: 4200, y: 260, w: 120, h: 20 },
-                { x: 4600, y: 340, w: 140, h: 20 }, { x: 4800, y: 260, w: 120, h: 20 },
-                { x: 5200, y: 340, w: 140, h: 20 }, { x: 5450, y: 240, w: 120, h: 20 },
-                { x: 5700, y: 300, w: 140, h: 20 }, { x: 6000, y: 240, w: 140, h: 20 }
+                { x: 2850, y: 340, w: 140, h: 20 }, { x: 3050, y: 260, w: 120, h: 20 },
+                { x: 3500, y: 340, w: 140, h: 20 }, { x: 3700, y: 260, w: 120, h: 20 },
+                { x: 4150, y: 340, w: 140, h: 20 }, { x: 4350, y: 260, w: 120, h: 20 },
+                { x: 4800, y: 340, w: 140, h: 20 }, { x: 5000, y: 260, w: 120, h: 20 },
+                { x: 5450, y: 340, w: 140, h: 20 }, { x: 5650, y: 240, w: 120, h: 20 },
+                { x: 6050, y: 320, w: 140, h: 20 }, { x: 6300, y: 240, w: 140, h: 20 },
+                { x: 6550, y: 300, w: 140, h: 20 }
             ],
             coins: [
-                { x: 270, y: 320 }, { x: 520, y: 260 }, { x: 770, y: 200 }, { x: 1070, y: 300 }, { x: 1270, y: 240 },
-                { x: 1620, y: 300 }, { x: 1820, y: 220 }, { x: 2220, y: 320 }, { x: 2420, y: 240 },
-                { x: 2820, y: 300 }, { x: 3020, y: 220 }, { x: 3420, y: 300 }, { x: 3620, y: 220 },
-                { x: 4020, y: 300 }, { x: 4220, y: 220 }, { x: 4620, y: 300 }, { x: 4820, y: 220 },
-                { x: 5220, y: 300 }, { x: 5470, y: 200 }, { x: 5720, y: 260 }, { x: 6020, y: 200 }
+                { x: 270, y: 320 }, { x: 520, y: 260 }, { x: 770, y: 200 },
+                { x: 1070, y: 300 }, { x: 1270, y: 240 },
+                { x: 1620, y: 300 }, { x: 1820, y: 220 },
+                { x: 2220, y: 320 }, { x: 2420, y: 240 },
+                { x: 2870, y: 300 }, { x: 3070, y: 220 },
+                { x: 3520, y: 300 }, { x: 3720, y: 220 },
+                { x: 4170, y: 300 }, { x: 4370, y: 220 },
+                { x: 4820, y: 300 }, { x: 5020, y: 220 },
+                { x: 5470, y: 300 }, { x: 5670, y: 200 },
+                { x: 6070, y: 280 }, { x: 6320, y: 200 }, { x: 6570, y: 260 }
             ],
             npcs: [
-                { x: 400, y: 420, name: '长老·格林', icon: '🧙', dialogs: ['城堡比森林更复杂。', '东侧塔楼有电梯。', '递归法师守卫在此。'] },
-                { x: 2500, y: 420, name: '商店', icon: '🏪', isShop: true, dialogs: ['高端商品，勇者~'] }
+                { x: 400, y: 420, name: '长老·格林', icon: '🧙', dialogs: [
+                    '这里是代码城堡，第三关试炼场。',
+                    '条件门、激光、switch 平台、递归陷阱……应有尽有。',
+                    '走到最深处，递归法师在那里等你。',
+                    '它的弱点只能用枪打中，别忘了！'
+                ]},
+                { x: 2800, y: 420, name: '商店', icon: '🏪', isShop: true, dialogs: ['高端商品，勇者~'] }
             ],
             gadgets: [
+                // 条件门
                 { type: 'conditional-gate', x: 1900, y: 300, w: 60, h: 200, requiresKeys: 3, opened: false, label: 'if (keys >= 3)' },
+                // 激光（两道）
                 { type: 'laser-sweep', x: 2400, y: 200, w: 20, h: 300, range: 400, period: 3.5, phase: 0, dmg: 15, state: 'warning', stateTimer: 0, currentY: 200, warningTime: 1.0, firingTime: 0.4, cooldownTime: 2.2 },
-                { type: 'laser-sweep', x: 4400, y: 180, w: 20, h: 300, range: 500, period: 4.5, phase: 1.5, dmg: 15, state: 'warning', stateTimer: 0, currentY: 180, warningTime: 1.2, firingTime: 0.4, cooldownTime: 2.6 },
+                { type: 'laser-sweep', x: 4800, y: 180, w: 20, h: 300, range: 500, period: 4.5, phase: 1.5, dmg: 15, state: 'warning', stateTimer: 0, currentY: 180, warningTime: 1.2, firingTime: 0.4, cooldownTime: 2.6 },
+                // switch 平台
                 { type: 'switch-platform', x: 2600, y: 240, w: 100, h: 16, active: false, targetY: 400, closedY: 240, current: 240 },
-                { type: 'switch-platform', x: 4200, y: 240, w: 100, h: 16, active: false, targetY: 400, closedY: 240, current: 240 },
-                /* ★ 悬崖变量平台 */
-                { type: 'variable-platform', x: 3500, y: 300, w: 90, h: 20, id: 'vp3', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true },
+                { type: 'switch-platform', x: 4600, y: 240, w: 100, h: 16, active: false, targetY: 400, closedY: 240, current: 240 },
+                // 悬崖变量平台
+                { type: 'variable-platform', x: 3800, y: 300, w: 90, h: 20, id: 'vp3', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true },
+                // 数组平台（5 块严格顺序）
                 { type: 'array-platforms', items: [
-                    { x: 3700, y: 380, w: 70, h: 16, idx: 0, order: 0 },
-                    { x: 3850, y: 320, w: 70, h: 16, idx: 1, order: 1 },
-                    { x: 4000, y: 380, w: 70, h: 16, idx: 2, order: 2 },
-                    { x: 4150, y: 320, w: 70, h: 16, idx: 3, order: 3 },
-                    { x: 4300, y: 260, w: 70, h: 16, idx: 4, order: 4 }
+                    { x: 3950, y: 380, w: 70, h: 16, idx: 0, order: 0 },
+                    { x: 4100, y: 320, w: 70, h: 16, idx: 1, order: 1 },
+                    { x: 4250, y: 380, w: 70, h: 16, idx: 2, order: 2 },
+                    { x: 4400, y: 320, w: 70, h: 16, idx: 3, order: 3 },
+                    { x: 4550, y: 260, w: 70, h: 16, idx: 4, order: 4 }
                 ], currentProgress: 0, completed: false, reward: 10, rewarded: false, mustSequence: true },
-                { type: 'pointer-teleport', x: 700, y: 380, toX: 2200, toY: 380, label: 'memset → 0x2200', cooldown: 0 },
+                // 传送门
+                { type: 'pointer-teleport', x: 700, y: 380, toX: 2300, toY: 380, label: 'memset → 0x2300', cooldown: 0 },
+                { type: 'pointer-teleport', x: 5200, y: 380, toX: 6300, toY: 380, label: 'malloc → 0x6300', cooldown: 0 },
+                // 地刺
                 { type: 'loop-spikes', x: 1250, y: 420, w: 200, h: 40, period: 2.2, amplitude: 70, phase: 0.3, dmg: 20 },
-                { type: 'loop-spikes', x: 3100, y: 420, w: 200, h: 40, period: 2.0, amplitude: 80, phase: 0.6, dmg: 20 },
-                { type: 'quiz-stone', x: 4700, y: 380, w: 50, h: 60, used: false, quizIndex: 2 },
-                { type: 'memory-leak', x: 5100, y: 200, w: 600, h: 260, dps: 8 },
-                { type: 'pointer-missile', x: 3400, y: 200, w: 40, h: 40, active: false, missiles: [], cooldown: 0 }
+                { type: 'loop-spikes', x: 3300, y: 420, w: 200, h: 40, period: 2.0, amplitude: 80, phase: 0.6, dmg: 20 },
+                { type: 'loop-spikes', x: 5700, y: 420, w: 200, h: 40, period: 1.8, amplitude: 90, phase: 0.4, dmg: 20 },
+                // 答题石碑
+                { type: 'quiz-stone', x: 5000, y: 380, w: 50, h: 60, used: false, quizIndex: 2 },
+                // 内存泄漏
+                { type: 'memory-leak', x: 500, y: 200, w: 500, h: 260, dps: 8 },
+                // 追踪导弹
+                { type: 'pointer-missile', x: 3600, y: 200, w: 40, h: 40, active: false, missiles: [], cooldown: 0 },
+                // 递归陷阱
+                { type: 'recursive-trap', x: 6500, y: 400, w: 400, h: 40, triggered: false, currentIdx: 0, platforms: [
+                    { x: 6500, y: 400, w: 140, h: 40 }, { x: 6660, y: 400, w: 120, h: 40 },
+                    { x: 6800, y: 400, w: 100, h: 40 }, { x: 6920, y: 400, w: 60, h: 40 }
+                ]}
             ],
             secrets: [
                 { x: 1300, y: 380, discovered: false, reward: 30, label: '🕯️ 烛台' },
-                { x: 5600, y: 340, discovered: false, reward: 40, label: '📜 书架' }
+                { x: 6300, y: 340, discovered: false, reward: 40, label: '📜 书架' }
             ],
             doors: [
-                { x: 100, y: 380, w: 60, h: 80, to: 'forest', label: '← 森林' },
-                { x: 6400, y: 380, w: 60, h: 80, to: 'castle_boss', label: '⚔️ Boss房' }
+                { x: 100, y: 380, w: 60, h: 80, to: 'forest_boss', label: '← 蠕虫巢穴' },
+                { x: 7100, y: 380, w: 60, h: 80, to: 'castle_boss', label: '⚔️ Boss房' }
             ],
             elevators: [], enemies: [],
-            checkpoint: { x: 6200, y: 420, active: false },
+            checkpoint: { x: 6900, y: 420, active: false },
             boss: null
         },
 
@@ -398,7 +427,8 @@
                 maxHp: 180, arenaX: 300, arenaWidth: 1000,
                 triggerX: 800,
                 waveVariants: ['basic', 'multi', 'tracking'],
-                barrageTypes: ['ring', 'sector', 'tracking', 'spiral']
+                barrageTypes: ['ring', 'sector', 'tracking', 'spiral'],
+                nextDoor: { to: 'bosstower', label: '→ 代码塔顶' }
             }
         },
 
@@ -645,10 +675,6 @@
                 <div class="adv-hud-right">
                     <div class="adv-resource"><span class="adv-res-ico">🪙</span><span id="advCoins">0</span></div>
                     <div class="adv-resource keys"><span class="adv-res-ico">🔑</span><span id="advKeys">0</span></div>
-                    <div class="adv-resource ammo" id="advAmmoDisplay" style="border-color: rgba(0,240,255,0.4); color: #64d2ff;">
-                        <span class="adv-res-ico">🔫</span>
-                        <span id="advAmmoText">8 / 8</span>
-                    </div>
                     <button class="adv-save-btn" id="advAchBtn">🏆 成就</button>
                     <button class="adv-save-btn" id="advShopBtn">🏪 商店</button>
                     <button class="adv-save-btn" id="advSaveBtn">💾 保存</button>
@@ -768,15 +794,8 @@
         const p = AD.player;
         if (p.gunCooldown > 0) return;
 
-        // ★ 弹药检查
-        if (p.ammo <= 0) {
-            if (!p._emptyShown) {
-                p._emptyShown = true;
-                showBanner('⚠ 弹夹空了！自动补充中…', '#ff2e88');
-                setTimeout(() => { p._emptyShown = false; }, 800);
-            }
-            return;
-        }
+        // ★ 弹药检查（不弹提示，靠左下角弹药条显示）
+        if (p.ammo <= 0) return;
 
         p.ammo--;
         p.gunCooldown = 20;      // ★ 射速改慢（从 8 帧 → 20 帧，约 0.33 秒/发）
@@ -799,7 +818,6 @@
 
         AD.runStats.shots++;
         spawnParticles(gunX, gunY, '#00f0ff', 4);
-        updateAmmoHud();
     }
 
     function updatePlayerBullets(dt) {
@@ -1139,7 +1157,6 @@
             Save.data.quizCorrect = (Save.data.quizCorrect || 0) + 1;
             Save.save({});
             document.getElementById('advCoins').textContent = AD.coins;
-            updateAmmoHud();
             showBanner('✓ 答对 +5 金币', '#00ff88');
             spawnParticles(AD.player.x + AD.player.w / 2, AD.player.y, '#00ff88', 20);
             checkAchievements();
@@ -1571,6 +1588,24 @@
         const isFinal = AD.boss.isFinal, isTutorial = AD.boss.isTutorial;
         AD.bossBullets = []; AD.clones = []; AD.blackholes = [];
         hideBossHud();
+        // ★ Boss 击败后，在房间右侧生成通往下一关的门
+        if (AD.boss.nextDoor) {
+            const doorX = AD.sceneData.width - 220;
+            const doorY = 380;
+            // 避免重复添加
+            if (!AD.doors.some(d => d.isRewardDoor)) {
+                AD.doors.push({
+                    x: doorX, y: doorY, w: 60, h: 80,
+                    to: AD.boss.nextDoor.to,
+                    label: AD.boss.nextDoor.label,
+                    isRewardDoor: true
+                });
+            }
+            setTimeout(() => {
+                showBanner('✨ 通往下一关的门已开启！', '#00ff88');
+                spawnParticles(doorX + 30, doorY + 40, '#00ff88', 30);
+            }, 1500);
+        }
         triggerSlowmo(5, true);
         spawnParticles(AD.boss.x, AD.boss.y, '#ffcc00', 60);
         showAchievement(`⚔️ 击败 ${bossName}`, 'BOSS 已倒下');
@@ -1886,7 +1921,6 @@
             if (p.ammoRegenTimer >= 0.9) {
                 p.ammoRegenTimer -= 0.9;
                 p.ammo++;
-                updateAmmoHud();
             }
         } else {
             p.ammoRegenTimer = 0;
@@ -2633,6 +2667,8 @@
 
         // ★ 枪口方向准星（在屏幕坐标系绘制）
         drawCrosshair(ctx);
+        // ★ 左下角弹药条
+        drawAmmoBar(ctx);
     }
 
     function drawCrosshair(ctx) {
@@ -2655,6 +2691,89 @@
         ctx.beginPath();
         ctx.arc(AD.mouse.x, AD.mouse.y, 6, 0, Math.PI * 2);
         ctx.stroke();
+    }
+
+    function drawAmmoBar(ctx) {
+        const p = AD.player;
+        const canvas = AD.canvas;
+        const barX = 32;
+        const barY = canvas.height - 70;
+        const barW = 220;
+        const barH = 18;
+
+        // ---- 外框背景 ----
+        ctx.save();
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(barX - 12, barY - 32, barW + 24, barH + 46, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // ---- 标题 ----
+        ctx.fillStyle = '#64d2ff';
+        ctx.font = 'bold 12px JetBrains Mono, monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🔫 弹 夹', barX, barY - 18);
+
+        // ---- 数值 ----
+        let numColor = '#64d2ff';
+        if (p.ammo <= 2) numColor = '#ffcc00';
+        if (p.ammo === 0) numColor = '#ff2e88';
+        ctx.fillStyle = numColor;
+        ctx.font = 'bold 13px JetBrains Mono, monospace';
+        ctx.textAlign = 'right';
+        ctx.fillText(p.ammo + ' / ' + p.maxAmmo, barX + barW, barY - 18);
+
+        // ---- 进度条底 ----
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.fillRect(barX, barY, barW, barH);
+
+        // ---- 恢复进度（半透明填充） ----
+        if (p.ammo < p.maxAmmo) {
+            const regenPct = (p.ammoRegenTimer || 0) / 0.9;
+            const regenW = (barW / p.maxAmmo) * regenPct;
+            const startX = barX + (p.ammo / p.maxAmmo) * barW;
+            ctx.fillStyle = 'rgba(100, 210, 255, 0.35)';
+            ctx.fillRect(startX, barY, regenW, barH);
+        }
+
+        // ---- 已装弹（发光） ----
+        const fillW = (p.ammo / p.maxAmmo) * barW;
+        ctx.shadowColor = numColor;
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = numColor;
+        ctx.fillRect(barX, barY, fillW, barH);
+        ctx.shadowBlur = 0;
+
+        // ---- 分段线（每发一格） ----
+        ctx.strokeStyle = 'rgba(10, 14, 26, 0.85)';
+        ctx.lineWidth = 1.5;
+        for (let i = 1; i < p.maxAmmo; i++) {
+            const x = barX + (i / p.maxAmmo) * barW;
+            ctx.beginPath();
+            ctx.moveTo(x, barY);
+            ctx.lineTo(x, barY + barH);
+            ctx.stroke();
+        }
+
+        // ---- 空仓闪烁警示 ----
+        if (p.ammo === 0) {
+            const pulse = Math.sin(performance.now() / 150) * 0.5 + 0.5;
+            ctx.strokeStyle = `rgba(255, 46, 136, ${0.5 + pulse * 0.5})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(barX - 12, barY - 32, barW + 24, barH + 46, 10);
+            ctx.stroke();
+            ctx.fillStyle = `rgba(255, 46, 136, ${0.7 + pulse * 0.3})`;
+            ctx.font = 'bold 10px JetBrains Mono, monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('RELOADING...', barX + barW / 2, barY + barH + 10);
+        }
+
+        ctx.restore();
     }
 
     function drawPlayer(ctx) {
