@@ -1,19 +1,313 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>课程详情 - CodeMaster</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ================= 页面背景与渐变 ================= */
+        body.detail-page-bg {
+            background:
+                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.08), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.08), transparent 35%),
+                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.05), transparent 40%),
+                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 星空粒子 */
+        #starField {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #starField span {
+            position: absolute;
+            width: 2px; height: 2px;
+            border-radius: 50%;
+            background: #64d2ff;
+            box-shadow: 0 0 6px #64d2ff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        /* 入场动画 */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .detail-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 130px 24px 80px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        /* ================= 左右布局 ================= */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* ================= 左侧 ================= */
+        .detail-left .card {
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 20px;
+            padding: 24px;
+            transition: all 0.35s ease;
+        }
+        .detail-left .card:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 20px rgba(0,212,255,0.1);
+        }
+
+        /* 面包屑与标题 */
+        .breadcrumb {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a { color: #00d4ff; }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        .course-detail-header h1 {
+            font-size: 34px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #64d2ff 60%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .course-detail-meta {
+            display: flex;
+            gap: 24px;
+            color: #a0aec0;
+            font-size: 14px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+
+        /* 章节列表 */
+        .chapter-list { margin-top: 16px; }
+        .chapter-item {
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: rgba(10, 14, 26, 0.6);
+            border: 1px solid #2a3447;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .chapter-item:hover {
+            border-color: rgba(0, 212, 255, 0.5);
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateX(4px);
+        }
+        .chapter-item.completed {
+            border-color: rgba(0, 255, 136, 0.4);
+        }
+        .chapter-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #fff;
+        }
+        .chapter-status {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-left: auto;
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+        .chapter-status.completed {
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+        }
+        .chapter-status.locked {
+            background: rgba(113, 128, 150, 0.1);
+            color: #718096;
+        }
+
+        /* ================= 右侧扩展 ================= */
+        .detail-right {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .detail-right .card {
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 20px;
+            padding: 22px;
+            transition: all 0.35s ease;
+        }
+        .detail-right .card:hover {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 18px rgba(0,212,255,0.1);
+        }
+
+        .detail-right h3 {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 你将学到 */
+        #learningGoals {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #learningGoals li {
+            padding: 8px 0;
+            color: #cbd5e1;
+            font-size: 14px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            border-bottom: 1px dashed rgba(255,255,255,0.06);
+        }
+        #learningGoals li:last-child { border-bottom: none; }
+        #learningGoals li::before {
+            content: '✓';
+            color: #00ff88;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* 亮点标签 */
+        .highlight-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .highlight-tag {
+            padding: 8px 16px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.25);
+            border-radius: 30px;
+            color: #64d2ff;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        .highlight-tag:hover {
+            background: rgba(0, 212, 255, 0.18);
+            box-shadow: 0 0 12px rgba(0,212,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        /* 适合人群 */
+        .audience-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .audience-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+        .audience-item span {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: rgba(123,44,191,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #a78bfa;
+            flex-shrink: 0;
+        }
+
+        /* 相关课程推荐 */
+        .related-courses {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .related-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(10,14,26,0.6);
+            border: 1px solid #2a3447;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        .related-item:hover {
+            border-color: rgba(0,212,255,0.5);
+            background: rgba(0,212,255,0.06);
+            transform: translateX(4px);
+        }
+        .related-icon {
+            font-size: 22px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,212,255,0.08);
+            border-radius: 10px;
+        }
+        .related-info strong {
+            display: block;
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+        .related-info span {
+            color: #718096;
+            font-size: 12px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 968px) {
+            .detail-layout {
+                grid-template-columns: 1fr;
+            }
+            .detail-container { padding: 100px 16px 40px; }
+            .course-detail-header h1 { font-size: 26px; }
+        }
+    </style>
 </head>
-<body>
+<body class="detail-page-bg">
+
+<div id="starField"></div>
+
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span>C-Learn</span>
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
@@ -21,6 +315,7 @@
                 <li><a href="quiz.html">在线小测</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
             </ul>
             <div class="nav-actions">
                 <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
@@ -29,107 +324,66 @@
         </div>
     </nav>
 
-    <section class="detail-page">
-        <div class="container">
-            <div class="course-detail-header">
-                <div class="breadcrumb">
-                    <a href="list.html">课程中心</a> / <span id="detailBreadcrumb">C语言基础入门</span>
+    <section class="detail-container">
+        <div class="course-detail-header">
+            <div class="breadcrumb">
+                <a href="list.html">课程中心</a> / <span id="detailBreadcrumb">C语言基础入门</span>
+            </div>
+            <h1 id="detailTitle">C语言基础入门</h1>
+            <div class="course-detail-meta">
+                <span id="detailMeta">📚 课程章节</span>
+                <span id="detailDuration">⏱️ 约 3 小时</span>
+            </div>
+            <div class="course-actions">
+                <button class="btn btn-primary">开始学习</button>
+                <button class="btn btn-outline" id="detailFavoriteBtn" data-course-id="basics">☆ 加入收藏</button>
+            </div>
+        </div>
+
+        <div class="detail-layout">
+            <!-- ================= 左侧内容 ================= -->
+            <div class="detail-left">
+                <div class="card" style="margin-bottom: 24px;">
+                    <h3 style="font-size: 20px; margin-bottom: 16px; color: #fff;">📖 课程简介</h3>
+                    <p id="detailDescription" style="color: #a0aec0; line-height: 1.8; font-size: 14px;">
+                        本课程专为零基础学员设计，从最基础的C语言语法开始，循序渐进地带你进入编程世界。
+                    </p>
                 </div>
-                <h1 id="detailTitle">C语言基础入门</h1>
-                <div class="course-detail-meta">
-                    <span id="detailMeta">📚 课程章节</span>
-                    <span id="detailDuration">⏱️ 约 3 小时</span>
-                </div>
-                <div style="display: flex; gap: 16px;">
-                    <button class="btn btn-primary">开始学习</button>
-                    <button class="btn btn-outline" id="detailFavoriteBtn" data-course-id="basics">☆ 加入收藏</button>
+
+                <div class="card">
+                    <h3 style="font-size: 20px; margin-bottom: 20px; color: #fff;">📑 课程章节</h3>
+                    <div class="chapter-list" id="chapterList">
+                        <!-- 由 main.js 动态填充 -->
+                    </div>
                 </div>
             </div>
 
-            <div class="profile-sections">
-                <div>
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h3 style="font-size: 20px; margin-bottom: 16px; color: var(--text-primary);">课程简介</h3>
-                        <p id="detailDescription" style="color: var(--text-secondary); line-height: 1.8;">
-                            本课程专为零基础学员设计，从最基础的C语言语法开始，循序渐进地带你进入编程世界。
-                            课程内容涵盖变量与数据类型、运算符、输入输出、流程控制等核心知识点，
-                            通过大量实例和练习，帮助你扎实掌握C语言基础，为后续学习打下坚实基础。
-                        </p>
-                    </div>
-
-                    <div class="card">
-                        <h3 style="font-size: 20px; margin-bottom: 20px; color: var(--text-primary);">课程章节</h3>
-                        <div class="chapter-list" id="chapterList">
-                            <div class="chapter-item completed">
-                                <div class="chapter-title">
-                                    ✅ 第1章：C语言概述
-                                    <span class="chapter-status completed">已完成</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item completed">
-                                <div class="chapter-title">
-                                    ✅ 第2章：开发环境搭建
-                                    <span class="chapter-status completed">已完成</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    ▶️ 第3章：变量与数据类型
-                                    <span class="chapter-status" style="background: rgba(0, 212, 255, 0.1); color: var(--primary);">进行中</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    🔒 第4章：运算符与表达式
-                                    <span class="chapter-status locked">未解锁</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    🔒 第5章：输入与输出
-                                    <span class="chapter-status locked">未解锁</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    🔒 第6章：选择结构
-                                    <span class="chapter-status locked">未解锁</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    🔒 第7章：循环结构
-                                    <span class="chapter-status locked">未解锁</span>
-                                </div>
-                            </div>
-                            <div class="chapter-item">
-                                <div class="chapter-title">
-                                    🔒 第8章：综合练习
-                                    <span class="chapter-status locked">未解锁</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <!-- ================= 右侧扩展内容 ================= -->
+            <div class="detail-right">
+                <!-- 你将学到 -->
+                <div class="card">
+                    <h3>🎯 你将学到</h3>
+                    <ul id="learningGoals">
+                        <!-- 由 main.js 动态填充 -->
+                    </ul>
                 </div>
 
-                <div>
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--text-primary);">学习进度</h3>
-                        <div class="progress-bar" style="height: 8px;">
-                            <div class="progress-fill" style="width: 25%"></div>
-                        </div>
-                        <p style="text-align: center; margin-top: 12px; color: var(--text-secondary); font-size: 14px;">
-                            已完成 3/12 课时
-                        </p>
-                    </div>
+                <!-- 课程亮点 -->
+                <div class="card">
+                    <h3>✨ 课程亮点</h3>
+                    <div class="highlight-tags" id="highlightTags"></div>
+                </div>
 
-                    <div class="card" style="margin-bottom: 24px;">
-                        <h3 style="font-size: 18px; margin-bottom: 16px; color: var(--text-primary);">你将学到</h3>
-                        <ul id="learningGoals" style="color: var(--text-secondary); font-size: 14px; line-height: 2;">
-                            <li>✓ C语言基本语法规则</li>
-                        </ul>
-                    </div>
+                <!-- 适合人群 -->
+                <div class="card">
+                    <h3>👥 适合人群</h3>
+                    <div class="audience-list" id="audienceList"></div>
+                </div>
 
+                <!-- 相关课程推荐 -->
+                <div class="card">
+                    <h3>🔗 相关课程推荐</h3>
+                    <div class="related-courses" id="relatedCourses"></div>
                 </div>
             </div>
         </div>
@@ -144,5 +398,117 @@
     </footer>
 
     <script src="assets/js/main.js"></script>
+    <script>
+        // ================= 星空背景 =================
+        (function(){
+            const field = document.getElementById('starField');
+            if (!field) return;
+            for (let i = 0; i < 60; i++) {
+                const s = document.createElement('span');
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = (Math.random() * 3) + 's';
+                s.style.opacity = Math.random() * 0.5 + 0.1;
+                const size = Math.random() * 2 + 1;
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                field.appendChild(s);
+            }
+        })();
+
+        // ================= 课程扩展数据 =================
+        const courseExtras = {
+            basics: {
+                highlights: ['零基础友好', '大量示例', '即时练习', '视频讲解'],
+                audience: ['编程初学者', '在校大学生', '转行人员', 'C语言爱好者'],
+                related: ['control-flow', 'io-array']
+            },
+            'control-flow': {
+                highlights: ['逻辑思维训练', '流程图辅助', '实战案例', '即时反馈'],
+                audience: ['已学完基础语法', '想提升逻辑能力', '准备算法学习'],
+                related: ['basics', 'functions']
+            },
+            'io-array': {
+                highlights: ['格式化输入输出', '数组可视化', '数据统计案例', '内存模型'],
+                audience: ['已掌握基础语法', '需要处理批量数据', '准备学习字符串'],
+                related: ['basics', 'strings']
+            },
+            functions: {
+                highlights: ['模块化思维', '递归可视化', '参数传递详解', '代码复用'],
+                audience: ['已学完流程控制', '想写出更整洁的代码', '准备学习算法'],
+                related: ['control-flow', 'pointers']
+            },
+            strings: {
+                highlights: ['字符串处理', '常用库函数', '文本分析案例', '安全输入'],
+                audience: ['已学完数组', '需要处理文本数据', '准备项目实战'],
+                related: ['io-array', 'file-io']
+            },
+            pointers: {
+                highlights: ['内存模型图解', '指针运算', '动态内存', '调试技巧'],
+                audience: ['已学完函数和数组', '想深入理解内存', '准备数据结构'],
+                related: ['functions', 'algorithms']
+            },
+            algorithms: {
+                highlights: ['复杂度分析', '经典算法', '代码实现', '面试必备'],
+                audience: ['已掌握指针和结构体', '准备算法竞赛', '想进大厂'],
+                related: ['pointers', 'project']
+            },
+            'file-io': {
+                highlights: ['文件读写', '数据持久化', '错误处理', '项目实战'],
+                audience: ['已学完指针', '需要保存数据', '准备做完整项目'],
+                related: ['strings', 'project']
+            },
+            project: {
+                highlights: ['完整项目', '需求分析', '代码重构', '团队协作'],
+                audience: ['已学完大部分课程', '想检验学习成果', '准备课程设计'],
+                related: ['algorithms', 'file-io']
+            }
+        };
+
+        // ================= 渲染右半部分扩展内容 =================
+        function renderCourseExtras() {
+            const params = new URLSearchParams(window.location.search);
+            const courseId = params.get('course') || 'basics';
+            const extras = courseExtras[courseId] || courseExtras.basics;
+            const catalog = window.courseCatalog || {};
+
+            // 1. 课程亮点
+            const highlightTags = document.getElementById('highlightTags');
+            if (highlightTags) {
+                highlightTags.innerHTML = extras.highlights.map(tag => 
+                    `<span class="highlight-tag">${tag}</span>`
+                ).join('');
+            }
+
+            // 2. 适合人群
+            const audienceList = document.getElementById('audienceList');
+            if (audienceList) {
+                audienceList.innerHTML = extras.audience.map((item, idx) => 
+                    `<div class="audience-item"><span>${idx + 1}</span>${item}</div>`
+                ).join('');
+            }
+
+            // 3. 相关课程推荐
+            const relatedCourses = document.getElementById('relatedCourses');
+            if (relatedCourses && extras.related) {
+                relatedCourses.innerHTML = extras.related.map(id => {
+                    const course = catalog[id];
+                    if (!course) return '';
+                    return `<a class="related-item" href="detail.html?course=${id}">
+                        <div class="related-icon">${course.icon}</div>
+                        <div class="related-info">
+                            <strong>${course.title}</strong>
+                            <span>${course.level} · ${course.chapters.length}章</span>
+                        </div>
+                    </a>`;
+                }).join('');
+            }
+        }
+
+        // 等待 main.js 完成动态渲染后再填充扩展内容
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(renderCourseExtras, 100);
+        });
+    </script>
 </body>
 </html>

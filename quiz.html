@@ -1,253 +1,1026 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>在线小测 - C语言编程学院</title>
-    <link rel="stylesheet" href="assets/css/reset.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-body{
-    padding:0;
-    min-height:100vh;
-    /* 让页面纵向排列：导航 + 主体内容 + footer */
-    display:flex;
-    flex-direction:column;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>在线小测 - CodeMaster</title>
+<link rel="stylesheet" href="assets/css/reset.css">
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+/* ============ 页面基础 ============ */
+body.quiz-home-page {
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background:
+        radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
+        radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
+        radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
+        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+    overflow-x: hidden;
 }
 
-#home-page{
-    display:block;
-    /* 占满剩余高度，用来垂直居中专题列表 */
+#starField {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+#starField span {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    border-radius: 50%;
+    background: #64d2ff;
+    box-shadow: 0 0 6px #64d2ff;
+    animation: twinkle 3s infinite ease-in-out;
+}
+@keyframes twinkle {
+    0%,100% { opacity: 0.15; transform: scale(0.8); }
+    50% { opacity: 0.9; transform: scale(1.2); }
+}
+
+/* ============ 页面容器 ============ */
+.quiz-home-wrap {
+    position: relative;
+    z-index: 1;
     flex: 1;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    max-width: 1240px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 130px 24px 60px;
 }
 
-.wrap{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:18px;
-    /* =========删除原来的absolute定位！========= */
-    /* position: absolute;
-    top:50%;
-    left:50%;
-    transform: translate(-50%, -50%); */
+/* ============ 顶部标题区 ============ */
+.quiz-hero {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeUp 0.6s ease both;
+}
+.quiz-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.35);
+    border-radius: 50px;
+    color: #64d2ff;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 18px;
+    box-shadow: 0 0 18px rgba(0,212,255,0.15);
+}
+.quiz-hero-badge i { font-size: 15px; }
+
+.quiz-hero h1 {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ffffff 0%, #64d2ff 60%, #7b2cbf 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+}
+.quiz-hero p {
+    color: #a0aec0;
+    font-size: 15px;
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.8;
 }
 
-.item{
-    position:relative;
-    width:280px;
-    height:52px;
-    background:linear-gradient(135deg, rgba(30,40,70,0.95), rgba(20,30,60,0.95));
-    border:1px solid rgba(100,210,255,0.6);
-    border-radius:26px;
+/* ============ 数据总览 ============ */
+.quiz-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+    animation: fadeUp 0.7s 0.05s ease both;
+}
+.stat-card {
+    position: relative;
+    padding: 22px 20px;
+    background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+    border: 1px solid #2a3447;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #64d2ff, transparent);
+    opacity: 0;
+    transition: opacity 0.35s;
+}
+.stat-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0,212,255,0.55);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35), 0 0 22px rgba(0,212,255,0.15);
+}
+.stat-card:hover::before { opacity: 1; }
+
+.stat-card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(0,212,255,0.18), rgba(123,44,191,0.18));
+    border: 1px solid rgba(100,210,255,0.35);
+    color: #64d2ff;
+    font-size: 20px;
+    margin-bottom: 14px;
+}
+.stat-card-value {
+    font-size: 30px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 6px;
+    font-family: 'JetBrains Mono','Consolas',monospace;
+}
+.stat-card-value small {
+    font-size: 14px;
+    color: #64d2ff;
+    font-weight: 600;
+    margin-left: 4px;
+}
+.stat-card-label {
+    color: #a0aec0;
+    font-size: 13px;
+}
+
+/* ============ 难度图例 ============ */
+.difficulty-legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.7s 0.1s ease both;
+}
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #a0aec0;
+    font-size: 13px;
+}
+.legend-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #08111f;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.35);
+}
+.legend-dot.s { background: radial-gradient(circle at 35% 35%, #7be4ff, #36a2eb); box-shadow: 0 0 12px rgba(100,210,255,0.55), inset 0 0 8px rgba(255,255,255,0.35); }
+.legend-dot.m { background: radial-gradient(circle at 35% 35%, #ffe08a, #f39c12); box-shadow: 0 0 12px rgba(243,156,18,0.55), inset 0 0 8px rgba(255,255,255,0.35); }
+.legend-dot.h { background: radial-gradient(circle at 35% 35%, #ff9a9e, #e53935); box-shadow: 0 0 12px rgba(229,57,53,0.55), inset 0 0 8px rgba(255,255,255,0.35); }
+
+/* ============ 主体双栏布局 ============ */
+.quiz-main {
+    display: grid;
+    grid-template-columns: 600px minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+    animation: fadeUp 0.7s 0.15s ease both;
+}
+
+/* ============ 左侧胶囊列表 ============ */
+.quiz-capsules {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 4px;
+}
+
+.item {
+    position: relative;
+    width: 380px;
+    height: 76px;
+    background: linear-gradient(135deg, rgba(30,40,70,0.95), rgba(20,30,60,0.95));
+    border: 1px solid rgba(100,210,255,0.35);
+    border-radius: 38px;
     box-shadow:
-        0 0 12px rgba(0,0,0,0.35),
-        inset 0 0 18px rgba(100,210,255,0.08);
-    cursor:pointer;
-    transition: all 0.32s ease;
-    display:flex;
-    align-items:center;
-    padding:0 24px;
-    overflow:visible;
+        0 6px 18px rgba(0,0,0,0.35),
+        inset 0 0 20px rgba(100,210,255,0.05);
+    cursor: pointer;
+    transition: width 0.42s cubic-bezier(0.34,1.2,0.64,1),
+                background 0.3s,
+                border-color 0.3s,
+                box-shadow 0.3s,
+                transform 0.3s;
+    display: flex;
+    align-items: center;
+    padding: 0 26px;
+    overflow: hidden;
 }
 
-.item:hover{
-    width:420px;
-    border-color:rgba(100,210,255,0.9);
-    background:linear-gradient(135deg, rgba(45,60,100,0.98), rgba(30,45,90,0.98));
+.item:hover,
+.item.is-active {
+    width: 580px;
+    border-color: #64d2ff;
+    background: linear-gradient(135deg, rgba(50,70,120,1), rgba(35,55,110,1));
     box-shadow:
-        0 0 18px rgba(100,210,255,0.55),
-        inset 0 0 22px rgba(100,210,255,0.12);
+        0 12px 28px rgba(0,0,0,0.5),
+        0 0 28px rgba(100,210,255,0.55),
+        inset 0 0 24px rgba(100,210,255,0.16);
+    transform: translateY(-2px);
 }
 
-.item.active{
-    width:420px;
-    border-color:#64d2ff;
-    background:linear-gradient(135deg, rgba(50,70,120,1), rgba(35,55,110,1));
+/* 序号徽章 */
+.item-index {
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(100,210,255,0.15), rgba(123,44,191,0.15));
+    border: 1.5px solid rgba(100,210,255,0.45);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono','Consolas',monospace;
+    font-size: 16px;
+    font-weight: 700;
+    color: #64d2ff;
+    margin-right: 18px;
+    transition: all 0.3s;
+    box-shadow: 0 0 10px rgba(100,210,255,0.15);
+}
+.item:hover .item-index,
+.item.is-active .item-index {
+    background: linear-gradient(135deg, #36a2eb, #64d2ff);
+    color: #08111f;
     box-shadow:
-        0 0 22px rgba(100,210,255,0.7),
-        inset 0 0 24px rgba(100,210,255,0.18);
+        0 0 18px rgba(100,210,255,0.85),
+        inset 0 0 8px rgba(255,255,255,0.4);
+    border-color: transparent;
+    transform: scale(1.06);
 }
 
-.item-text{
-    font-size:16px;
-    color:#eaf6ff;
-    white-space:nowrap;
-    letter-spacing:0.5px;
-    text-shadow:0 0 8px rgba(100,210,255,0.45);
+.item-text {
+    font-size: 18px;
+    color: #eaf6ff;
+    white-space: nowrap;
+    letter-spacing: 0.6px;
+    text-shadow: 0 0 8px rgba(100,210,255,0.35);
+    flex: 1;
 }
 
-.dot-box{
-    position:absolute;
-    right:18px;
-    display:flex;
-    gap:14px;
-    opacity:0;
-    visibility:hidden;
-    transition:0.25s ease;
+/* 悬停时出现的"进入"提示 */
+.item-go {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64d2ff;
+    opacity: 0;
+    transform: translateX(12px);
+    transition: opacity 0.3s 0.1s, transform 0.3s 0.1s;
+    white-space: nowrap;
+    margin-left: 12px;
+}
+.item:hover .item-go,
+.item.is-active .item-go {
+    opacity: 1;
+    transform: translateX(0);
+}
+.item-go i { font-size: 16px; }
+
+/* 环形进度 */
+.item-progress {
+    width: 50px;
+    height: 50px;
+    flex-shrink: 0;
+    margin-right: 14px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64d2ff;
+    font-family: 'JetBrains Mono','Consolas',monospace;
+    transition: margin 0.3s;
+}
+.item-progress svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+}
+.item-progress circle {
+    fill: none;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+}
+.item-progress .track { stroke: rgba(100,210,255,0.15); }
+.item-progress .bar {
+    stroke: #64d2ff;
+    transition: stroke-dasharray 0.6s ease, stroke 0.3s;
+    filter: drop-shadow(0 0 5px rgba(100,210,255,0.8));
 }
 
-.item:hover .dot-box,
-.item.active .dot-box{
-    opacity:1;
-    visibility:visible;
+/* ============ 右侧详情面板 ============ */
+.topic-detail {
+    position: relative;
+    min-height: 560px;
+    padding: 40px 36px;
+    background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+    border: 1px solid #2a3447;
+    border-radius: 22px;
+    overflow: hidden;
+    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.35s;
+}
+.topic-detail::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 85% 12%, rgba(0,212,255,0.12), transparent 45%),
+        radial-gradient(circle at 15% 90%, rgba(123,44,191,0.10), transparent 45%);
+    pointer-events: none;
+}
+.topic-detail.switching {
+    opacity: 0.25;
+    transform: translateX(12px);
 }
 
-.dot-box a{
-    display:flex;
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 35%, #7be4ff, #36a2eb);
-    color:#08111f;
-    text-decoration:none;
-    align-items:center;
-    justify-content:center;
-    font-size:14px;
-    font-weight:600;
-    transition:0.2s;
+/* 背景大号装饰数字 */
+.detail-num-bg {
+    position: absolute;
+    top: -40px;
+    right: 16px;
+    font-size: 240px;
+    font-weight: 900;
+    font-family: 'JetBrains Mono','Consolas',monospace;
+    line-height: 1;
+    color: rgba(100,210,255,0.05);
+    letter-spacing: -10px;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* 详情头部 */
+.detail-header {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 28px;
+}
+.detail-icon {
+    width: 60px; height: 60px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #36a2eb, #64d2ff);
+    display: flex; align-items: center; justify-content: center;
+    color: #08111f;
+    font-size: 30px;
     box-shadow:
-        0 0 12px rgba(100,210,255,0.65),
-        inset 0 0 10px rgba(255,255,255,0.35);
+        0 0 24px rgba(100,210,255,0.45),
+        inset 0 0 14px rgba(255,255,255,0.35);
+}
+.detail-title-wrap {
+    flex: 1;
+    min-width: 0;
+}
+.detail-title-wrap h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+}
+.detail-title-wrap p {
+    color: #a0aec0;
+    font-size: 14px;
+    line-height: 1.75;
 }
 
-.dot-box a.done{
-    background:radial-gradient(circle at 35% 35%, #69ff9a, #27ae60);
-    color:#0f2f1a;
-    box-shadow:
-        0 0 12px rgba(39,174,96,0.65),
-        inset 0 0 10px rgba(255,255,255,0.35);
+/* 难度卡片 */
+.detail-section-label {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #dfefff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 14px;
+    letter-spacing: 0.4px;
+}
+.detail-section-label i { color: #64d2ff; font-size: 16px; }
+
+.detail-difficulties {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 12px;
+    margin-bottom: 28px;
 }
 
-.dot-box a:hover{
-    transform:scale(1.15);
-    box-shadow:
-        0 0 16px rgba(100,210,255,0.9),
-        inset 0 0 12px rgba(255,255,255,0.45);
+.diff-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(10,14,26,0.6);
+    border: 1px solid #2a3447;
+    border-radius: 14px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.28s ease;
+    position: relative;
+    overflow: hidden;
 }
-    </style>
+.diff-card::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, transparent, #64d2ff, transparent);
+    opacity: 0;
+    transition: opacity 0.28s;
+}
+.diff-card:hover {
+    transform: translateX(6px);
+    border-color: rgba(100,210,255,0.7);
+    background: rgba(30,50,100,0.75);
+    box-shadow: 0 0 20px rgba(100,210,255,0.2);
+}
+.diff-card:hover::after { opacity: 1; }
+
+.diff-card.s::after { background: linear-gradient(180deg, transparent, #36a2eb, transparent); }
+.diff-card.m::after { background: linear-gradient(180deg, transparent, #f39c12, transparent); }
+.diff-card.h::after { background: linear-gradient(180deg, transparent, #e53935, transparent); }
+
+.diff-badge {
+    width: 46px; height: 46px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+    font-weight: 700;
+    color: #08111f;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.35);
+}
+.diff-card.s .diff-badge { background: radial-gradient(circle at 35% 35%, #7be4ff, #36a2eb); box-shadow: 0 0 14px rgba(100,210,255,0.6), inset 0 0 10px rgba(255,255,255,0.35); }
+.diff-card.m .diff-badge { background: radial-gradient(circle at 35% 35%, #ffe08a, #f39c12); box-shadow: 0 0 14px rgba(243,156,18,0.6), inset 0 0 10px rgba(255,255,255,0.35); }
+.diff-card.h .diff-badge { background: radial-gradient(circle at 35% 35%, #ff9a9e, #e53935); box-shadow: 0 0 14px rgba(229,57,53,0.6), inset 0 0 10px rgba(255,255,255,0.35); }
+
+.diff-info { flex: 1; min-width: 0; }
+.diff-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+.diff-info span {
+    color: #a0aec0;
+    font-size: 12px;
+}
+
+.diff-state {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 20px;
+    background: rgba(100,210,255,0.1);
+    border: 1px solid rgba(100,210,255,0.3);
+    color: #64d2ff;
+    font-weight: 600;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.diff-state.done {
+    background: rgba(39,174,96,0.12);
+    border-color: rgba(39,174,96,0.45);
+    color: #69ff9a;
+}
+.diff-state.done i { font-size: 13px; }
+
+/* 知识点标签 */
+.detail-tags {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.tag {
+    padding: 6px 14px;
+    background: rgba(100,210,255,0.08);
+    border: 1px solid rgba(100,210,255,0.25);
+    border-radius: 20px;
+    color: #64d2ff;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.25s;
+}
+.tag:hover {
+    background: rgba(100,210,255,0.18);
+    border-color: rgba(100,210,255,0.6);
+    box-shadow: 0 0 12px rgba(100,210,255,0.35);
+    transform: translateY(-2px);
+}
+
+/* ============ 底部提示 ============ */
+.quiz-tip {
+    text-align: center;
+    margin-top: 34px;
+    padding: 18px;
+    color: #718096;
+    font-size: 13px;
+}
+.quiz-tip strong { color: #64d2ff; font-weight: 600; }
+
+/* ============ 动画 ============ */
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ 响应式 ============ */
+@media (max-width: 1180px) {
+    .quiz-main {
+        grid-template-columns: 520px minmax(0, 1fr);
+        gap: 28px;
+    }
+    .item { width: 340px; }
+    .item:hover, .item.is-active { width: 500px; }
+    .topic-detail { padding: 32px 28px; }
+    .detail-num-bg { font-size: 190px; }
+}
+
+@media (max-width: 980px) {
+    .quiz-main {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+    .quiz-capsules {
+        align-items: flex-start;
+    }
+    .item { width: 100%; max-width: 520px; }
+    .item:hover, .item.is-active { width: 100%; max-width: 560px; }
+}
+
+@media (max-width: 900px) {
+    .quiz-stats { grid-template-columns: repeat(2, 1fr); }
+    .quiz-hero h1 { font-size: 32px; }
+}
+
+@media (max-width: 640px) {
+    .quiz-home-wrap { padding: 110px 16px 40px; }
+    .quiz-hero h1 { font-size: 26px; }
+
+    .item {
+        height: 66px;
+        padding: 0 18px;
+        border-radius: 33px;
+    }
+    .item-index {
+        width: 38px; height: 38px;
+        font-size: 13px;
+        margin-right: 12px;
+    }
+    .item-text { font-size: 15px; }
+    .item-progress { width: 40px; height: 40px; font-size: 10px; margin-right: 8px; }
+    .item-go { display: none; }
+
+    .topic-detail { padding: 26px 20px; min-height: auto; }
+    .detail-num-bg { font-size: 140px; top: -20px; right: 8px; }
+    .detail-icon { width: 50px; height: 50px; font-size: 24px; }
+    .detail-title-wrap h2 { font-size: 20px; }
+    .diff-card { padding: 14px 16px; gap: 12px; }
+    .diff-badge { width: 40px; height: 40px; font-size: 15px; }
+    .diff-info h4 { font-size: 14px; }
+    .diff-state { font-size: 11px; padding: 4px 10px; }
+
+    .quiz-stats { gap: 10px; }
+    .stat-card { padding: 16px 14px; }
+    .stat-card-value { font-size: 22px; }
+    .legend-dot { width: 22px; height: 22px; font-size: 11px; }
+}
+</style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">Cm</div>
-                <span>CodeMaster</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html">首页</a></li>
-                <li><a href="list.html">课程中心</a></li>
-                <li><a href="quiz.html" class="active">在线小测</a></li>
-                <li><a href="game.html">编程游戏</a></li>
-                <li><a href="profile.html">个人中心</a></li>
-                <li><a href="team.html">制作团队</a></li>
-            </ul>
-            <div class="nav-actions">
-                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
-                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
-            </div>
-        </div>
-    </nav>
+<body class="quiz-home-page">
 
-    <section class="quiz-page">
-        <div id="home-page">
-            <div class="wrap">
-                <div class="item" data-topic="0">
-                    <span class="item-text">C语言基础编程</span>
-                    <div class="dot-box">
-                        <a href="quiz1-s.html">简</a>
-                        <a href="quiz1-m.html">中</a>
-                        <a href="quiz1-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="1">
-                    <span class="item-text">循环与分支结构</span>
-                    <div class="dot-box">
-                        <a href="quiz2-s.html">简</a>
-                        <a href="quiz2-m.html">中</a>
-                        <a href="quiz2-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="2">
-                    <span class="item-text">函数与模块化数据</span>
-                    <div class="dot-box">
-                        <a href="quiz3-s.html">简</a>
-                        <a href="quiz3-m.html">中</a>
-                        <a href="quiz3-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="3">
-                    <span class="item-text">指针与内存管理</span>
-                    <div class="dot-box">
-                        <a href="quiz4-s.html">简</a>
-                        <a href="quiz4-m.html">中</a>
-                        <a href="quiz4-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="4">
-                    <span class="item-text">数组与字符串</span>
-                    <div class="dot-box">
-                        <a href="quiz5-s.html">简</a>
-                        <a href="quiz5-m.html">中</a>
-                        <a href="quiz5-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="5">
-                    <span class="item-text">结构体与共同体</span>
-                    <div class="dot-box">
-                        <a href="quiz6-s.html">简</a>
-                        <a href="quiz6-m.html">中</a>
-                        <a href="quiz6-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="6">
-                    <span class="item-text">数据结构与算法</span>
-                    <div class="dot-box">
-                        <a href="quiz7-s.html">简</a>
-                        <a href="quiz7-m.html">中</a>
-                        <a href="quiz7-h.html">难</a>
-                    </div>
-                </div>
-                <div class="item" data-topic="7">
-                    <span class="item-text">文件操作与IO</span>
-                    <div class="dot-box">
-                        <a href="quiz8-s.html">简</a>
-                        <a href="quiz8-m.html">中</a>
-                        <a href="quiz8-h.html">难</a>
-                    </div>
+<div id="starField"></div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">Cm</div>
+            <span>CodeMaster</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">首页</a></li>
+            <li><a href="list.html">课程中心</a></li>
+            <li><a href="quiz.html" class="active">在线小测</a></li>
+            <li><a href="game.html">编程游戏</a></li>
+            <li><a href="profile.html">个人中心</a></li>
+            <li><a href="team.html">制作团队</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+            <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
+        </div>
+    </div>
+</nav>
+
+<section class="quiz-home-wrap">
+
+    <div class="quiz-hero">
+        <div class="quiz-hero-badge">
+            <i class="ph ph-exam"></i>
+            <span>在线小测中心</span>
+        </div>
+        <h1>用测试检验真知</h1>
+        <p>8 大 C 语言专题，每专题 3 个难度等级，共 120+ 道精心设计的题目，助你查漏补缺、稳步进阶。</p>
+    </div>
+
+    <div class="quiz-stats">
+        <div class="stat-card">
+            <div class="stat-card-icon"><i class="ph ph-stack"></i></div>
+            <div class="stat-card-value" id="statTotal">8</div>
+            <div class="stat-card-label">学习专题</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon"><i class="ph ph-check-circle"></i></div>
+            <div class="stat-card-value" id="statDone">0<small>/24</small></div>
+            <div class="stat-card-label">已完成试卷</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon"><i class="ph ph-target"></i></div>
+            <div class="stat-card-value" id="statScore">--</div>
+            <div class="stat-card-label">平均得分</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-icon"><i class="ph ph-medal"></i></div>
+            <div class="stat-card-value" id="statPass">0</div>
+            <div class="stat-card-label">优秀次数（90+）</div>
+        </div>
+    </div>
+
+    <div class="difficulty-legend">
+        <div class="legend-item"><span class="legend-dot s">简</span> 基础题 · 适合刚学完知识点</div>
+        <div class="legend-item"><span class="legend-dot m">中</span> 进阶题 · 综合应用</div>
+        <div class="legend-item"><span class="legend-dot h">难</span> 挑战题 · 深入原理</div>
+    </div>
+
+    <div class="quiz-main">
+        <!-- 左侧：胶囊列表 -->
+        <div class="quiz-capsules" id="capsuleList">
+            <div class="item is-active" data-topic="0">
+                <div class="item-index">01</div>
+                <span class="item-text">C语言基础编程</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="0">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>©2026 CodeMaster 北京理工大学</p>
+            <div class="item" data-topic="1">
+                <div class="item-index">02</div>
+                <span class="item-text">循环与分支结构</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="1">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="2">
+                <div class="item-index">03</div>
+                <span class="item-text">函数与模块化</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="2">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="3">
+                <div class="item-index">04</div>
+                <span class="item-text">指针与内存管理</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="3">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="4">
+                <div class="item-index">05</div>
+                <span class="item-text">数组与字符串</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="4">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="5">
+                <div class="item-index">06</div>
+                <span class="item-text">结构体与共同体</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="5">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="6">
+                <div class="item-index">07</div>
+                <span class="item-text">数据结构与算法</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="6">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
+            </div>
+            <div class="item" data-topic="7">
+                <div class="item-index">08</div>
+                <span class="item-text">文件操作与IO</span>
+                <span class="item-go">进入 <i class="ph ph-arrow-right"></i></span>
+                <div class="item-progress" data-topic-progress="7">
+                    <svg viewBox="0 0 36 36"><circle class="track" cx="18" cy="18" r="16"/><circle class="bar" cx="18" cy="18" r="16" stroke-dasharray="0 100.53"/></svg>
+                    <span class="pct">0%</span>
+                </div>
             </div>
         </div>
-    </footer>
 
-    <script src="assets/js/main.js"></script>
-    <script src="assets/js/quiz.js"></script>
-    <script>
-const items = document.querySelectorAll('.item');
-items.forEach(el=>{
-    el.addEventListener('click',function(e){
-        if(e.target.tagName === 'A') return;
-        items.forEach(i=>i.classList.remove('active'));
-        this.classList.add('active');
-    })
-})
-refreshHomeMark();
+        <!-- 右侧：专题详情面板（JS 动态渲染） -->
+        <div class="topic-detail" id="topicDetail"></div>
+    </div>
+
+    <div class="quiz-tip">
+        提示：鼠标悬停左侧胶囊，右侧会显示该专题的详细信息和难度入口 · <strong>绿色</strong>表示已完成
+    </div>
+
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-bottom">
+            <p>©2026 CodeMaster 北京理工大学</p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script src="assets/js/quiz.js"></script>
+<script>
+// ========== 星星背景 ==========
+(function(){
+    const field = document.getElementById('starField');
+    if (!field) return;
+    const count = 60;
+    for (let i = 0; i < count; i++) {
+        const s = document.createElement('span');
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        s.style.animationDelay = (Math.random() * 3) + 's';
+        s.style.opacity = Math.random() * 0.5 + 0.1;
+        const size = Math.random() * 2 + 1;
+        s.style.width = size + 'px';
+        s.style.height = size + 'px';
+        field.appendChild(s);
+    }
+})();
+
+// ========== 专题数据 ==========
+const topicData = [
+    {
+        num: '01',
+        name: 'C语言基础编程',
+        icon: 'ph-code',
+        desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块基石。',
+        tags: ['变量声明', '数据类型', '运算符', 'printf/scanf', '程序结构'],
+        base: 'quiz1'
+    },
+    {
+        num: '02',
+        name: '循环与分支结构',
+        icon: 'ph-arrows-clockwise',
+        desc: 'if-else、switch、for、while、do-while 的控制逻辑，让程序学会"做决定"和"重复执行"。',
+        tags: ['if-else', 'switch', 'for', 'while', 'break/continue'],
+        base: 'quiz2'
+    },
+    {
+        num: '03',
+        name: '函数与模块化',
+        icon: 'ph-package',
+        desc: '函数定义、参数传递、递归调用与作用域，掌握拆分复杂问题的思维方式。',
+        tags: ['函数声明', '参数传递', '返回值', '递归', '作用域'],
+        base: 'quiz3'
+    },
+    {
+        num: '04',
+        name: '指针与内存管理',
+        icon: 'ph-wrench',
+        desc: '从地址、指针运算到动态内存分配，理解C语言最核心也最具挑战的机制。',
+        tags: ['地址与指针', '指针运算', 'malloc/free', '数组指针', '函数指针'],
+        base: 'quiz4'
+    },
+    {
+        num: '05',
+        name: '数组与字符串',
+        icon: 'ph-clipboard-text',
+        desc: '一维/二维数组、字符数组与字符串处理函数，批量数据的组织与操作。',
+        tags: ['一维数组', '二维数组', '字符数组', 'strlen/strcpy', '字符串比较'],
+        base: 'quiz5'
+    },
+    {
+        num: '06',
+        name: '结构体与共同体',
+        icon: 'ph-stack-simple',
+        desc: 'struct、union、enum 与位域，把复杂数据打包成一个整体。',
+        tags: ['struct', 'union', 'enum', '位域', 'typedef'],
+        base: 'quiz6'
+    },
+    {
+        num: '07',
+        name: '数据结构与算法',
+        icon: 'ph-tree-structure',
+        desc: '链表、栈、队列、树与排序算法，夯实计算机科学的核心基础。',
+        tags: ['链表', '栈与队列', '二叉树', '排序', '查找'],
+        base: 'quiz7'
+    },
+    {
+        num: '08',
+        name: '文件操作与IO',
+        icon: 'ph-folder',
+        desc: '文件的打开、读写、定位与关闭，让数据持久化保存到磁盘。',
+        tags: ['fopen/fclose', 'fread/fwrite', 'fseek', '文本/二进制', '错误处理'],
+        base: 'quiz8'
+    }
+];
+
+// ========== 读取答题记录 ==========
+function getQuizRecord(){
+    try {
+        const str = localStorage.getItem("quizRecord");
+        return str ? JSON.parse(str) : {};
+    } catch(e){ return {}; }
+}
+
+// ========== 渲染右侧详情面板 ==========
+function renderTopicDetail(topicIndex){
+    const data = topicData[topicIndex];
+    const panel = document.getElementById('topicDetail');
+    if (!data || !panel) return;
+
+    const record = getQuizRecord();
+    const difficulties = [
+        { level: 's', label: '简单', title: '基础题', desc: '适合刚学完知识点', href: `${data.base}-s.html` },
+        { level: 'm', label: '中', title: '进阶题', desc: '综合应用能力', href: `${data.base}-m.html` },
+        { level: 'h', label: '难', title: '挑战题', desc: '深入原理细节', href: `${data.base}-h.html` }
+    ];
+
+    const diffHtml = difficulties.map(function(d, i){
+        const key = `${topicIndex}-${i}`;
+        const rec = record[key];
+        let stateHtml = '';
+        if (rec) {
+            const score = rec.score || 0;
+            stateHtml = `<span class="diff-state done"><i class="ph ph-check-circle"></i> ${score}分</span>`;
+        } else {
+            stateHtml = `<span class="diff-state">开始 <i class="ph ph-arrow-right"></i></span>`;
+        }
+        return `<a class="diff-card ${d.level}" href="${d.href}">
+            <div class="diff-badge">${d.label}</div>
+            <div class="diff-info">
+                <h4>${d.title}</h4>
+                <span>${d.desc}</span>
+            </div>
+            ${stateHtml}
+        </a>`;
+    }).join('');
+
+    const tagHtml = data.tags.map(t => `<span class="tag">#${t}</span>`).join('');
+
+    panel.innerHTML = `
+        <div class="detail-num-bg">${data.num}</div>
+        <div class="detail-header">
+            <div class="detail-icon"><i class="ph ${data.icon}"></i></div>
+            <div class="detail-title-wrap">
+                <h2>${data.name}</h2>
+                <p>${data.desc}</p>
+            </div>
+        </div>
+        <div class="detail-section-label">
+            <i class="ph ph-flag"></i>
+            <span>选择难度开始测试</span>
+        </div>
+        <div class="detail-difficulties">${diffHtml}</div>
+        <div class="detail-section-label">
+            <i class="ph ph-tag"></i>
+            <span>核心知识点</span>
+        </div>
+        <div class="detail-tags">${tagHtml}</div>
+    `;
+}
+
+// ========== 胶囊悬停与点击联动 ==========
+let lockedTopic = 0;   // 用户点击锁定的专题
+let hoverTopic = null; // 当前鼠标悬停的专题
+
+function switchDetail(index){
+    const panel = document.getElementById('topicDetail');
+    if (!panel) return;
+    panel.classList.add('switching');
+    setTimeout(function(){
+        renderTopicDetail(index);
+        panel.classList.remove('switching');
+    }, 140);
+}
+
+function applyActive(index){
+    document.querySelectorAll('.item').forEach(function(el, i){
+        el.classList.toggle('is-active', i === index);
+    });
+}
+
+const capsuleItems = document.querySelectorAll('.item');
+capsuleItems.forEach(function(el, i){
+    el.addEventListener('mouseenter', function(){
+        hoverTopic = i;
+        applyActive(i);
+        switchDetail(i);
+    });
+    el.addEventListener('mouseleave', function(){
+        hoverTopic = null;
+        // 恢复到已锁定（或默认第一个）的专题
+        applyActive(lockedTopic);
+        switchDetail(lockedTopic);
+    });
+    el.addEventListener('click', function(){
+        lockedTopic = i;
+        applyActive(i);
+        switchDetail(i);
+    });
+});
+
+// 初始渲染第一个专题
+renderTopicDetail(0);
+
+// ========== 更新顶部统计 + 环形进度 ==========
+function updateQuizStats(){
+    const record = getQuizRecord();
+    const totalPapers = 8 * 3;
+    const keys = Object.keys(record);
+    const doneCount = keys.length;
+
+    let scoreSum = 0, passCount = 0;
+    keys.forEach(k => {
+        const s = record[k].score || 0;
+        scoreSum += s;
+        if (s >= 90) passCount++;
+    });
+    const avgScore = doneCount > 0 ? Math.round(scoreSum / doneCount) : '--';
+
+    const elDone = document.getElementById('statDone');
+    const elScore = document.getElementById('statScore');
+    const elPass = document.getElementById('statPass');
+    if (elDone) elDone.innerHTML = `${doneCount}<small>/${totalPapers}</small>`;
+    if (elScore) elScore.textContent = avgScore;
+    if (elPass) elPass.textContent = passCount;
+
+    document.querySelectorAll('.item-progress').forEach(function(box){
+        const t = Number(box.dataset.topicProgress);
+        let doneInTopic = 0;
+        for (let d = 0; d < 3; d++) {
+            if (record[`${t}-${d}`]) doneInTopic++;
+        }
+        const pct = Math.round(doneInTopic / 3 * 100);
+        const bar = box.querySelector('.bar');
+        const pctText = box.querySelector('.pct');
+        if (bar) {
+            const circumference = 2 * Math.PI * 16;
+            const dash = (pct / 100) * circumference;
+            bar.setAttribute('stroke-dasharray', `${dash} ${circumference}`);
+            if (pct === 100) {
+                bar.style.stroke = '#27ae60';
+                if (pctText) pctText.style.color = '#27ae60';
+            } else if (pct > 0) {
+                bar.style.stroke = '#64d2ff';
+            }
+        }
+        if (pctText) pctText.textContent = pct + '%';
+    });
+}
+
+window.addEventListener('load', function(){
+    if (typeof refreshHomeMark === 'function') {
+        refreshHomeMark();
+    }
+    updateQuizStats();
+});
 </script>
 </body>
 </html>

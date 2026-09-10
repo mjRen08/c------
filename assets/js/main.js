@@ -1974,3 +1974,44 @@ function renderHomeCourseProgress() {
         if (progressText && progress === 100) progressText.textContent = '已完成';
     });
 }
+
+// ========== 全局页面切换进度条 ==========
+(function() {
+    const bar = document.createElement('div');
+    bar.id = 'pageProgressBar';
+    document.body.appendChild(bar);
+
+    let timer = null;
+    let v = 0;
+
+    function start() {
+        bar.classList.add('active');
+        v = 10;
+        bar.style.width = v + '%';
+        clearInterval(timer);
+        timer = setInterval(function() {
+            if (v < 85) {
+                v += Math.random() * 8 + 2;
+                bar.style.width = v + '%';
+            }
+        }, 180);
+    }
+    function finish() {
+        clearInterval(timer);
+        bar.style.width = '100%';
+        setTimeout(function() {
+            bar.classList.remove('active');
+            setTimeout(function() { bar.style.width = '0%'; v = 0; }, 250);
+        }, 300);
+    }
+    document.addEventListener('click', function(e) {
+        const a = e.target.closest('a');
+        if (!a) return;
+        const href = a.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+        if (a.target === '_blank') return;
+        if (href.startsWith('http') && !href.includes(location.host)) return;
+        start();
+    });
+    window.addEventListener('load', function() { start(); setTimeout(finish, 400); });
+})();

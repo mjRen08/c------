@@ -7,54 +7,291 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* ========== 团队抽卡组件局部样式（不污染全局） ========== */
-        .team-card-area {
+        /* ================= 页面背景 ================= */
+        body.team-page-bg {
+            background:
+                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.10), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.10), transparent 35%),
+                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.06), transparent 40%),
+                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* 星空粒子 */
+        #starField {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #starField span {
+            position: absolute;
+            border-radius: 50%;
+            background: #64d2ff;
+            box-shadow: 0 0 6px #64d2ff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        /* 入场动画 */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .team-container {
             position: relative;
-            width: 820px;
-            height: 420px;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 130px 24px 80px;
+        }
+
+        /* ================= Hero 区域 ================= */
+        .team-hero {
+            text-align: center;
+            margin-bottom: 56px;
+            animation: fadeUp 0.7s ease both;
+        }
+        .team-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            border-radius: 50px;
+            color: #64d2ff;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 22px;
+            box-shadow: 0 0 22px rgba(0,212,255,0.15);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%,100% { box-shadow: 0 0 18px rgba(0,212,255,0.15); }
+            50% { box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+        }
+        .team-badge .pulse-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+            animation: pulseDot 1.5s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%,100% { opacity: 0.5; transform: scale(0.85); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .team-hero h2 {
+            font-size: 44px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #64d2ff 55%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+            letter-spacing: 1px;
+        }
+        .team-hero p {
+            color: #a0aec0;
+            font-size: 16px;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ================= 团队数据统计 ================= */
+        .team-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 780px;
+            margin: 0 auto 60px;
+            animation: fadeUp 0.7s 0.1s ease both;
+        }
+        .team-stat-card {
+            padding: 22px 20px;
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .team-stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0;
+            transition: opacity 0.35s;
+        }
+        .team-stat-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(0,212,255,0.5);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 22px rgba(0,212,255,0.15);
+        }
+        .team-stat-card:hover::before { opacity: 1; }
+        .team-stat-card .num {
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', 'Consolas', monospace;
+        }
+        .team-stat-card .lbl {
+            color: #a0aec0;
+            font-size: 13px;
+        }
+
+        /* ================= 项目背景卡片 ================= */
+        .project-intro {
+            max-width: 900px;
+            margin: 0 auto 60px;
+            padding: 32px 36px;
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeUp 0.7s 0.15s ease both;
+        }
+        .project-intro::before {
+            content: '';
+            position: absolute;
+            top: -40%; right: -10%;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(123,44,191,0.15), transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .project-intro h3 {
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .project-intro h3 .emoji {
+            font-size: 24px;
+            filter: drop-shadow(0 0 8px rgba(0,212,255,0.5));
+        }
+        .project-intro p {
+            color: #a0aec0;
+            line-height: 1.9;
+            font-size: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ================= 团队成员标题 ================= */
+        .team-section-title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
+            gap: 12px;
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+        .team-section-title::before,
+        .team-section-title::after {
+            content: '';
+            display: block;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff);
+        }
+        .team-section-title::after {
+            background: linear-gradient(90deg, #00d4ff, transparent);
+        }
+        .team-section-subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 40px;
+            animation: fadeUp 0.7s 0.25s ease both;
+        }
+
+        /* ================= 抽卡交互组件 ================= */
+        .team-card-area {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            height: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
             cursor: default;
+            animation: fadeUp 0.7s 0.3s ease both;
         }
 
         .team-card-stack {
             position: relative;
             width: 520px;
             height: 320px;
-            transition: transform .45s cubic-bezier(0.34,1.56,0.64,1);
+            transition: transform .55s cubic-bezier(0.34,1.56,0.64,1);
         }
 
-        /* 卡牌区域局部网格背景，不修改页面body */
+        /* 卡牌区域网格背景 */
         .team-card-stack::before {
             content: "";
             position: absolute;
-            inset: 0;
+            inset: -40px;
             background-image:
-                linear-gradient(rgba(0,255,255,.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0,255,255,.03) 1px, transparent 1px);
+                linear-gradient(rgba(0,255,255,.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,255,.04) 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
+            border-radius: 50%;
+            -webkit-mask-image: radial-gradient(circle, #000 30%, transparent 70%);
+            mask-image: radial-gradient(circle, #000 30%, transparent 70%);
         }
 
         .team-card {
             position: absolute;
             width: 300px;
             height: 400px;
-            background: #0f172a;
-            border: 3px solid var(--card-color); /* 加粗边框 */
-            border-radius: 14px;
+            background: linear-gradient(145deg, #0f172a 0%, #0a0f1f 100%);
+            border: 2px solid var(--card-color);
+            border-radius: 16px;
             cursor: pointer;
             transition:
-                transform .45s cubic-bezier(0.34,1.56,0.64,1),
+                transform .5s cubic-bezier(0.34,1.56,0.64,1),
                 box-shadow .3s,
-                left .45s cubic-bezier(0.34,1.56,0.64,1);
-            box-shadow: 0 4px 12px rgba(0,0,0,.4);
+                left .5s cubic-bezier(0.34,1.56,0.64,1);
+            box-shadow: 0 8px 20px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,0.03);
             user-select: none;
             overflow: hidden;
-            color:#fff;
+            color: #fff;
+        }
+
+        /* 卡牌全息纹路 */
+        .team-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 10%, rgba(255,255,255,0.08), transparent 40%),
+                linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+            pointer-events: none;
+            opacity: 0.7;
         }
 
         .team-card-0 { left: 0;   z-index: 1; }
@@ -63,118 +300,426 @@
         .team-card-3 { left: 120px; z-index: 4; }
         .team-card-4 { left: 160px; z-index: 5; }
 
-        /* 卡片内部左侧竖排名字，颜色取自卡片变量 */
+        /* 卡片竖排名字 */
         .team-card-name {
             position: absolute;
-            left:16px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
             writing-mode: vertical-rl;
             text-orientation: upright;
-            letter-spacing:5px;
-            font-size:19px;
-            color:var(--card-color);
-            text-shadow: 0 0 8px var(--card-color);
-            z-index:2;
-            transition: opacity 0.45s ease;
-            pointer-events:none;
+            letter-spacing: 6px;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--card-color);
+            text-shadow: 0 0 12px var(--card-color);
+            z-index: 2;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
         }
 
-        /* 成员详情面板，默认透明 */
+        /* 卡片序号装饰 */
+        .team-card-index {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 42px;
+            font-weight: 900;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--card-color);
+            opacity: 0.18;
+            line-height: 1;
+            z-index: 2;
+            transition: opacity 0.4s;
+        }
+        .team-card:hover .team-card-index { opacity: 0.35; }
+
+        /* 卡片底部装饰条 */
+        .team-card-stripe {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--card-color), transparent);
+            z-index: 2;
+        }
+
+        /* 详情面板 */
         .team-card-detail {
-            width:100%;
-            height:100%;
-            padding:28px 20px 28px 68px;
-            text-align:center;
-            opacity:0;
-            transition: opacity 0.6s ease;
-            pointer-events:none;
+            width: 100%;
+            height: 100%;
+            padding: 26px 20px 26px 68px;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+        }
+        .team-card-detail::-webkit-scrollbar { width: 4px; }
+        .team-card-detail::-webkit-scrollbar-thumb {
+            background: rgba(100,210,255,0.3);
+            border-radius: 2px;
         }
 
         .team-avatar {
-            width:76px;
-            height:76px;
-            margin:0 auto 14px;
-            border-radius:50%;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            font-size:30px;
-            font-weight:700;
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: 700;
+            position: relative;
+            background: var(--card-color);
+            box-shadow: 0 0 24px var(--card-color);
         }
-
         .team-avatar img {
             width: 100%;
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
+            border: 3px solid var(--card-color);
         }
 
         .team-card-detail h4 {
-            font-size:18px;
-            margin-bottom:4px;
+            font-size: 20px;
+            margin-bottom: 6px;
+            color: #fff;
+            letter-spacing: 1px;
         }
         .team-card-detail .role {
-            color:#22d3ee;
-            font-size:13px;
-            margin-bottom:12px;
+            color: var(--card-color);
+            font-size: 12px;
+            margin-bottom: 14px;
+            font-weight: 600;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+        }
+        .team-card-detail .divider {
+            width: 40px;
+            height: 2px;
+            background: var(--card-color);
+            margin: 0 auto 14px;
+            border-radius: 2px;
+            box-shadow: 0 0 8px var(--card-color);
         }
         .team-card-detail .desc {
-            color:#cbd5e1;
-            font-size: 10px;
-            line-height:1.6;
+            color: #cbd5e1;
+            font-size: 11px;
+            line-height: 1.75;
+            text-align: justify;
         }
 
+        /* 悬停效果 */
         .team-card:hover {
-            transform: translateY(-10px) translateX(3px);
+            transform: translateY(-12px) translateX(4px);
             box-shadow:
-                0 12px 24px rgba(0,0,0,.5),
-                0 0 0 4px var(--card-color); /* hover外发光同步加粗 */
+                0 16px 32px rgba(0,0,0,.55),
+                0 0 0 4px var(--card-color),
+                0 0 30px var(--card-color);
         }
 
-        /* 抽中放大状态：保留卡片自身颜色，不再强制金色 */
+        /* 抽中放大状态 */
         .team-card.picked {
-            left:600px !important;
-            top:50% !important;
-            transform: translateY(-50%) scale(2.1) !important;
-            z-index:999;
+            left: 600px !important;
+            top: 50% !important;
+            transform: translateY(-50%) scale(2) !important;
+            z-index: 999;
             box-shadow:
-                0 20px 60px rgba(0,0,0,.6),
-                0 0 30px var(--card-color); /* 光晕使用卡片自身颜色 */
+                0 24px 60px rgba(0,0,0,.7),
+                0 0 40px var(--card-color),
+                0 0 80px var(--card-color);
+            animation: pickedPulse 2.5s ease-in-out infinite;
+        }
+        @keyframes pickedPulse {
+            0%,100% { box-shadow: 0 24px 60px rgba(0,0,0,.7), 0 0 30px var(--card-color), 0 0 60px var(--card-color); }
+            50% { box-shadow: 0 24px 60px rgba(0,0,0,.7), 0 0 50px var(--card-color), 0 0 100px var(--card-color); }
         }
         .team-card.picked .team-card-name {
-            opacity:0;
+            opacity: 0;
+        }
+        .team-card.picked .team-card-index {
+            opacity: 0;
         }
         .team-card.picked .team-card-detail {
-    opacity: 1;
-    padding-left: 20px;
-    transform: translateX(8px);
-}
-
+            opacity: 1;
+            padding-left: 20px;
+            transform: translateX(8px);
+            pointer-events: auto;
+        }
 
         .team-card-area:has(.picked) .team-card-stack {
             transform: translateX(-80px);
         }
 
         .team-tip-text {
-            text-align:center;
-            margin-top:110px;
-            font-size:17px;
-            color:var(--text-secondary);
-            min-height:40px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 15px;
+            color: #a0aec0;
+            min-height: 40px;
             transform: translateX(0);
-            transition: transform .45s ease;
+            transition: transform .5s ease;
+            animation: fadeUp 0.7s 0.35s ease both;
         }
-
         .team-card-area.has-picked + .team-tip-text {
             transform: translateX(-180px);
         }
         .team-tip-text strong {
-            color:#fbbf24;
+            color: #ffcc00;
+            text-shadow: 0 0 12px rgba(255,204,0,0.6);
+        }
+
+        /* ================= 能力标签墙 ================= */
+        .skill-wall {
+            max-width: 900px;
+            margin: 60px auto 40px;
+            animation: fadeUp 0.7s 0.4s ease both;
+        }
+        .skill-wall h3 {
+            text-align: center;
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+        .skill-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+        }
+        .skill-tag {
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            border: 1px solid;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: default;
+        }
+        .skill-tag:hover {
+            transform: translateY(-4px) scale(1.06);
+        }
+        .skill-tag.t-blue {
+            background: rgba(0,212,255,0.08);
+            border-color: rgba(0,212,255,0.35);
+            color: #64d2ff;
+        }
+        .skill-tag.t-blue:hover {
+            box-shadow: 0 8px 20px rgba(0,212,255,0.3);
+            background: rgba(0,212,255,0.16);
+        }
+        .skill-tag.t-purple {
+            background: rgba(123,44,191,0.08);
+            border-color: rgba(123,44,191,0.4);
+            color: #c4b5fd;
+        }
+        .skill-tag.t-purple:hover {
+            box-shadow: 0 8px 20px rgba(123,44,191,0.3);
+            background: rgba(123,44,191,0.18);
+        }
+        .skill-tag.t-green {
+            background: rgba(0,255,136,0.06);
+            border-color: rgba(0,255,136,0.3);
+            color: #6ee7b7;
+        }
+        .skill-tag.t-green:hover {
+            box-shadow: 0 8px 20px rgba(0,255,136,0.25);
+            background: rgba(0,255,136,0.14);
+        }
+        .skill-tag.t-pink {
+            background: rgba(244,114,182,0.08);
+            border-color: rgba(244,114,182,0.35);
+            color: #f9a8d4;
+        }
+        .skill-tag.t-pink:hover {
+            box-shadow: 0 8px 20px rgba(244,114,182,0.3);
+            background: rgba(244,114,182,0.16);
+        }
+        .skill-tag.t-yellow {
+            background: rgba(255,204,0,0.08);
+            border-color: rgba(255,204,0,0.3);
+            color: #fbbf24;
+        }
+        .skill-tag.t-yellow:hover {
+            box-shadow: 0 8px 20px rgba(255,204,0,0.3);
+            background: rgba(255,204,0,0.16);
+        }
+
+        /* ================= 项目里程碑时间线 ================= */
+        .timeline-section {
+            max-width: 900px;
+            margin: 60px auto 40px;
+            animation: fadeUp 0.7s 0.45s ease both;
+        }
+        .timeline-section h3 {
+            text-align: center;
+            font-size: 22px;
+            color: #fff;
+            margin-bottom: 32px;
+        }
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: linear-gradient(180deg, #00d4ff, #7b2cbf, transparent);
+            border-radius: 2px;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 26px;
+        }
+        .timeline-item:last-child { padding-bottom: 0; }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -34px;
+            top: 6px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            box-shadow: 0 0 14px rgba(0,212,255,0.6);
+            border: 3px solid #0a0f1f;
+        }
+        .timeline-date {
+            font-size: 12px;
+            color: #64d2ff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .timeline-desc {
+            color: #a0aec0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* ================= 联系方式 ================= */
+        .contact-section {
+            max-width: 900px;
+            margin: 60px auto 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            animation: fadeUp 0.7s 0.5s ease both;
+        }
+        .contact-card {
+            padding: 24px 20px;
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 18px;
+            text-align: center;
+            transition: all 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0;
+            transition: opacity 0.35s;
+        }
+        .contact-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,212,255,0.5);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4), 0 0 24px rgba(0,212,255,0.18);
+        }
+        .contact-card:hover::before { opacity: 1; }
+        .contact-icon {
+            width: 52px; height: 52px;
+            margin: 0 auto 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, rgba(0,212,255,0.15), rgba(123,44,191,0.15));
+            border: 1px solid rgba(0,212,255,0.3);
+            transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+        }
+        .contact-card:hover .contact-icon {
+            transform: scale(1.15) rotate(-8deg);
+        }
+        .contact-label {
+            font-size: 12px;
+            color: #718096;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .contact-value {
+            color: #e2e8f0;
+            font-size: 14px;
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        /* ================= 响应式 ================= */
+        @media (max-width: 968px) {
+            .team-stats { grid-template-columns: repeat(3, 1fr); }
+            .contact-section { grid-template-columns: 1fr; }
+            .team-card-area { transform: scale(0.85); height: 420px; }
+            .team-hero h2 { font-size: 34px; }
+        }
+        @media (max-width: 640px) {
+            .team-container { padding: 100px 16px 60px; }
+            .team-hero h2 { font-size: 26px; }
+            .team-hero p { font-size: 14px; }
+            .team-stats { gap: 10px; }
+            .team-stat-card { padding: 16px 12px; }
+            .team-stat-card .num { font-size: 22px; }
+            .team-stat-card .lbl { font-size: 11px; }
+
+            .team-card-area {
+                transform: scale(0.6);
+                height: 320px;
+                margin-top: -60px;
+            }
+            .team-tip-text {
+                font-size: 13px;
+                margin-top: -50px;
+            }
+            .team-card-area.has-picked + .team-tip-text {
+                transform: translateX(-100px);
+            }
+            .project-intro { padding: 22px; }
+            .project-intro h3 { font-size: 18px; }
+            .project-intro p { font-size: 14px; }
+            .contact-card { padding: 20px 16px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .team-container * { animation: none !important; }
         }
     </style>
 </head>
-<body>
+<body class="team-page-bg">
+
+<div id="starField"></div>
+
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
@@ -196,120 +741,222 @@
         </div>
     </nav>
 
-    <section style="padding: 140px 0 80px;">
-        <div class="container">
-            <div style="text-align: center; margin-bottom: 60px;">
-                <h2 class="section-title">关于制作团队</h2>
-                <p class="section-subtitle">来自北京理工大学的五位大学生，用代码创造编程学习的无限可能</p>
+    <section class="team-container">
+
+        <!-- ================= Hero ================= -->
+        <div class="team-hero">
+            <div class="team-badge">
+                <span class="pulse-dot"></span>
+                <span>北京理工大学 · 项目团队</span>
             </div>
+            <h2>关于制作团队</h2>
+            <p>五位来自北京理工大学的大学生，用代码与设计，共同打造一个让 C 语言学习变得更有趣的在线平台。</p>
+        </div>
 
-            <div class="card" style="max-width: 800px; margin: 0 auto 60px; text-align: center; padding: 40px;">
-                <h3 style="font-size: 24px; margin-bottom: 16px; color: var(--text-primary);">项目背景</h3>
-                <p style="color: var(--text-secondary); line-height: 1.9;">
-                    CodeMaster 诞生于北京理工大学的课程项目。我们发现传统的编程教学方式枯燥乏味，
-                    初学者往往难以入门。因此我们希望打造一个集课程教学、在线测验、游戏化学习于一体的平台，
-                    让C语言学习变得有趣、高效、触手可及。团队五位成员各司其职，
-                    从产品设计、前端开发到内容策划，共同打磨出这个作品。
-                </p>
+        <!-- ================= 团队数据 ================= -->
+        <div class="team-stats">
+            <div class="team-stat-card">
+                <div class="num">5</div>
+                <div class="lbl">团队成员</div>
             </div>
+            <div class="team-stat-card">
+                <div class="num">8000+</div>
+                <div class="lbl">代码行数</div>
+            </div>
+            <div class="team-stat-card">
+                <div class="num">10+</div>
+                <div class="lbl">核心页面</div>
+            </div>
+        </div>
 
-            <h3 style="text-align: center; font-size: 24px; margin-bottom: 40px; color: var(--text-primary);">团队成员</h3>
+        <!-- ================= 项目背景 ================= -->
+        <div class="project-intro">
+            <h3><span class="emoji">💡</span> 项目背景</h3>
+            <p>
+                CodeMaster 诞生于北京理工大学的课程项目。我们发现传统的编程教学方式枯燥乏味，初学者往往难以入门。
+                因此我们希望打造一个集课程教学、在线测验、游戏化学习于一体的平台，让 C 语言学习变得有趣、高效、触手可及。
+                团队五位成员各司其职，从产品设计、前端开发到内容策划，共同打磨出这个作品。
+            </p>
+        </div>
 
-            <!-- ========== 抽卡交互组件开始 ========== -->
-            <div class="team-card-area" id="teamCardArea">
-                <div class="team-card-stack">
-                    <!-- 张天艺：青蓝色 -->
-                    <div class="team-card team-card-0" data-name="张天艺" style="--card-color:#22d3ee;">
-                        <div class="team-card-name">张天艺</div>
-                        <div class="team-card-detail">
-                            <div class="team-avatar"><img src="assets/images/张.jpg" alt="张天艺头像"></div>
-                            <h4>张天艺&emsp;</h4>
-                            <p class="role">队长/项目经理/技术总监/程序员&emsp;</p>
-                            <p class="desc" style="text-align: left">
-                                &emsp;&emsp;作为整个小组的负责人，全程把控项目推进节奏，规划每个阶段的开发任务，组织小组交流讨论。
-                                同时制定统一的代码编写规范，审核组员完成的代码，攻克开发中的技术难题。
-                                主要负责网站首页、在线测验以及趣味小游戏等难度较高的核心页面开发。
-                                平时爱好FPS游戏、篮球和魂类游戏，长期游玩锻炼了大局意识与抗压能力。
-                                遇到代码bug或者项目进度受阻时，会积极寻找解决办法，合理分配任务，
-                                带领团队稳步完成整个C语言教学网站的开发工作。同时制定统一的代码编写规范，
-                                审核组员完成的代码，攻克开发中的技术难题。
-                            </p>
-                        </div>
+        <!-- ================= 团队成员 ================= -->
+        <h3 class="team-section-title">团队成员</h3>
+        <p class="team-section-subtitle">点击卡牌抽取成员详情 ✨</p>
+
+        <div class="team-card-area" id="teamCardArea">
+            <div class="team-card-stack">
+                <!-- 张天艺 -->
+                <div class="team-card team-card-0" data-name="张天艺" style="--card-color:#22d3ee;">
+                    <div class="team-card-index">01</div>
+                    <div class="team-card-name">张天艺</div>
+                    <div class="team-card-stripe"></div>
+                    <div class="team-card-detail">
+                        <div class="team-avatar"><img src="assets/images/张.jpg" alt="张天艺头像"></div>
+                        <h4>张天艺</h4>
+                        <p class="role">队长 / 项目经理 / 技术总监 / 程序员</p>
+                        <div class="divider"></div>
+                        <p class="desc">
+                            作为整个小组的负责人，全程把控项目推进节奏，规划每个阶段的开发任务，组织小组交流讨论。
+                            同时制定统一的代码编写规范，审核组员完成的代码，攻克开发中的技术难题。
+                            主要负责网站首页、在线测验以及趣味小游戏等难度较高的核心页面开发。
+                            平时爱好 FPS 游戏、篮球和魂类游戏，长期游玩锻炼了大局意识与抗压能力。
+                            遇到 bug 或项目进度受阻时，会积极寻找解决办法，合理分配任务，带领团队稳步完成整个 C 语言教学网站的开发工作。
+                        </p>
                     </div>
-                    <!-- 任明捷：玫瑰红 -->
-                    <div class="team-card team-card-1" data-name="任明捷" style="--card-color:#fb7185;">
-                        <div class="team-card-name">任明捷</div>
-                        <div class="team-card-detail">
-                            <div class="team-avatar"><img src="assets/images/任.jpg" alt="任明捷头像"></div>
-                            <h4>任明捷&emsp;</h4>
-                            <p class="role">程序员/测试员&emsp;</p>
-                            <p class="desc" style="text-align: left">
-                                &emsp;&emsp;在团队中承担开发与测试两项工作，主要完成知识点列表、教程详情、团队介绍页面的搭建，
-                                编写HTML结构和CSS样式，调整页面布局，优化基础展示效果。页面开发完成之后参与网站测试，
-                                逐一浏览各个板块，记录布局错乱、交互异常等各类问题并及时反馈修改。课余时间喜欢打乒乓球和篮球，
-                                团体运动让我十分看重团队协作。写代码时注重整洁规范，遇到页面显示问题会反复调试，主动和组员沟通想法，
-                                认真做好分配的开发和测试工作。
-                            </p>
-                        </div>
+                </div>
+
+                <!-- 任明捷 -->
+                <div class="team-card team-card-1" data-name="任明捷" style="--card-color:#fb7185;">
+                    <div class="team-card-index">02</div>
+                    <div class="team-card-name">任明捷</div>
+                    <div class="team-card-stripe"></div>
+                    <div class="team-card-detail">
+                        <div class="team-avatar"><img src="assets/images/任.jpg" alt="任明捷头像"></div>
+                        <h4>任明捷</h4>
+                        <p class="role">程序员 / 测试员</p>
+                        <div class="divider"></div>
+                        <p class="desc">
+                            在团队中承担开发与测试两项工作，主要完成知识点列表、教程详情、团队介绍页面的搭建，
+                            编写 HTML 结构和 CSS 样式，调整页面布局，优化基础展示效果。
+                            页面开发完成之后参与网站测试，逐一浏览各个板块，记录布局错乱、交互异常等各类问题并及时反馈修改。
+                            课余时间喜欢打乒乓球和篮球，团体运动让我十分看重团队协作。
+                            写代码时注重整洁规范，遇到页面显示问题会反复调试，主动和组员沟通想法，认真做好分配的开发和测试工作。
+                        </p>
                     </div>
-                    <!-- 郑铭超：翠绿色 -->
-                    <div class="team-card team-card-2" data-name="郑铭超" style="--card-color:#34d399;">
-                        <div class="team-card-name">郑铭超</div>
-                        <div class="team-card-detail">
-                            <div class="team-avatar"><img src="assets/images/郑.jpg" alt="郑铭超头像"></div>
-                            <h4>郑铭超&emsp;</h4>
-                            <p class="role">程序员/测试员&emsp;</p>
-                            <p class="desc" style="text-align: left">
-                                &emsp;&emsp;负责登录、注册、个人主页模块的代码开发，利用JavaScript实现表单输入校验、信息弹窗等交互功能。
-                                网站大体完工后开展多浏览器兼容性测试，仔细体验每一项交互效果，不放过细微漏洞，整理完整Bug清单，配合开发人员修复缺陷。
-                                闲暇时喜欢游玩Celeste和各类FPS游戏，养成了细心、有耐心的做事风格。排查问题时善于多角度寻找故障原因，
-                                积极和团队交流，持续优化网站的稳定性与使用体验。
-                            </p>
-                        </div>
+                </div>
+
+                <!-- 郑铭超 -->
+                <div class="team-card team-card-2" data-name="郑铭超" style="--card-color:#34d399;">
+                    <div class="team-card-index">03</div>
+                    <div class="team-card-name">郑铭超</div>
+                    <div class="team-card-stripe"></div>
+                    <div class="team-card-detail">
+                        <div class="team-avatar"><img src="assets/images/郑.jpg" alt="郑铭超头像"></div>
+                        <h4>郑铭超</h4>
+                        <p class="role">程序员 / 测试员</p>
+                        <div class="divider"></div>
+                        <p class="desc">
+                            负责登录、注册、个人主页模块的代码开发，利用 JavaScript 实现表单输入校验、信息弹窗等交互功能。
+                            网站大体完工后开展多浏览器兼容性测试，仔细体验每一项交互效果，不放过细微漏洞，整理完整 Bug 清单，配合开发人员修复缺陷。
+                            闲暇时喜欢游玩 Celeste 和各类 FPS 游戏，养成了细心、有耐心的做事风格。
+                            排查问题时善于多角度寻找故障原因，积极和团队交流，持续优化网站的稳定性与使用体验。
+                        </p>
                     </div>
-                    <!-- 李宜忱：淡紫色 -->
-                    <div class="team-card team-card-3" data-name="李宜忱" style="--card-color:#a78bfa;">
-                        <div class="team-card-name">李宜忱</div>
-                        <div class="team-card-detail">
-                            <div class="team-avatar"><img src="assets/images/李.jpg" alt="李宜忱头像"></div>
-                            <h4>李宜忱&emsp;</h4>
-                            <p class="role">UI设计/CIO&emsp;</p>
-                            <p class="desc" style="text-align: left">
-                                &emsp;&emsp;主要工作是网站视觉设计，确定整套页面的配色风格，挑选合适的图片素材，不断调整页面布局与细节，
-                                提升网站美观度。项目进入收尾阶段后，汇总全部源代码、网页截图，整理各类交付材料，
-                                完成文档配图与排版，并且负责最终作业提交。日常爱好乒乓球与篮球，运动经历让他习惯站在使用者的角度设计界面。
-                                虽然不负责大量代码编写，但专注优化视觉感受，配合其他成员完善网站，整理全套交付资料。
-                            </p>
-                        </div>
+                </div>
+
+                <!-- 李宜忱 -->
+                <div class="team-card team-card-3" data-name="李宜忱" style="--card-color:#a78bfa;">
+                    <div class="team-card-index">04</div>
+                    <div class="team-card-name">李宜忱</div>
+                    <div class="team-card-stripe"></div>
+                    <div class="team-card-detail">
+                        <div class="team-avatar"><img src="assets/images/李.jpg" alt="李宜忱头像"></div>
+                        <h4>李宜忱</h4>
+                        <p class="role">UI 设计 / CIO</p>
+                        <div class="divider"></div>
+                        <p class="desc">
+                            主要工作是网站视觉设计，确定整套页面的配色风格，挑选合适的图片素材，不断调整页面布局与细节，提升网站美观度。
+                            项目进入收尾阶段后，汇总全部源代码、网页截图，整理各类交付材料，完成文档配图与排版，并且负责最终作业提交。
+                            日常爱好乒乓球与篮球，运动经历让他习惯站在使用者的角度设计界面。
+                            虽然不负责大量代码编写，但专注优化视觉感受，配合其他成员完善网站，整理全套交付资料。
+                        </p>
                     </div>
-                    <!-- 严浩然：琥珀黄 -->
-                    <div class="team-card team-card-4" data-name="严浩然" style="--card-color:#fbbf24;">
-                        <div class="team-card-name">严浩然</div>
-                        <div class="team-card-detail">
-                            <div class="team-avatar"><img src="assets/images/严.jpg" alt="严浩然头像"></div>
-                            <h4>严浩然&emsp;</h4>
-                            <p class="role">文档编辑/网页编辑&emsp;</p>
-                            <p class="desc" style="text-align: left">
-                                &emsp;&emsp;主要负责项目文档的撰写、修改和校对，同时收集整理C语言教学资料，搜集课程知识点与配套练习题，
-                                录入到网站当中，仔细审核网页全部文字内容，修正语句错误，保证文案通顺易懂。
-                                业余爱好打篮球和CS，组队游戏的经历让我懂得沟通配合的重要性。相比代码开发，
-                                更擅长文字整理与素材归档，踏实完成文案校对、资料汇总等任务，不断完善网站教学内容，
-                                为项目交付做好文字方面的保障。
-                            </p>
-                        </div>
+                </div>
+
+                <!-- 严浩然 -->
+                <div class="team-card team-card-4" data-name="严浩然" style="--card-color:#fbbf24;">
+                    <div class="team-card-index">05</div>
+                    <div class="team-card-name">严浩然</div>
+                    <div class="team-card-stripe"></div>
+                    <div class="team-card-detail">
+                        <div class="team-avatar"><img src="assets/images/严.jpg" alt="严浩然头像"></div>
+                        <h4>严浩然</h4>
+                        <p class="role">文档编辑 / 网页编辑</p>
+                        <div class="divider"></div>
+                        <p class="desc">
+                            主要负责项目文档的撰写、修改和校对，同时收集整理 C 语言教学资料，搜集课程知识点与配套练习题，录入到网站当中，
+                            仔细审核网页全部文字内容，修正语句错误，保证文案通顺易懂。
+                            业余爱好打篮球和 CS，组队游戏的经历让我懂得沟通配合的重要性。
+                            相比代码开发，更擅长文字整理与素材归档，踏实完成文案校对、资料汇总等任务，不断完善网站教学内容，为项目交付做好文字方面的保障。
+                        </p>
                     </div>
                 </div>
             </div>
-            <div class="team-tip-text" id="teamTip">点击卡牌查看团队成员详情</div>
-            <!-- ========== 抽卡交互组件结束 ========== -->
+        </div>
+        <div class="team-tip-text" id="teamTip">点击卡牌查看团队成员详情</div>
 
-            <div class="card" style="max-width: 800px; margin: 60px auto 0; padding: 32px; text-align: center;">
-                <h3 style="font-size: 20px; margin-bottom: 16px; color: var(--text-primary);">联系我们</h3>
-                <p style="color: var(--text-secondary); margin-bottom: 8px;">📧 组长邮箱：3664250017@qq.com</p>
-                <p style="color: var(--text-secondary); margin-bottom: 8px;">🏫 学校：北京理工大学</p>
-                <p style="color: var(--text-secondary);">📍 地址：北京市海淀区中关村南大街5号</p>
+        <!-- ================= 能力标签墙 ================= -->
+        <div class="skill-wall">
+            <h3>🛠️ 团队技能矩阵</h3>
+            <div class="skill-tags">
+                <span class="skill-tag t-blue">HTML5</span>
+                <span class="skill-tag t-blue">CSS3</span>
+                <span class="skill-tag t-blue">JavaScript</span>
+                <span class="skill-tag t-purple">UI / UX 设计</span>
+                <span class="skill-tag t-purple">视觉配色</span>
+                <span class="skill-tag t-green">C 语言</span>
+                <span class="skill-tag t-green">算法设计</span>
+                <span class="skill-tag t-pink">文档撰写</span>
+                <span class="skill-tag t-pink">内容校对</span>
+                <span class="skill-tag t-yellow">项目管理</span>
+                <span class="skill-tag t-yellow">测试与调试</span>
+                <span class="skill-tag t-blue">Canvas 游戏</span>
+                <span class="skill-tag t-purple">交互设计</span>
+                <span class="skill-tag t-green">响应式布局</span>
             </div>
         </div>
+
+        <!-- ================= 项目里程碑 ================= -->
+        <div class="timeline-section">
+            <h3>📅 项目里程碑</h3>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 · 第 1 阶段</div>
+                    <div class="timeline-title">🚀 项目启动</div>
+                    <div class="timeline-desc">确定选题方向与团队分工，完成需求分析与整体原型设计。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 · 第 2 阶段</div>
+                    <div class="timeline-title">🎨 视觉与框架搭建</div>
+                    <div class="timeline-desc">确立赛博朋克科技风配色体系，完成首页、课程中心等核心页面框架。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 · 第 3 阶段</div>
+                    <div class="timeline-title">⚙️ 功能开发</div>
+                    <div class="timeline-desc">完成在线小测系统、编程游戏（横板闯关 + 贪吃蛇）与用户中心模块。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 · 第 4 阶段</div>
+                    <div class="timeline-title">🧪 测试与优化</div>
+                    <div class="timeline-desc">多浏览器兼容性测试、性能优化、动效打磨，修复各类 Bug。</div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">2026 · 第 5 阶段</div>
+                    <div class="timeline-title">📦 交付与答辩</div>
+                    <div class="timeline-desc">整理源代码与文档，完成课程设计答辩与最终提交。</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= 联系方式 ================= -->
+        <div class="contact-section">
+            <div class="contact-card">
+                <div class="contact-icon">📧</div>
+                <div class="contact-label">组长邮箱</div>
+                <div class="contact-value">3664250017@qq.com</div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon">🏫</div>
+                <div class="contact-label">所在学校</div>
+                <div class="contact-value">北京理工大学</div>
+            </div>
+            <div class="contact-card">
+                <div class="contact-icon">📍</div>
+                <div class="contact-label">学校地址</div>
+                <div class="contact-value">北京市海淀区中关村南大街 5 号</div>
+            </div>
+        </div>
+
     </section>
 
     <footer class="footer">
@@ -321,37 +968,53 @@
     </footer>
 
     <script>
-        /* 团队抽卡交互脚本 */
+        // ================= 星空背景 =================
+        (function(){
+            const field = document.getElementById('starField');
+            if (!field) return;
+            for (let i = 0; i < 70; i++) {
+                const s = document.createElement('span');
+                const size = Math.random() * 2 + 1;
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.animationDelay = (Math.random() * 3) + 's';
+                s.style.animationDuration = (2 + Math.random() * 3) + 's';
+                s.style.opacity = Math.random() * 0.5 + 0.1;
+                field.appendChild(s);
+            }
+        })();
+
+        // ================= 抽卡交互 =================
         const teamCards = document.querySelectorAll(".team-card");
         const teamCardArea = document.getElementById("teamCardArea");
         const teamTip = document.getElementById("teamTip");
 
         function resetTeamCards() {
-            teamCards.forEach(c => c.classList.remove("picked"));
+            teamCards.forEach(function(c) { c.classList.remove("picked"); });
             teamCardArea.classList.remove("has-picked");
         }
 
-        teamCards.forEach(card => {
+        teamCards.forEach(function(card) {
             card.addEventListener("click", function (e) {
                 e.stopPropagation();
-                if(this.classList.contains("picked")){
-                    //收回卡牌
+                if (this.classList.contains("picked")) {
                     resetTeamCards();
                     teamTip.textContent = "点击卡牌查看团队成员详情";
-                }else{
-                    //抽选卡牌
+                } else {
                     resetTeamCards();
                     this.classList.add("picked");
                     teamCardArea.classList.add("has-picked");
-                    teamTip.innerHTML = `查看成员！选中：<strong>${this.dataset.name}</strong>，点击卡牌收回`;
+                    teamTip.innerHTML = '查看成员！选中：<strong>' + this.dataset.name + '</strong>，点击卡牌或空白处收回';
                 }
-            })
-        })
-        //点击空白区域收回
-        teamCardArea.addEventListener("click", function (){
+            });
+        });
+
+        teamCardArea.addEventListener("click", function () {
             resetTeamCards();
             teamTip.textContent = "点击卡牌查看团队成员详情";
-        })
+        });
     </script>
     <script src="assets/js/main.js"></script>
 </body>

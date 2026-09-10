@@ -3,55 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 - C语言编程学院</title>
+    <title>登录 - CodeMaster</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* 登录页统一背景（与首页/课程中心一致） */
+        body.auth-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
+                radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
+                radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
+                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+        }
+
+        /* 星空粒子 */
+        #starField {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #starField span {
+            position: absolute;
+            border-radius: 50%;
+            background: #64d2ff;
+            box-shadow: 0 0 6px #64d2ff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        /* 浮动光斑 */
+        .auth-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .auth-orb.orb-a {
+            width: 480px; height: 480px;
+            background: rgba(0,212,255,0.18);
+            top: -120px; left: -120px;
+            animation: orbFloat 14s ease-in-out infinite;
+        }
+        .auth-orb.orb-b {
+            width: 420px; height: 420px;
+            background: rgba(123,44,191,0.16);
+            bottom: -140px; right: -100px;
+            animation: orbFloat 18s ease-in-out infinite reverse;
+        }
+        @keyframes orbFloat {
+            0%,100% { transform: translate(0,0) scale(1); }
+            50% { transform: translate(40px,-30px) scale(1.08); }
+        }
+
+        .auth-page .auth-card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            padding: 44px 40px;
+            background: linear-gradient(145deg, rgba(26,35,56,0.92) 0%, rgba(20,27,45,0.92) 100%);
+            border: 1px solid rgba(0,212,255,0.25);
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 30px 70px rgba(0,0,0,0.5),
+                0 0 40px rgba(0,212,255,0.1),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            animation: cardIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .auth-page .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 24px; right: 24px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00d4ff, #7b2cbf, transparent);
+            border-radius: 3px;
+            animation: topLine 3s ease-in-out infinite;
+        }
+        @keyframes topLine {
+            0%,100% { opacity: 0.6; }
+            50% { opacity: 1; box-shadow: 0 0 20px rgba(0,212,255,0.8); }
+        }
+
+        /* Logo 交互增强 */
+        .auth-page .auth-header .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .auth-page .auth-header .logo:hover {
+            transform: scale(1.05);
+        }
+        .auth-page .auth-header .logo .logo-icon {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 17px;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(0,212,255,0.4);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: -0.5px;
+        }
+        .auth-page .auth-header .logo .logo-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+            transform: translateX(-100%);
+            animation: shine 3.5s infinite;
+        }
+        @keyframes shine {
+            0%, 60% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        .auth-page .auth-header .logo span {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff 0%, #64d2ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-page .auth-header h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .auth-page .auth-header p {
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        /* 输入框增强 */
+        .auth-page .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(10,14,26,0.8);
+            border: 1.5px solid #2a3447;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .auth-page .form-group input:hover {
+            border-color: rgba(0,212,255,0.4);
+        }
+        .auth-page .form-group input:focus {
+            border-color: #00d4ff;
+            background: rgba(10,14,26,0.95);
+            box-shadow: 0 0 0 4px rgba(0,212,255,0.12), 0 0 24px rgba(0,212,255,0.2);
+            transform: translateY(-1px);
+        }
+        .auth-page .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a0aec0;
+            letter-spacing: 0.3px;
+            transition: color 0.3s;
+        }
+        .auth-page .form-group:focus-within label {
+            color: #64d2ff;
+        }
+
+        /* 按钮增强 */
+        .auth-page .auth-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 700;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0,212,255,0.35);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+        .auth-page .auth-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        .auth-page .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(0,212,255,0.55);
+        }
+        .auth-page .auth-btn:hover::after { transform: translateX(100%); }
+        .auth-page .auth-btn:active { transform: translateY(0); }
+
+        /* 页脚链接 */
+        .auth-page .auth-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #a0aec0;
+            transition: color 0.3s;
+        }
+        .auth-page .auth-footer a {
+            color: #64d2ff;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+        .auth-page .auth-footer a:hover {
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0,212,255,0.6);
+        }
+
+        /* 演示账号徽章 */
+        .auth-page .demo-badge {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #718096;
+            padding: 10px 16px;
+            background: rgba(0,212,255,0.05);
+            border: 1px dashed rgba(0,212,255,0.25);
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .auth-page .demo-badge:hover {
+            background: rgba(0,212,255,0.1);
+            border-color: rgba(0,212,255,0.5);
+            color: #64d2ff;
+        }
+        .auth-page .demo-badge code {
+            color: #64d2ff;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(0,212,255,0.1);
+            padding: 2px 8px;
+            border-radius: 5px;
+            margin: 0 2px;
+        }
+    </style>
 </head>
 <body class="auth-page">
-    <div class="auth-card card">
-        <div class="auth-header">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span>C-Learn</span>
-            </a>
-            <h2>欢迎回来</h2>
-            <p>登录账号继续你的编程学习之旅</p>
-        </div>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="username">用户名</label>
-                <input type="text" id="username" placeholder="请输入用户名" required>
-            </div>
+<div id="starField"></div>
+<div class="auth-orb orb-a"></div>
+<div class="auth-orb orb-b"></div>
 
-            <div class="form-group">
-                <label for="password">密码</label>
-                <input type="password" id="password" placeholder="请输入密码" required>
-            </div>
-
-            <div class="form-row">
-                <label class="remember-me">
-                    <input type="checkbox"> 记住我
-                </label>
-                <a href="#" class="forgot-link">忘记密码？</a>
-            </div>
-
-            <button type="submit" class="btn btn-primary auth-btn">登 录</button>
-        </form>
-
-        <div class="auth-footer">
-            还没有账号？<a href="register.html">立即注册</a>
-        </div>
-
-        <div class="auth-footer">
-            ©2026 CodeMaster 北京理工大学
-        </div>
-
-        <p style="text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-muted);">
-            演示账号：admin / admin
-        </p>
+<div class="auth-card card">
+    <div class="auth-header">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">Cm</div>
+            <span>CodeMaster</span>
+        </a>
+        <h2>欢迎回来</h2>
+        <p>登录账号继续你的编程学习之旅</p>
     </div>
 
-    <script src="assets/js/main.js"></script>
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input type="text" id="username" placeholder="请输入用户名" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input type="password" id="password" placeholder="请输入密码" required>
+        </div>
+
+        <div class="form-row">
+            <label class="remember-me">
+                <input type="checkbox"> 记住我
+            </label>
+            <a href="#" class="forgot-link">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary auth-btn">登 录</button>
+    </form>
+
+    <div class="auth-footer">
+        还没有账号？<a href="register.html">立即注册</a>
+    </div>
+
+    <div class="auth-footer" style="margin-top: 8px; font-size: 12px;">
+        ©2026 CodeMaster 北京理工大学
+    </div>
+
+    <div class="demo-badge">
+        演示账号：<code>admin</code> / <code>admin</code>
+    </div>
+</div>
+
+<script src="assets/js/main.js"></script>
+<script>
+    // 星空背景
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 60; i++) {
+            const s = document.createElement('span');
+            const size = Math.random() * 2 + 1;
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.animationDuration = (2 + Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            field.appendChild(s);
+        }
+    })();
+</script>
 </body>
 </html>

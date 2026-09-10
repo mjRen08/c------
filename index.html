@@ -6,8 +6,478 @@
     <title>Code Master - 从零开始学C语言</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ================= 页面背景 ================= */
+        body.home-page-bg {
+            background:
+                radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
+                radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
+                radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
+                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+            overflow-x: hidden;
+        }
+
+        /* 星空粒子 */
+        #starField {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        #starField span {
+            position: absolute;
+            border-radius: 50%;
+            background: #64d2ff;
+            box-shadow: 0 0 6px #64d2ff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+
+        /* 顶部滚动进度条 */
+        #scrollProgress {
+            position: fixed;
+            top: 0; left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf, #00ff88);
+            z-index: 2000;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 12px rgba(0,212,255,0.8);
+        }
+
+        /* ================= 滚动渐入动画 ================= */
+        .reveal {
+            opacity: 0;
+            transform: translateY(48px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+                        transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* 从左/右进入的变体 */
+        .reveal-left { opacity: 0; transform: translateX(-60px); }
+        .reveal-right { opacity: 0; transform: translateX(60px); }
+        .reveal-left.revealed,
+        .reveal-right.revealed { opacity: 1; transform: translateX(0); }
+
+        /* 缩放进入 */
+        .reveal-zoom { opacity: 0; transform: scale(0.88); }
+        .reveal-zoom.revealed { opacity: 1; transform: scale(1); }
+
+        /* ================= Hero 区域 ================= */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 90px;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 15%; right: -8%;
+            width: 620px; height: 620px;
+            background: radial-gradient(circle, rgba(0,212,255,0.18) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatSlow 8s ease-in-out infinite;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -18%; left: -10%;
+            width: 520px; height: 520px;
+            background: radial-gradient(circle, rgba(123,44,191,0.18) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatSlow 10s ease-in-out infinite reverse;
+        }
+        @keyframes floatSlow {
+            0%,100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        .hero-content { position: relative; z-index: 1; max-width: 680px; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.35);
+            border-radius: 50px;
+            color: #64d2ff;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 26px;
+            box-shadow: 0 0 22px rgba(0,212,255,0.15);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%,100% { box-shadow: 0 0 18px rgba(0,212,255,0.15); }
+            50% { box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+        }
+
+        .hero h1 {
+            font-size: 60px;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 22px;
+            color: #fff;
+            letter-spacing: -1px;
+        }
+        .hero h1 span {
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 60%, #00ff88 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 18px;
+            color: #a0aec0;
+            margin-bottom: 36px;
+            line-height: 1.8;
+        }
+        .hero-buttons { display: flex; gap: 16px; margin-bottom: 56px; flex-wrap: wrap; }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(0,212,255,0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        .btn-primary:hover::after { transform: translateX(100%); }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(0,212,255,0.5);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 56px;
+            flex-wrap: wrap;
+        }
+        .stat-item h3 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 4px;
+        }
+        .stat-item p { font-size: 14px; color: #718096; margin: 0; }
+
+        /* ================= 通用 Section ================= */
+        .home-section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 0;
+        }
+        .home-section.alt-bg {
+            background: rgba(20, 27, 45, 0.35);
+            border-top: 1px solid rgba(42, 52, 71, 0.6);
+            border-bottom: 1px solid rgba(42, 52, 71, 0.6);
+        }
+
+        .section-title {
+            font-size: 34px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #64d2ff 60%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.5px;
+        }
+        .section-subtitle {
+            color: #a0aec0;
+            margin-bottom: 56px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* ================= 特色功能卡片 ================= */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .feature-card {
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 20px;
+            padding: 32px 26px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.55);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.45), 0 0 26px rgba(0,212,255,0.18);
+        }
+        .feature-card:hover::before { opacity: 1; }
+
+        .feature-icon {
+            width: 68px; height: 68px;
+            margin: 0 auto 22px;
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 8px 22px rgba(0,212,255,0.28);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .feature-card:hover .feature-icon {
+            transform: scale(1.12) rotate(-6deg);
+        }
+        .feature-card h3 {
+            font-size: 19px;
+            margin-bottom: 12px;
+            color: #fff;
+            transition: color 0.3s;
+        }
+        .feature-card:hover h3 { color: #64d2ff; }
+        .feature-card p {
+            color: #a0aec0;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        /* ================= 课程卡片 ================= */
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .course-card {
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .course-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: 2;
+        }
+        .course-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(0, 212, 255, 0.6);
+            box-shadow: 0 16px 42px rgba(0,0,0,0.5), 0 0 26px rgba(0,212,255,0.18);
+        }
+        .course-card:hover::before { opacity: 1; }
+
+        .course-cover {
+            height: 150px;
+            margin: -24px -24px 20px;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 54px;
+            position: relative;
+            transition: transform 0.5s ease;
+            overflow: hidden;
+        }
+        .course-card:hover .course-cover { transform: scale(1.04); }
+        .course-cover::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 35%, rgba(20,27,45,0.95));
+        }
+        .course-level {
+            position: absolute;
+            top: 14px; right: 14px;
+            padding: 5px 13px;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
+            z-index: 2;
+        }
+        .course-card h3 {
+            font-size: 19px;
+            margin-bottom: 10px;
+            color: #fff;
+            transition: color 0.3s;
+        }
+        .course-card:hover h3 { color: #64d2ff; }
+        .course-desc {
+            color: #a0aec0;
+            font-size: 14px;
+            margin-bottom: 18px;
+            line-height: 1.65;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .course-card .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 3px;
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+        .course-card .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            border-radius: 3px;
+            transition: width 0.6s ease;
+        }
+        .course-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .course-meta span { font-size: 13px; color: #718096; }
+
+        /* ================= 成就徽章 ================= */
+        .achievement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 20px;
+        }
+        .achievement-item {
+            text-align: center;
+            padding: 26px 16px;
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 18px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .achievement-item:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0,212,255,0.5);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+        }
+        .achievement-icon {
+            width: 66px; height: 66px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            background: rgba(255,255,255,0.04);
+            border: 2px solid #2a3447;
+            transition: all 0.4s;
+        }
+        .achievement-item.unlocked .achievement-icon {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            border-color: transparent;
+            box-shadow: 0 0 24px rgba(0,212,255,0.5);
+            animation: iconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes iconPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .achievement-item h4 {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #fff;
+            transition: color 0.3s;
+        }
+        .achievement-item p { font-size: 12px; color: #718096; }
+        .achievement-item.unlocked { border-color: rgba(0,212,255,0.5); }
+        .achievement-item.unlocked h4 { color: #64d2ff; }
+        .achievement-item.locked .achievement-icon {
+            opacity: 0.35;
+            filter: grayscale(1);
+        }
+
+        /* ================= 页脚 ================= */
+        .footer {
+            position: relative;
+            z-index: 1;
+            padding: 60px 0 30px;
+            background: rgba(20, 27, 45, 0.6);
+            border-top: 1px solid #2a3447;
+        }
+
+        /* ================= 响应式 ================= */
+        @media (max-width: 968px) {
+            .hero h1 { font-size: 42px; }
+            .features-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 640px) {
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 15px; }
+            .hero-stats { gap: 28px; }
+            .stat-item h3 { font-size: 28px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 26px; }
+            .home-section { padding: 70px 0; }
+        }
+
+        /* 减少动效偏好 */
+        @media (prefers-reduced-motion: reduce) {
+            .reveal, .reveal-left, .reveal-right, .reveal-zoom {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
 </head>
-<body>
+<body class="home-page-bg">
+
+<div id="scrollProgress"></div>
+<div id="starField"></div>
+
     <!-- 导航栏 -->
     <nav class="navbar">
         <div class="nav-container">
@@ -33,7 +503,7 @@
     <!-- Hero区域 -->
     <section class="hero">
         <div class="container">
-            <div class="hero-content fade-in">
+            <div class="hero-content">
                 <div class="hero-badge">
                     <span>🚀</span>
                     <span>全新交互式学习体验</span>
@@ -60,6 +530,8 @@
                         <p>实战练习</p>
                     </div>
                     <div class="stat-item">
+                        <h3>120+</h3>
+                        <p>测验题目</p>
                     </div>
                 </div>
             </div>
@@ -67,37 +539,37 @@
     </section>
 
     <!-- 特色功能 -->
-    <section class="features">
+    <section class="home-section">
         <div class="container">
-            <h2 class="section-title">为什么选择我们</h2>
-            <p class="section-subtitle">打造沉浸式编程学习体验</p>
-            <div class="features-grid">
-                <div class="feature-card card">
+            <h2 class="section-title reveal">为什么选择我们</h2>
+            <p class="section-subtitle reveal">打造沉浸式编程学习体验</p>
+            <div class="features-grid" data-stagger>
+                <div class="feature-card reveal">
                     <div class="feature-icon">🎮</div>
                     <h3>游戏化学习</h3>
                     <p>通过闯关游戏的方式学习编程知识，边玩边学，让学习充满乐趣和成就感</p>
                 </div>
-                <div class="feature-card card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">📝</div>
                     <h3>即时小测</h3>
                     <p>每章节配套智能测验，即时反馈学习效果，查漏补缺巩固知识点</p>
                 </div>
-                <div class="feature-card card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">🏆</div>
                     <h3>成就系统</h3>
                     <p>丰富的徽章和等级体系，记录你的每一步成长，解锁专属成就奖励</p>
                 </div>
-                <div class="feature-card card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">📱</div>
                     <h3>响应式设计</h3>
                     <p>完美适配电脑、平板和手机，随时随地都能学习，支持打包为Android App</p>
                 </div>
-                <div class="feature-card card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">🎯</div>
                     <h3>系统化课程</h3>
                     <p>从入门到精通，循序渐进的课程体系，零基础也能轻松学会C语言</p>
                 </div>
-                <div class="feature-card card">
+                <div class="feature-card reveal">
                     <div class="feature-icon">💡</div>
                     <h3>实战导向</h3>
                     <p>大量真实编程案例和项目实战，学以致用，真正掌握编程思维</p>
@@ -107,12 +579,12 @@
     </section>
 
     <!-- 热门课程 -->
-    <section class="courses">
+    <section class="home-section alt-bg">
         <div class="container">
-            <h2 class="section-title">热门课程</h2>
-            <p class="section-subtitle">精选优质内容，开启编程之旅</p>
-            <div class="courses-grid">
-                <div class="course-card card" data-course-id="basics" onclick="location.href='detail.html?course=basics'">
+            <h2 class="section-title reveal">热门课程</h2>
+            <p class="section-subtitle reveal">精选优质内容，开启编程之旅</p>
+            <div class="courses-grid" data-stagger>
+                <div class="course-card reveal" data-course-id="basics" onclick="location.href='detail.html?course=basics'">
                     <div class="course-cover">
                         <span class="course-level">入门</span>
                         📘
@@ -127,7 +599,7 @@
                         <span>⭐ 4.9</span>
                     </div>
                 </div>
-                <div class="course-card card" data-course-id="pointers" onclick="location.href='detail.html?course=pointers'">
+                <div class="course-card reveal" data-course-id="pointers" onclick="location.href='detail.html?course=pointers'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">
                         <span class="course-level">进阶</span>
                         🔧
@@ -142,7 +614,7 @@
                         <span>⭐ 4.8</span>
                     </div>
                 </div>
-                <div class="course-card card" data-course-id="algorithms" onclick="location.href='detail.html?course=algorithms'">
+                <div class="course-card reveal" data-course-id="algorithms" onclick="location.href='detail.html?course=algorithms'">
                     <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
                         <span class="course-level">高级</span>
                         🌲
@@ -162,11 +634,11 @@
     </section>
 
     <!-- 成就预览 -->
-    <section class="achievements">
+    <section class="home-section">
         <div class="container">
-            <h2 class="section-title">成就徽章</h2>
-            <p class="section-subtitle">收集徽章，见证你的成长之路</p>
-            <div class="achievement-grid" id="achievementGrid">
+            <h2 class="section-title reveal">成就徽章</h2>
+            <p class="section-subtitle reveal">收集徽章，见证你的成长之路</p>
+            <div class="achievement-grid" id="achievementGrid" data-stagger>
                 <!-- JS动态渲染 -->
             </div>
         </div>
@@ -187,9 +659,9 @@
                     <h4>课程学习</h4>
                     <ul>
                         <li><a href="list.html">全部课程</a></li>
-                        <li><a href="#">基础入门</a></li>
-                        <li><a href="#">进阶提升</a></li>
-                        <li><a href="#">实战项目</a></li>
+                        <li><a href="list.html">基础入门</a></li>
+                        <li><a href="list.html">进阶提升</a></li>
+                        <li><a href="list.html">实战项目</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -197,18 +669,18 @@
                     <ul>
                         <li><a href="quiz.html">在线小测</a></li>
                         <li><a href="game.html">编程游戏</a></li>
-                        <li><a href="#">代码挑战</a></li>
-                        <li><a href="#">学习社区</a></li>
+                        <li><a href="quiz.html">代码挑战</a></li>
+                        <li><a href="team.html">学习社区</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>关于我们</h4>
                     <ul>
                         <li><a href="team.html">制作团队</a></li>
-                        <li><a href="#">关于平台</a></li>
-                        <li><a href="#">联系方式</a></li>
-                        <li><a href="#">帮助中心</a></li>
-                        <li><a href="#">意见反馈</a></li>
+                        <li><a href="index.html">关于平台</a></li>
+                        <li><a href="team.html">联系方式</a></li>
+                        <li><a href="team.html">帮助中心</a></li>
+                        <li><a href="team.html">意见反馈</a></li>
                     </ul>
                 </div>
             </div>
@@ -219,5 +691,112 @@
     </footer>
 
     <script src="assets/js/main.js"></script>
+    <script>
+        // ================= 星空背景 =================
+        (function(){
+            const field = document.getElementById('starField');
+            if (!field) return;
+            const count = 80;
+            for (let i = 0; i < count; i++) {
+                const s = document.createElement('span');
+                const size = Math.random() * 2 + 1;
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.animationDelay = (Math.random() * 3) + 's';
+                s.style.animationDuration = (2 + Math.random() * 3) + 's';
+                s.style.opacity = Math.random() * 0.5 + 0.1;
+                field.appendChild(s);
+            }
+        })();
+
+        // ================= 顶部滚动进度条 =================
+        (function(){
+            const bar = document.getElementById('scrollProgress');
+            if (!bar) return;
+            let ticking = false;
+            function update() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+                bar.style.width = pct + '%';
+                ticking = false;
+            }
+            window.addEventListener('scroll', function(){
+                if (!ticking) {
+                    window.requestAnimationFrame(update);
+                    ticking = true;
+                }
+            }, { passive: true });
+            update();
+        })();
+
+        // ================= 滚动渐入动画 =================
+        (function(){
+            if (!('IntersectionObserver' in window)) {
+                // 降级：直接显示
+                document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-zoom')
+                    .forEach(function(el){ el.classList.add('revealed'); });
+                return;
+            }
+
+            const observer = new IntersectionObserver(function(entries){
+                entries.forEach(function(entry){
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.12,
+                rootMargin: '0px 0px -60px 0px'
+            });
+
+            // 为网格子元素设置交错延迟
+            function applyStagger(container) {
+                const children = container.querySelectorAll('.reveal');
+                children.forEach(function(child, i){
+                    if (!child.style.transitionDelay) {
+                        child.style.transitionDelay = (i * 0.08) + 's';
+                    }
+                });
+            }
+
+            document.querySelectorAll('[data-stagger]').forEach(applyStagger);
+
+            // 观察所有 reveal 元素
+            function observeAll() {
+                document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-zoom')
+                    .forEach(function(el){
+                        if (!el.classList.contains('revealed')) {
+                            observer.observe(el);
+                        }
+                    });
+            }
+            observeAll();
+
+            // 成就列表由 main.js 动态生成，稍后重新观察
+            setTimeout(function(){
+                document.querySelectorAll('#achievementGrid').forEach(applyStagger);
+                observeAll();
+            }, 300);
+        })();
+
+        // ================= 导航栏滚动加深 =================
+        (function(){
+            const navbar = document.querySelector('.navbar');
+            if (!navbar) return;
+            window.addEventListener('scroll', function(){
+                if (window.scrollY > 40) {
+                    navbar.style.background = 'rgba(10, 14, 26, 0.95)';
+                    navbar.style.boxShadow = '0 4px 24px rgba(0,0,0,0.5)';
+                } else {
+                    navbar.style.background = 'rgba(10, 14, 26, 0.85)';
+                    navbar.style.boxShadow = 'none';
+                }
+            }, { passive: true });
+        })();
+    </script>
 </body>
 </html>

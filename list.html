@@ -3,179 +3,787 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>课程中心 - C语言编程学院</title>
+    <title>课程中心 - CodeMaster</title>
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        /* ================= 页面背景 ================= */
+        body.course-page-bg {
+            background:
+                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.08), transparent 30%),
+                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.08), transparent 35%),
+                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.05), transparent 40%),
+                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #starField { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        #starField span {
+            position: absolute; border-radius: 50%;
+            background: #64d2ff; box-shadow: 0 0 6px #64d2ff;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+        @keyframes twinkle {
+            0%,100% { opacity: 0.15; transform: scale(0.8); }
+            50% { opacity: 0.9; transform: scale(1.2); }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .course-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 130px 24px 80px;
+        }
+
+        /* ================= Hero 头 ================= */
+        .course-hero {
+            text-align: center;
+            margin-bottom: 44px;
+            animation: fadeUp 0.6s ease both;
+        }
+        .course-hero .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: rgba(0,212,255,0.08);
+            border: 1px solid rgba(0,212,255,0.35);
+            border-radius: 50px;
+            color: #64d2ff;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            box-shadow: 0 0 22px rgba(0,212,255,0.15);
+            animation: badgePulse 3s ease-in-out infinite;
+        }
+        @keyframes badgePulse {
+            0%,100% { box-shadow: 0 0 18px rgba(0,212,255,0.15); }
+            50% { box-shadow: 0 0 30px rgba(0,212,255,0.4); }
+        }
+        .course-hero h2 {
+            font-size: 44px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 0%, #64d2ff 55%, #7b2cbf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 14px;
+            letter-spacing: 0.5px;
+        }
+        .course-hero p {
+            color: #a0aec0;
+            font-size: 16px;
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ================= 工具栏（搜索 + 筛选） ================= */
+        .course-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 34px;
+            padding: 16px 22px;
+            background: linear-gradient(145deg, rgba(26,35,56,0.7), rgba(20,27,45,0.7));
+            border: 1px solid #2a3447;
+            border-radius: 18px;
+            backdrop-filter: blur(12px);
+            animation: fadeUp 0.6s 0.05s ease both;
+        }
+        .course-search {
+            position: relative;
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+        }
+        .course-search svg {
+            position: absolute;
+            left: 14px;
+            width: 16px; height: 16px;
+            color: #64d2ff;
+            pointer-events: none;
+        }
+        .course-search input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: rgba(10,14,26,0.7);
+            border: 1.5px solid #2a3447;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .course-search input:hover { border-color: rgba(0,212,255,0.4); }
+        .course-search input:focus {
+            outline: none;
+            border-color: #00d4ff;
+            box-shadow: 0 0 0 4px rgba(0,212,255,0.1);
+            background: rgba(10,14,26,0.95);
+        }
+        .course-search input::placeholder { color: #718096; }
+
+        .course-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(10,14,26,0.6);
+            border: 1px solid #2a3447;
+            color: #a0aec0;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+        }
+        .filter-chip:hover {
+            color: #64d2ff;
+            border-color: rgba(0,212,255,0.5);
+            background: rgba(0,212,255,0.08);
+            transform: translateY(-2px);
+        }
+        .filter-chip.active {
+            background: linear-gradient(135deg, #00d4ff, #7b2cbf);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 6px 18px rgba(0,212,255,0.4);
+            font-weight: 700;
+        }
+
+        /* ================= Bento 布局 ================= */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 22px;
+            grid-auto-flow: dense;
+        }
+
+        /* 大卡占 4 列 */
+        .bento-card.size-lg { grid-column: span 4; }
+        /* 中卡占 3 列 */
+        .bento-card.size-md { grid-column: span 3; }
+        /* 小卡占 2 列 */
+        .bento-card.size-sm { grid-column: span 2; }
+
+        /* ================= 卡片 ================= */
+        .bento-card {
+            position: relative;
+            background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
+            border: 1px solid #2a3447;
+            border-radius: 22px;
+            padding: 26px;
+            cursor: pointer;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+                        border-color 0.35s, box-shadow 0.4s;
+            opacity: 0;
+            transform: translateY(30px);
+            min-height: 220px;
+        }
+        .bento-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .bento-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--card-accent, #00d4ff), transparent);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+        .bento-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%),
+                rgba(0,212,255,0.10), transparent 45%);
+            opacity: 0;
+            transition: opacity 0.35s;
+            pointer-events: none;
+        }
+        .bento-card:hover {
+            transform: translateY(-8px) scale(1.008);
+            border-color: var(--card-accent, #00d4ff);
+            box-shadow:
+                0 20px 50px rgba(0,0,0,0.5),
+                0 0 40px color-mix(in srgb, var(--card-accent, #00d4ff) 25%, transparent);
+        }
+        .bento-card:hover::before { opacity: 1; }
+        .bento-card:hover::after { opacity: 1; }
+
+        /* 卡片内部装饰光斑 */
+        .bento-glow {
+            position: absolute;
+            top: -50%; right: -30%;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, color-mix(in srgb, var(--card-accent, #00d4ff) 25%, transparent), transparent 70%);
+            border-radius: 50%;
+            opacity: 0.4;
+            transition: transform 0.6s, opacity 0.4s;
+            pointer-events: none;
+        }
+        .bento-card:hover .bento-glow {
+            transform: scale(1.3) translate(-15px, 15px);
+            opacity: 0.7;
+        }
+
+        /* 大号装饰序号 */
+        .bento-num {
+            position: absolute;
+            top: 16px;
+            right: 22px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1;
+            color: color-mix(in srgb, var(--card-accent, #00d4ff) 14%, transparent);
+            user-select: none;
+            pointer-events: none;
+            transition: all 0.5s;
+        }
+        .bento-card:hover .bento-num {
+            color: color-mix(in srgb, var(--card-accent, #00d4ff) 22%, transparent);
+            transform: scale(1.05);
+        }
+
+        /* 卡片图标 */
+        .bento-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            background: linear-gradient(135deg,
+                color-mix(in srgb, var(--card-accent, #00d4ff) 22%, transparent),
+                color-mix(in srgb, var(--card-accent, #00d4ff) 6%, transparent));
+            border: 1px solid color-mix(in srgb, var(--card-accent, #00d4ff) 40%, transparent);
+            box-shadow: 0 0 20px color-mix(in srgb, var(--card-accent, #00d4ff) 20%, transparent);
+            margin-bottom: 18px;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .bento-card:hover .bento-icon {
+            transform: scale(1.1) rotate(-6deg);
+        }
+
+        /* 卡片内容 */
+        .bento-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        .bento-level {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            width: fit-content;
+            margin-bottom: 12px;
+            background: color-mix(in srgb, var(--card-accent, #00d4ff) 12%, transparent);
+            color: var(--card-accent, #00d4ff);
+            border: 1px solid color-mix(in srgb, var(--card-accent, #00d4ff) 35%, transparent);
+        }
+
+        .bento-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+            transition: color 0.3s;
+        }
+        .bento-card:hover .bento-title {
+            color: var(--card-accent, #64d2ff);
+        }
+
+        .bento-desc {
+            color: #a0aec0;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 18px;
+            flex: 1;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* 卡片底部 */
+        .bento-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            margin-top: auto;
+        }
+        .bento-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 12px;
+            color: #718096;
+        }
+        .bento-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .bento-meta .dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: currentColor;
+            opacity: 0.5;
+        }
+
+        /* 环形进度 */
+        .bento-ring {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+        .bento-ring svg {
+            width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
+        .bento-ring .track {
+            fill: none;
+            stroke: rgba(255,255,255,0.08);
+            stroke-width: 3.5;
+        }
+        .bento-ring .bar {
+            fill: none;
+            stroke: var(--card-accent, #00d4ff);
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 4px var(--card-accent, #00d4ff));
+            transition: stroke-dasharray 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .bento-ring .pct {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--card-accent, #00d4ff);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* 悬浮操作按钮组 */
+        .bento-actions {
+            position: absolute;
+            bottom: 22px;
+            right: 22px;
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.35s 0.05s, transform 0.35s 0.05s;
+            z-index: 2;
+        }
+        .bento-card:hover .bento-actions {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .bento-action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10,14,26,0.85);
+            border: 1px solid rgba(0,212,255,0.4);
+            color: #64d2ff;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            backdrop-filter: blur(8px);
+        }
+        .bento-action-btn:hover {
+            background: var(--card-accent, #00d4ff);
+            color: #0a0f1f;
+            border-color: transparent;
+            transform: scale(1.12) rotate(-4deg);
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--card-accent, #00d4ff) 60%, transparent);
+        }
+
+        /* 收藏按钮 */
+        .bento-fav {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10,14,26,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #718096;
+            font-size: 15px;
+            cursor: pointer;
+            z-index: 3;
+            transition: all 0.3s;
+            backdrop-filter: blur(6px);
+        }
+        .bento-fav:hover {
+            color: #ffcc00;
+            border-color: rgba(255,204,0,0.5);
+            background: rgba(255,204,0,0.1);
+            transform: scale(1.12);
+        }
+        .bento-fav.active {
+            color: #ffcc00;
+            background: rgba(255,204,0,0.15);
+            border-color: rgba(255,204,0,0.6);
+            box-shadow: 0 0 14px rgba(255,204,0,0.4);
+        }
+
+        /* 空状态 */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 80px 20px;
+            color: #718096;
+        }
+        .empty-state .ico {
+            font-size: 60px;
+            opacity: 0.4;
+            margin-bottom: 16px;
+        }
+
+        /* ================= 响应式 ================= */
+        @media (max-width: 1100px) {
+            .bento-card.size-lg { grid-column: span 6; }
+            .bento-card.size-md { grid-column: span 3; }
+            .bento-card.size-sm { grid-column: span 3; }
+        }
+        @media (max-width: 768px) {
+            .course-container { padding: 100px 16px 40px; }
+            .course-hero h2 { font-size: 30px; }
+            .course-hero p { font-size: 14px; }
+            .bento-grid { grid-template-columns: 1fr; gap: 16px; }
+            .bento-card.size-lg,
+            .bento-card.size-md,
+            .bento-card.size-sm { grid-column: span 1; }
+            .bento-num { font-size: 60px; }
+            .bento-actions { position: static; opacity: 1; transform: none; margin-top: 12px; }
+        }
+    </style>
 </head>
-<body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <div class="logo-icon">Cm</div>
-                <span>CodeMaster</span>
-            </a>
-            <ul class="nav-links">
-                <li><a href="index.html">首页</a></li>
-                <li><a href="list.html" class="active">课程中心</a></li>
-                <li><a href="quiz.html">在线小测</a></li>
-                <li><a href="game.html">编程游戏</a></li>
-                <li><a href="profile.html">个人中心</a></li>
-                <li><a href="team.html">制作团队</a></li>
-            </ul>
-            <div class="nav-actions">
-                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
-                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
-            </div>
+<body class="course-page-bg">
+
+<div id="starField"></div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <div class="logo-icon">Cm</div>
+            <span>CodeMaster</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.html">首页</a></li>
+            <li><a href="list.html" class="active">课程中心</a></li>
+            <li><a href="quiz.html">在线小测</a></li>
+            <li><a href="game.html">编程游戏</a></li>
+            <li><a href="profile.html">个人中心</a></li>
+            <li><a href="team.html">制作团队</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+            <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <section class="courses" style="padding-top: 140px;">
-        <div class="container">
-            <h2 class="section-title">课程中心</h2>
-            <p class="section-subtitle">系统化学习路径，从入门到精通</p>
-
-            <div class="course-level-section">
-                <h3 class="course-level-title">入门</h3>
-                <div class="courses-grid">
-                <div class="course-card card" onclick="location.href='detail.html?course=basics'">
-                    <div class="course-cover">
-                        <span class="course-level">入门</span>
-                        📘
-                    </div>
-                    <h3>C语言基础入门</h3>
-                    <p class="course-desc">从零开始学习C语言，掌握变量、数据类型、运算符、流程控制等核心基础知识</p>
-                    <div class="course-meta">
-                        <span>12 课时 · 3小时</span>
-                        <button class="course-favorite" data-course-id="basics" aria-label="收藏 C语言基础入门" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=control-flow'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #feca57);">
-                        <span class="course-level">入门</span>
-                        🔄
-                    </div>
-                    <h3>循环与分支结构</h3>
-                    <p class="course-desc">深入学习if-else、switch、for、while等控制语句，掌握程序逻辑控制</p>
-                    <div class="course-meta">
-                        <span>8 课时 · 2小时</span>
-                        <button class="course-favorite" data-course-id="control-flow" aria-label="收藏 循环与分支结构" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=io-array'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #00cec9);">
-                        <span class="course-level">入门</span>
-                        📥
-                    </div>
-                    <h3>输入输出与数组</h3>
-                    <p class="course-desc">掌握printf、scanf和数组的基本用法，学会处理一组相关数据</p>
-                    <div class="course-meta">
-                        <span>9 课时 · 2.5小时</span>
-                        <button class="course-favorite" data-course-id="io-array" aria-label="收藏 输入输出与数组" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-                </div>
-            </div>
-
-            <div class="course-level-section">
-                <h3 class="course-level-title">进阶</h3>
-                <div class="courses-grid">
-                <div class="course-card card" onclick="location.href='detail.html?course=functions'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
-                        <span class="course-level">进阶</span>
-                        📦
-                    </div>
-                    <h3>函数与模块化编程</h3>
-                    <p class="course-desc">学习函数定义与调用、参数传递、递归调用，掌握模块化编程思想</p>
-                    <div class="course-meta">
-                        <span>10 课时 · 2.5小时</span>
-                        <button class="course-favorite" data-course-id="functions" aria-label="收藏 函数与模块化编程" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=strings'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #00cec9);">
-                        <span class="course-level">进阶</span>
-                        📋
-                    </div>
-                    <h3>数组与字符串</h3>
-                    <p class="course-desc">一维数组、二维数组、字符数组与字符串处理，掌握批量数据处理</p>
-                    <div class="course-meta">
-                        <span>9 课时 · 2.5小时</span>
-                        <button class="course-favorite" data-course-id="strings" aria-label="收藏 数组与字符串" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=pointers'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #ff6b6b, #ee5a24);">
-                        <span class="course-level">进阶</span>
-                        🔧
-                    </div>
-                    <h3>指针与内存管理</h3>
-                    <p class="course-desc">深入理解指针概念，掌握动态内存分配，写出更高效的C语言代码</p>
-                    <div class="course-meta">
-                        <span>8 课时 · 3小时</span>
-                        <button class="course-favorite" data-course-id="pointers" aria-label="收藏 指针与内存管理" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-                </div>
-            </div>
-
-            <div class="course-level-section">
-                <h3 class="course-level-title">高级</h3>
-                <div class="courses-grid">
-                <div class="course-card card" onclick="location.href='detail.html?course=algorithms'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #5f27cd, #00d2d3);">
-                        <span class="course-level">高级</span>
-                        🌲
-                    </div>
-                    <h3>数据结构与算法</h3>
-                    <p class="course-desc">链表、栈、队列、树、排序算法，夯实计算机科学核心基础</p>
-                    <div class="course-meta">
-                        <span>15 课时 · 5小时</span>
-                        <button class="course-favorite" data-course-id="algorithms" aria-label="收藏 数据结构与算法" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=file-io'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #fd79a8, #e84393);">
-                        <span class="course-level">高级</span>
-                        📁
-                    </div>
-                    <h3>文件操作与IO</h3>
-                    <p class="course-desc">文件读写、缓冲IO、目录操作，掌握数据持久化存储技术</p>
-                    <div class="course-meta">
-                        <span>6 课时 · 1.5小时</span>
-                        <button class="course-favorite" data-course-id="file-io" aria-label="收藏 文件操作与IO" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-
-                <div class="course-card card" onclick="location.href='detail.html?course=project'">
-                    <div class="course-cover" style="background: linear-gradient(135deg, #00b894, #55efc4);">
-                        <span class="course-level">实战</span>
-                        💻
-                    </div>
-                    <h3>项目实战：学生管理系统</h3>
-                    <p class="course-desc">综合运用所学知识，开发完整的C语言项目，提升实战能力</p>
-                    <div class="course-meta">
-                        <span>10 课时 · 4小时</span>
-                        <button class="course-favorite" data-course-id="project" aria-label="收藏 项目实战：学生管理系统" onclick="event.stopPropagation()">☆</button>
-                    </div>
-                </div>
-                </div>
-            </div>
+<section class="course-container">
+    <div class="course-hero">
+        <div class="badge">
+            <span>🚀</span>
+            <span>系统化课程 · 从入门到精通</span>
         </div>
-    </section>
+        <h2>选择你的 C 语言冒险路径</h2>
+        <p>9 门精心设计的课程，覆盖基础语法、数据结构、算法与项目实战。每门课配有交互式代码演示与实机练习。</p>
+    </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-bottom">
-                <p>©2026 CodeMaster 北京理工大学</p>
-            </div>
+    <!-- 工具栏 -->
+    <div class="course-toolbar">
+        <div class="course-search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="courseSearch" placeholder="搜索课程名称或关键词…">
         </div>
-    </footer>
+        <div class="course-filters" id="courseFilters">
+            <button class="filter-chip active" data-filter="all">全部</button>
+            <button class="filter-chip" data-filter="入门">入门</button>
+            <button class="filter-chip" data-filter="进阶">进阶</button>
+            <button class="filter-chip" data-filter="高级">高级</button>
+            <button class="filter-chip" data-filter="实战">实战</button>
+        </div>
+    </div>
 
-    <script src="assets/js/main.js"></script>
+    <!-- Bento 网格 -->
+    <div class="bento-grid" id="bentoGrid"></div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-bottom">
+            <p>©2026 CodeMaster 北京理工大学</p>
+        </div>
+    </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+<script>
+    // 星空背景
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 70; i++) {
+            const s = document.createElement('span');
+            const size = Math.random() * 2 + 1;
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.animationDuration = (2 + Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            field.appendChild(s);
+        }
+    })();
+
+    // ================= 课程数据 =================
+    const COURSES = [
+        { id: 'basics', title: 'C语言基础入门', icon: '📘', level: '入门', size: 'lg',
+          accent: '#00d4ff',
+          desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块地基。',
+          chapters: 12, hours: 3, rating: 4.9 },
+        { id: 'control-flow', title: '循环与分支结构', icon: '🔄', level: '入门', size: 'sm',
+          accent: '#ff8a00',
+          desc: 'if-else、switch、for、while，掌握程序逻辑控制。',
+          chapters: 8, hours: 2, rating: 4.8 },
+        { id: 'io-array', title: '输入输出与数组', icon: '📥', level: '入门', size: 'sm',
+          accent: '#00ff88',
+          desc: 'printf/scanf 与数组，学会处理一组相关数据。',
+          chapters: 9, hours: 2.5, rating: 4.8 },
+        { id: 'functions', title: '函数与模块化编程', icon: '📦', level: '进阶', size: 'md',
+          accent: '#a855f7',
+          desc: '函数定义、参数传递、递归调用，掌握模块化编程思想。',
+          chapters: 10, hours: 2.5, rating: 4.9 },
+        { id: 'strings', title: '数组与字符串', icon: '📋', level: '进阶', size: 'md',
+          accent: '#22d3ee',
+          desc: '一维/二维数组、字符数组与字符串处理，掌握批量数据处理。',
+          chapters: 9, hours: 2.5, rating: 4.7 },
+        { id: 'pointers', title: '指针与内存管理', icon: '🔧', level: '进阶', size: 'sm',
+          accent: '#ff4757',
+          desc: '地址、指针运算、动态内存，深入理解C语言核心。',
+          chapters: 8, hours: 3, rating: 4.9 },
+        { id: 'algorithms', title: '数据结构与算法', icon: '🌲', level: '高级', size: 'md',
+          accent: '#7b2cbf',
+          desc: '链表、栈、队列、树、排序查找，夯实算法基础。',
+          chapters: 15, hours: 5, rating: 5.0 },
+        { id: 'file-io', title: '文件操作与IO', icon: '📁', level: '高级', size: 'sm',
+          accent: '#f472b6',
+          desc: '文件读写、缓冲IO，掌握数据持久化存储技术。',
+          chapters: 6, hours: 1.5, rating: 4.6 },
+        { id: 'project', title: '项目实战：学生管理系统', icon: '💻', level: '实战', size: 'lg',
+          accent: '#fbbf24',
+          desc: '综合运用函数、结构体、文件、菜单交互，分阶段完成一个可运行的学生管理系统项目，从需求分析到代码重构全流程。',
+          chapters: 10, hours: 4, rating: 5.0 }
+    ];
+
+    let currentFilter = 'all';
+    let currentKeyword = '';
+
+    // ================= 渲染 =================
+    function renderBento() {
+        const grid = document.getElementById('bentoGrid');
+        const user = (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
+        const completedCourses = (user && user.completedCourses) || [];
+        const courseLessons = (user && user.courseLessons) || {};
+
+        const filtered = COURSES.filter(c => {
+            if (currentFilter !== 'all' && c.level !== currentFilter) return false;
+            if (currentKeyword && !c.title.toLowerCase().includes(currentKeyword) &&
+                !c.desc.toLowerCase().includes(currentKeyword)) return false;
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <div class="ico">🔍</div>
+                    <div>没有找到匹配的课程，换个关键词试试？</div>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = filtered.map((c, i) => {
+            const done = completedCourses.includes(c.id);
+            const lessonCount = (courseLessons[c.id] || []).length;
+            const progress = done ? 100 : Math.round((lessonCount / c.chapters) * 100);
+            const circumference = 2 * Math.PI * 18;
+
+            return `
+                <article class="bento-card size-${c.size}" 
+                         data-id="${c.id}"
+                         data-accent="${c.accent}"
+                         style="--card-accent: ${c.accent}; transition-delay: ${i * 70}ms;"
+                         onclick="goDetail('${c.id}')">
+                    <div class="bento-glow"></div>
+                    <div class="bento-num">${String(i + 1).padStart(2, '0')}</div>
+                    <button class="bento-fav ${done ? 'active' : ''}" 
+                            data-id="${c.id}"
+                            onclick="event.stopPropagation(); toggleFav(this, '${c.id}')"
+                            aria-label="收藏">☆</button>
+
+                    <div class="bento-icon">${c.icon}</div>
+                    <div class="bento-content">
+                        <span class="bento-level">${c.level}</span>
+                        <h3 class="bento-title">${c.title}</h3>
+                        <p class="bento-desc">${c.desc}</p>
+
+                        <div class="bento-foot">
+                            <div class="bento-meta">
+                                <span>📖 ${c.chapters} 课时</span>
+                                <span class="dot"></span>
+                                <span>⏱ ${c.hours}h</span>
+                                <span class="dot"></span>
+                                <span>⭐ ${c.rating}</span>
+                            </div>
+                            <div class="bento-ring">
+                                <svg viewBox="0 0 44 44">
+                                    <circle class="track" cx="22" cy="22" r="18"/>
+                                    <circle class="bar" cx="22" cy="22" r="18" 
+                                            stroke-dasharray="${progress / 100 * circumference} ${circumference}"/>
+                                </svg>
+                                <span class="pct">${progress}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bento-actions">
+                        <button class="bento-action-btn" title="学习" 
+                                onclick="event.stopPropagation(); goDetail('${c.id}')">学</button>
+                        <button class="bento-action-btn" title="练习" 
+                                onclick="event.stopPropagation(); goDetail('${c.id}')">练</button>
+                        <button class="bento-action-btn" title="测试" 
+                                onclick="event.stopPropagation(); goQuiz()">测</button>
+                    </div>
+                </article>
+            `;
+        }).join('');
+
+        // 交错入场
+        requestAnimationFrame(() => {
+            grid.querySelectorAll('.bento-card').forEach(card => {
+                setTimeout(() => card.classList.add('visible'), 40);
+            });
+        });
+
+        // 卡片光效跟随鼠标
+        grid.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+                card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+            });
+        });
+
+        // 应用收藏状态
+        applyFavStates();
+    }
+
+    function goDetail(id) {
+        location.href = 'detail.html?course=' + id;
+    }
+    function goQuiz() {
+        location.href = 'quiz.html';
+    }
+
+    // ================= 收藏 =================
+    function getFavs() {
+        try {
+            return JSON.parse(localStorage.getItem('cm_course_favorites') || '[]');
+        } catch (e) { return []; }
+    }
+    function applyFavStates() {
+        const favs = getFavs();
+        document.querySelectorAll('.bento-fav').forEach(btn => {
+            const active = favs.includes(btn.dataset.id);
+            btn.classList.toggle('active', active);
+            btn.textContent = active ? '★' : '☆';
+        });
+    }
+    window.toggleFav = function (btn, id) {
+        let favs = getFavs();
+        if (favs.includes(id)) {
+            favs = favs.filter(f => f !== id);
+            btn.textContent = '☆';
+            btn.classList.remove('active');
+            if (typeof showToast === 'function') showToast('已取消收藏', 'info');
+        } else {
+            favs.push(id);
+            btn.textContent = '★';
+            btn.classList.add('active');
+            if (typeof showToast === 'function') showToast('已加入收藏', 'success');
+        }
+        localStorage.setItem('cm_course_favorites', JSON.stringify(favs));
+    };
+
+    // ================= 筛选与搜索 =================
+    document.getElementById('courseFilters').addEventListener('click', e => {
+        const chip = e.target.closest('.filter-chip');
+        if (!chip) return;
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        currentFilter = chip.dataset.filter;
+        renderBento();
+    });
+
+    document.getElementById('courseSearch').addEventListener('input', (e) => {
+        currentKeyword = e.target.value.trim().toLowerCase();
+        renderBento();
+    });
+
+    // 初始化
+    renderBento();
+</script>
 </body>
 </html>
