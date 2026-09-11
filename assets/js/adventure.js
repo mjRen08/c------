@@ -1,14 +1,16 @@
 /* ============================================================
-   adventure.js v7.0
-   新增：枪械系统 | 存档点 | 平台重构 | Boss 技能扩充
+   adventure.js v8.0
+   新增：按键重绑定 | 页面内答题弹窗 | 更多Boss弹幕
+         可视化激光/地刺 | 弱点伤害下调 | 题库扩充
+         手动存档 | 死亡扣金币 | 存档点复活
    ============================================================ */
 
 (function () {
     'use strict';
 
-    const SAVE_KEY = 'cm_adventure_save_v7';
-    const TUTORIAL_KEY = 'cm_adventure_tutorials_seen_v7';
-    const ACHIEVEMENT_KEY = 'cm_adventure_achievements_v7';
+    const SAVE_KEY = 'cm_adventure_save_v8';
+    const TUTORIAL_KEY = 'cm_adventure_tutorials_seen_v8';
+    const ACHIEVEMENT_KEY = 'cm_adventure_achievements_v8';
 
     /* ---------- 精灵图 ---------- */
     const SPRITE = {
@@ -24,17 +26,17 @@
 
     /* ---------- 教程 ---------- */
     const TUTORIALS = {
-        'variable-platform': { title: '悬崖变量平台', concept: '变量在悬崖上累积，每次"跳上去"counter++。', goal: '用【二段跳】和【冲刺】连续踩 3 次，把平台踩实！', code: `int counter = 0;\ncounter++;\nif (counter >= 3) platform.stable = true;`, tip: '平台在悬崖上！先跳起来→按住 Shift 二段跳→按 J 冲刺接近平台。' },
+        'variable-platform': { title: '悬崖变量平台', concept: '变量在悬崖上累积，每次"跳上去"counter++。', goal: '用【二段跳】和【冲刺】连续踩 3 次，把平台踩实！', code: `int counter = 0;\ncounter++;\nif (counter >= 3) platform.stable = true;`, tip: '平台在悬崖上！先跳起来→按住 Shift 二段跳→按 Q 冲刺接近平台。' },
         'loop-spikes': { title: '循环地刺', concept: 'for 循环有节奏地重复。', goal: '找准空隙通过。', code: `for (int i = 0; i < n; i++) spike.y = sin(i) * A;`, tip: '数着节拍跳过去。' },
         'pointer-teleport': { title: '指针传送门', concept: '指针保存地址。', goal: '走进传送门瞬移。', code: `int *p = &target;\n*p = 0x2200;`, tip: '踩上去即可瞬移。' },
         'array-platforms': { title: '数组平台', concept: '数组必须按索引顺序访问。', goal: '只能踩 order 匹配的平台，其余虚化。', code: `int arr[5] = {10,20,30,40,50};\n// arr[0] → arr[1] → ...`, tip: '踩错全部重置，必须严格按顺序。' },
         'memory-pool': { title: '内存池', concept: 'malloc 需要 free。', goal: '站上回血，但扣金币。', code: `int *p = malloc(sizeof(int) * n);`, tip: '回血要花钱。' },
         'conditional-gate': { title: '条件门', concept: 'if 只在条件成立时执行。', goal: '收集足够钥匙。', code: `if (keys >= 3) gate.open();`, tip: '去商店买钥匙。' },
-        'switch-platform': { title: 'switch 平台', concept: 'switch 分支执行。', goal: '按 E 切换升降。', code: `switch (state) { case UP: y -= 10; break; }`, tip: '靠近按 E。' },
+        'switch-platform': { title: 'switch 平台', concept: 'switch 分支执行。', goal: '按 F 切换升降。', code: `switch (state) { case UP: y -= 10; break; }`, tip: '靠近按 F。' },
         'recursive-trap': { title: '递归陷阱', concept: '递归必须有终止条件。', goal: '在平台消失前快速跳跃。', code: `void f(int n) { if (n<=0) return; f(n-1); }`, tip: '连贯地跳。' },
-        'pointer-missile': { title: '追踪导弹', concept: '悬空指针追踪到崩溃。', goal: '用冲刺甩开，3 秒后消失。', code: `while (1) m.x += (t.x - m.x) * 0.1;`, tip: '按 J 冲刺甩开。' },
+        'pointer-missile': { title: '追踪导弹', concept: '悬空指针追踪到崩溃。', goal: '用冲刺甩开，3 秒后消失。', code: `while (1) m.x += (t.x - m.x) * 0.1;`, tip: '按 Q 冲刺甩开。' },
         'memory-leak': { title: '内存泄漏', concept: '忘记 free 会耗尽资源。', goal: '快速通过紫色毒雾。', code: `while (1) { int *p = malloc(1024); }`, tip: '用冲刺快速通过。' },
-        'quiz-stone': { title: '答题石碑', concept: '石碑上刻着谜题。', goal: '按 E 答题，答对 +5 金币。', code: `if (answer == correct) coins += 5;`, tip: '答错不扣血。' },
+        'quiz-stone': { title: '答题石碑', concept: '石碑上刻着谜题。', goal: '按 F 答题，答对 +5 金币。', code: `if (answer == correct) coins += 5;`, tip: '答错不扣血。' },
         'laser-sweep': { title: '扫描激光', concept: '激光周期性扫描。', goal: '红色警告时让开。', code: `for (int i = 0; i < range; i++) laser.scan();`, tip: '警告线出现时闪避。' },
         'boss-barrage': { title: '弹幕阶段', concept: 'Boss 连续发射多波子弹。', goal: '用冲刺、跳跃、护盾躲避。', code: `for (int i = 0; i < 12; i++) fireBullet(i * 30);`, tip: '弹幕有节奏，找到间隙。' },
         'gun': { title: '代码枪', concept: '你自带武器枪，枪口追踪鼠标。', goal: '鼠标左键或 J 键发射子弹，命中 Boss 弱点造成伤害。', code: `bullet.dir = mouse.pos - gun.pos;\nfire(bullet);`, tip: '弱点必须用枪打，不能再点击。' },
@@ -66,9 +68,11 @@
         data: {
             coins: 0, keys: 0, skills: [], upgrades: [], currentScene: 'village',
             bossesDefeated: [], totalCoins: 0, secretsFound: 0, ending: null,
-            totalPlayTime: 0, lastPlayed: Date.now(), version: 7,
+            totalPlayTime: 0, lastPlayed: Date.now(), version: 8,
             defeatedNoDamage: [], quizCorrect: 0, maxCoinsOneRun: 0, laserHits: 0,
             gunKills: 0, bestAccuracy: 0,
+            playerX: null, playerY: null, playerHp: null, playerMaxHp: null,
+            checkpoint: null, sceneEntry: {},
             upgradeStats: { maxHpBonus: 0, dashCdMul: 1, invinMul: 1, magnetMul: 1, shieldBonus: 0, reviveCount: 0, slowmoBonus: 0 }
         },
         load() {
@@ -78,6 +82,7 @@
                     const d = JSON.parse(raw);
                     this.data = Object.assign(this.data, d);
                     if (!this.data.upgradeStats) this.data.upgradeStats = { maxHpBonus: 0, dashCdMul: 1, invinMul: 1, magnetMul: 1, shieldBonus: 0, reviveCount: 0, slowmoBonus: 0 };
+                    if (!this.data.sceneEntry) this.data.sceneEntry = {};
                 }
             } catch (e) {}
             return this.data;
@@ -91,9 +96,11 @@
             this.data = {
                 coins: 0, keys: 0, skills: [], upgrades: [], currentScene: 'village',
                 bossesDefeated: [], totalCoins: 0, secretsFound: 0, ending: null,
-                totalPlayTime: 0, lastPlayed: Date.now(), version: 7,
+                totalPlayTime: 0, lastPlayed: Date.now(), version: 8,
                 defeatedNoDamage: [], quizCorrect: 0, maxCoinsOneRun: 0, laserHits: 0,
                 gunKills: 0, bestAccuracy: 0,
+                playerX: null, playerY: null, playerHp: null, playerMaxHp: null,
+                checkpoint: null, sceneEntry: {},
                 upgradeStats: { maxHpBonus: 0, dashCdMul: 1, invinMul: 1, magnetMul: 1, shieldBonus: 0, reviveCount: 0, slowmoBonus: 0 }
             };
         },
@@ -126,13 +133,13 @@
         return true;
     }
 
-    /* ---------- 技能 / 物品 / 强化 ---------- */
+    /* ---------- 技能 / 物品 / 强化（★ 热键已重绑定） ---------- */
     const SKILLS = {
-        doubleJump: { id: 'doubleJump', name: '二段跳',  icon: '🦅', cost: 8,  desc: '空中再次跳跃（悬崖必备）', hotkey: 'Shift' },
-        magnet:     { id: 'magnet',     name: '金币磁铁', icon: '🧲', cost: 10, desc: '自动吸取金币', hotkey: '' },
-        dash:       { id: 'dash',       name: '冲刺',    icon: '💨', cost: 12, desc: '向前瞬移（悬崖必备）', hotkey: 'J' },
-        shield:     { id: 'shield',     name: '护盾',    icon: '🛡️', cost: 15, desc: '抵挡一次伤害', hotkey: 'K' },
-        slowmo:     { id: 'slowmo',     name: '时间减速', icon: '⏳', cost: 20, desc: '手动慢动作', hotkey: 'L' }
+        doubleJump: { id: 'doubleJump', name: '二段跳',  icon: '🦅', cost: 8,  desc: '空中再次跳跃（Shift）', hotkey: 'Shift' },
+        magnet:     { id: 'magnet',     name: '金币磁铁', icon: '🧲', cost: 10, desc: '自动吸取金币',           hotkey: '' },
+        dash:       { id: 'dash',       name: '冲刺',    icon: '💨', cost: 12, desc: '向前瞬移（Q）',          hotkey: 'Q' },
+        shield:     { id: 'shield',     name: '护盾',    icon: '🛡️', cost: 15, desc: '抵挡一次伤害（E）',      hotkey: 'E' },
+        slowmo:     { id: 'slowmo',     name: '时间减速', icon: '⏳', cost: 20, desc: '手动慢动作（L）',        hotkey: 'L' }
     };
 
     const ITEMS = {
@@ -180,15 +187,12 @@
                 { x: 2920, y: 300 }, { x: 2960, y: 300 }, { x: 3170, y: 240 }, { x: 3670, y: 240 }
             ],
             npcs: [
-                { x: 150, y: 420, name: '老村长', icon: '👴', dialogs: ['欢迎来到新手村！', '你有一把枪，鼠标瞄准，左键射击。', '途中的挑战都试炼你的操作。', 'Boss 弱点只能用子弹打中！'] },
+                { x: 150, y: 420, name: '老村长', icon: '👴', dialogs: ['欢迎来到新手村！', '你有一把枪，鼠标瞄准，左键射击。', 'Q 冲刺、E 护盾、F 交互、J 取消。', 'Boss 弱点只能用子弹打中！'] },
                 { x: 550, y: 420, name: '商店', icon: '🏪', isShop: true, dialogs: ['欢迎光临！'] }
             ],
             gadgets: [
-                /* ★ 变量平台：悬崖上，只有踩实才能过 */
-                { type: 'variable-platform', x: 2450, y: 320, w: 90, h: 20, id: 'vp1', counter: 0, target: 3, stable: false, reward: 8, rewarded: false,
-                  onCliff: true, checkpoint: false },
+                { type: 'variable-platform', x: 2450, y: 320, w: 90, h: 20, id: 'vp1', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true, checkpoint: false },
                 { type: 'quiz-stone', x: 1000, y: 380, w: 50, h: 60, used: false, quizIndex: 0 },
-                /* ★ 数组平台：必须按顺序 */
                 { type: 'array-platforms', items: [
                     { x: 3150, y: 380, w: 80, h: 16, idx: 0, order: 0 },
                     { x: 3300, y: 320, w: 80, h: 16, idx: 1, order: 1 },
@@ -258,12 +262,10 @@
                 { x: 4200, y: 420, name: '商店', icon: '🏪', isShop: true, dialogs: ['新商品，看看吧~'] }
             ],
             gadgets: [
-                /* ★ 悬崖变量平台 */
                 { type: 'variable-platform', x: 2800, y: 320, w: 90, h: 20, id: 'vp2', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true },
                 { type: 'loop-spikes', x: 1400, y: 420, w: 200, h: 40, period: 2.0, amplitude: 60, phase: 0, dmg: 20 },
                 { type: 'loop-spikes', x: 2400, y: 420, w: 250, h: 40, period: 2.4, amplitude: 80, phase: 0.5, dmg: 20 },
                 { type: 'pointer-teleport', x: 500, y: 380, toX: 2900, toY: 380, label: '*p → 0x2900', cooldown: 0 },
-                /* ★ 数组平台 */
                 { type: 'array-platforms', items: [
                     { x: 3450, y: 380, w: 70, h: 16, idx: 0, order: 0 },
                     { x: 3600, y: 320, w: 70, h: 16, idx: 1, order: 1 },
@@ -327,7 +329,6 @@
                 { x: 2800, y: 460, w: 500, h: 80 }, { x: 3450, y: 460, w: 500, h: 80 },
                 { x: 4100, y: 460, w: 500, h: 80 }, { x: 4750, y: 460, w: 500, h: 80 },
                 { x: 5400, y: 460, w: 500, h: 80 }, { x: 6000, y: 460, w: 1200, h: 80 },
-                // 高空平台
                 { x: 250, y: 360, w: 120, h: 20 }, { x: 500, y: 300, w: 100, h: 20 }, { x: 750, y: 240, w: 100, h: 20 },
                 { x: 1050, y: 340, w: 120, h: 20 }, { x: 1250, y: 280, w: 100, h: 20 },
                 { x: 1600, y: 340, w: 120, h: 20 }, { x: 1800, y: 260, w: 120, h: 20 },
@@ -362,17 +363,12 @@
                 { x: 2800, y: 420, name: '商店', icon: '🏪', isShop: true, dialogs: ['高端商品，勇者~'] }
             ],
             gadgets: [
-                // 条件门
                 { type: 'conditional-gate', x: 1900, y: 300, w: 60, h: 200, requiresKeys: 3, opened: false, label: 'if (keys >= 3)' },
-                // 激光（两道）
                 { type: 'laser-sweep', x: 2400, y: 200, w: 20, h: 300, range: 400, period: 3.5, phase: 0, dmg: 15, state: 'warning', stateTimer: 0, currentY: 200, warningTime: 1.0, firingTime: 0.4, cooldownTime: 2.2 },
                 { type: 'laser-sweep', x: 4800, y: 180, w: 20, h: 300, range: 500, period: 4.5, phase: 1.5, dmg: 15, state: 'warning', stateTimer: 0, currentY: 180, warningTime: 1.2, firingTime: 0.4, cooldownTime: 2.6 },
-                // switch 平台
                 { type: 'switch-platform', x: 2600, y: 240, w: 100, h: 16, active: false, targetY: 400, closedY: 240, current: 240 },
                 { type: 'switch-platform', x: 4600, y: 240, w: 100, h: 16, active: false, targetY: 400, closedY: 240, current: 240 },
-                // 悬崖变量平台
                 { type: 'variable-platform', x: 3800, y: 300, w: 90, h: 20, id: 'vp3', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true },
-                // 数组平台（5 块严格顺序）
                 { type: 'array-platforms', items: [
                     { x: 3950, y: 380, w: 70, h: 16, idx: 0, order: 0 },
                     { x: 4100, y: 320, w: 70, h: 16, idx: 1, order: 1 },
@@ -380,20 +376,14 @@
                     { x: 4400, y: 320, w: 70, h: 16, idx: 3, order: 3 },
                     { x: 4550, y: 260, w: 70, h: 16, idx: 4, order: 4 }
                 ], currentProgress: 0, completed: false, reward: 10, rewarded: false, mustSequence: true },
-                // 传送门
                 { type: 'pointer-teleport', x: 700, y: 380, toX: 2300, toY: 380, label: 'memset → 0x2300', cooldown: 0 },
                 { type: 'pointer-teleport', x: 5200, y: 380, toX: 6300, toY: 380, label: 'malloc → 0x6300', cooldown: 0 },
-                // 地刺
                 { type: 'loop-spikes', x: 1250, y: 420, w: 200, h: 40, period: 2.2, amplitude: 70, phase: 0.3, dmg: 20 },
                 { type: 'loop-spikes', x: 3300, y: 420, w: 200, h: 40, period: 2.0, amplitude: 80, phase: 0.6, dmg: 20 },
                 { type: 'loop-spikes', x: 5700, y: 420, w: 200, h: 40, period: 1.8, amplitude: 90, phase: 0.4, dmg: 20 },
-                // 答题石碑
                 { type: 'quiz-stone', x: 5000, y: 380, w: 50, h: 60, used: false, quizIndex: 2 },
-                // 内存泄漏
                 { type: 'memory-leak', x: 500, y: 200, w: 500, h: 260, dps: 8 },
-                // 追踪导弹
                 { type: 'pointer-missile', x: 3600, y: 200, w: 40, h: 40, active: false, missiles: [], cooldown: 0 },
-                // 递归陷阱
                 { type: 'recursive-trap', x: 6500, y: 400, w: 400, h: 40, triggered: false, currentIdx: 0, platforms: [
                     { x: 6500, y: 400, w: 140, h: 40 }, { x: 6660, y: 400, w: 120, h: 40 },
                     { x: 6800, y: 400, w: 100, h: 40 }, { x: 6920, y: 400, w: 60, h: 40 }
@@ -479,7 +469,6 @@
                 { type: 'loop-spikes', x: 4400, y: 420, w: 200, h: 40, period: 2.0, amplitude: 90, phase: 0.4, dmg: 20 },
                 { type: 'pointer-teleport', x: 1000, y: 380, toX: 2000, toY: 380, label: '*(p+i) → 0x2000', cooldown: 0 },
                 { type: 'pointer-teleport', x: 4200, y: 380, toX: 5500, toY: 380, label: 'malloc → 0x5500', cooldown: 0 },
-                /* ★ 悬崖变量平台 */
                 { type: 'variable-platform', x: 5100, y: 300, w: 90, h: 20, id: 'vp4', counter: 0, target: 3, stable: false, reward: 8, rewarded: false, onCliff: true },
                 { type: 'array-platforms', items: [
                     { x: 3600, y: 380, w: 70, h: 16, idx: 0, order: 0 },
@@ -522,7 +511,6 @@
                 waveVariants: ['basic', 'multi', 'tracking', 'laser'],
                 barrageTypes: ['ring', 'sector', 'tracking', 'spiral', 'random'],
                 isFinal: true,
-                // ★ 额外技能
                 extraSkills: ['teleport', 'summon', 'clone', 'blackhole', 'rewind']
             }
         },
@@ -543,15 +531,33 @@
         }
     };
 
+    /* ★ 题库扩充至 25 道题，顺序轮换 */
     const QUIZ_BANK = [
-        { q: 'sizeof(int) 在 32 位系统返回多少？', opts: [2, 4, 8], answer: 4 },
-        { q: '以下哪个是合法变量名？', opts: ['123abc', 'my_var', 'int'], answer: 'my_var' },
-        { q: 'for 循环三个表达式用什么分隔？', opts: [',', ';', ':'], answer: ';' },
-        { q: '跳出循环用哪个关键字？', opts: ['continue', 'break', 'return'], answer: 'break' },
-        { q: '数组下标从几开始？', opts: [0, 1, -1], answer: 0 },
-        { q: 'int a = 5; a++; a 的值是？', opts: [5, 6, 4], answer: 6 },
-        { q: 'printf 输出整数用什么占位符？', opts: ['%d', '%s', '%f'], answer: '%d' },
-        { q: '字符串以什么字符结尾？', opts: ['\\n', '\\0', '\\t'], answer: '\\0' }
+        { q: 'sizeof(int) 在 32 位系统返回多少？',           opts: [2, 4, 8],             answer: 4 },
+        { q: '以下哪个是合法变量名？',                       opts: ['123abc', 'my_var', 'int'], answer: 'my_var' },
+        { q: 'for 循环三个表达式用什么分隔？',               opts: [',', ';', ':'],       answer: ';' },
+        { q: '跳出循环用哪个关键字？',                       opts: ['continue', 'break', 'return'], answer: 'break' },
+        { q: '数组下标从几开始？',                           opts: [0, 1, -1],            answer: 0 },
+        { q: 'int a = 5; a++; a 的值是？',                   opts: [5, 6, 4],             answer: 6 },
+        { q: 'printf 输出整数用什么占位符？',                opts: ['%d', '%s', '%f'],    answer: '%d' },
+        { q: '字符串以什么字符结尾？',                       opts: ['\\n', '\\0', '\\t'], answer: '\\0' },
+        { q: 'int a = 7 / 2; a 的值是？',                    opts: [2, 3, 3.5],           answer: 3 },
+        { q: 'unsigned int x = 5; x <<= 2; x 的值是？',       opts: [7, 10, 20],           answer: 20 },
+        { q: 'int a=3,b=4; a < b ? b : a 的结果？',          opts: [3, 4, 0],             answer: 4 },
+        { q: 'char 类型占用多少字节？',                      opts: [1, 2, 4],             answer: 1 },
+        { q: 'int sum=0; for(i=1;i<=4;i++) sum+=i; sum 是？', opts: [8, 10, 12],           answer: 10 },
+        { q: 'strlen("cat") 返回多少？',                     opts: [2, 3, 4],             answer: 3 },
+        { q: '指针变量主要用来保存什么？',                   opts: ['整数大小', '变量的地址', '函数名'], answer: '变量的地址' },
+        { q: '取变量 x 的地址用哪个运算符？',                opts: ['*', '&', '%'],       answer: '&' },
+        { q: '函数执行完毕用哪个关键字返回结果？',           opts: ['break', 'return', 'continue'], answer: 'return' },
+        { q: 'struct 关键字用来定义什么？',                  opts: ['结构体', '数组', '指针'], answer: '结构体' },
+        { q: '栈通常遵循什么原则？',                         opts: ['先进先出', '后进先出', '随机访问'], answer: '后进先出' },
+        { q: '队列通常遵循什么原则？',                       opts: ['后进先出', '先进先出', '随机访问'], answer: '先进先出' },
+        { q: 'fopen 打开文件失败时返回什么？',               opts: ['NULL', 'EOF', '0字符'], answer: 'NULL' },
+        { q: '以 "r" 模式打开文件表示什么？',                opts: ['只读', '只写', '追加'], answer: '只读' },
+        { q: '局部静态变量 static int 的特点？',             opts: ['每次重新初始化', '保留上次的值', '只能在 main 用'], answer: '保留上次的值' },
+        { q: '二分查找要求数据满足什么？',                   opts: ['无序', '已排序', '全为字符串'], answer: '已排序' },
+        { q: '函数参数按值传递时，函数内修改形参？',         opts: ['改变调用者原变量', '不改变调用者原变量', '一定崩溃'], answer: '不改变调用者原变量' }
     ];
 
     /* ============================================================
@@ -572,16 +578,16 @@
             gunAngle: 0,
             gunCooldown: 0,
             shootAnimTimer: 0,
-            stunned: 0,              // ★ 修复跳跃 Bug
-            ammo: 8,                 // ★ 弹药系统
-            maxAmmo: 8,              // ★ 弹药上限
-            ammoRegenTimer: 0        // ★ 弹药恢复计时
+            stunned: 0,
+            ammo: 8, maxAmmo: 8, ammoRegenTimer: 0
         },
         coins: Save.data.coins, keys: Save.data.keys, runCoins: 0,
         doors: [], elevators: [], npcs: [], enemies: [],
         gadgets: [], bullets: [], particles: [], damageTexts: [],
         missiles: [], bossBullets: [], playerBullets: [], clones: [],
         blackholes: [],
+        bossLasers: [],       // ★ 新
+        bossSpikes: [],       // ★ 新
         camera: { x: 0 },
         dialog: null, dialogIndex: 0,
         timeScale: 1, slowmoTimer: 0,
@@ -597,7 +603,9 @@
         tutorialActive: false, tutorialData: null,
         choiceActive: false, choiceData: null,
         quizActive: false, quizData: null, quizStone: null,
-        checkpoint: null, // { scene, x, y, activated }
+        quizBankIndex: 0,
+        checkpoint: Save.data.checkpoint || null,
+        sceneEntry: Save.data.sceneEntry || {},
         runStats: { shots: 0, hits: 0 },
         _bgImageLoaded: null, _sprite: null
     };
@@ -642,7 +650,7 @@
                     <div class="adv-tut-block"><div class="adv-tut-label">💻 对应代码</div><pre class="adv-tut-code">${escapeHtml(t.code)}</pre></div>
                     <div class="adv-tut-tip">💡 ${t.tip}</div>
                 </div>
-                <button class="adv-tutorial-close" id="advTutorialClose">我知道了 (按 E 继续)</button>
+                <button class="adv-tutorial-close" id="advTutorialClose">我知道了 (按 F 或 J 继续)</button>
             </div>`;
         modal.classList.add('active');
         $('#advTutorialClose').addEventListener('click', closeTutorial);
@@ -677,7 +685,7 @@
                     <div class="adv-resource keys"><span class="adv-res-ico">🔑</span><span id="advKeys">0</span></div>
                     <button class="adv-save-btn" id="advAchBtn">🏆 成就</button>
                     <button class="adv-save-btn" id="advShopBtn">🏪 商店</button>
-                    <button class="adv-save-btn" id="advSaveBtn">💾 保存</button>
+                    <button class="adv-save-btn" id="advSaveBtn">💾 存档</button>
                 </div>
             </div>
             <div class="adv-canvas-wrap" id="advCanvasWrap">
@@ -692,7 +700,7 @@
                 <div class="adv-dialog" id="advDialog">
                     <div class="adv-dialog-speaker" id="advDialogSpeaker"></div>
                     <div class="adv-dialog-text" id="advDialogText"></div>
-                    <div class="adv-dialog-hint">按 E / 空格 继续</div>
+                    <div class="adv-dialog-hint">按 F / 空格 继续</div>
                 </div>
                 <div class="adv-shield-ui" id="advShieldUI">
                     <div class="adv-shield-title">防御代码光波 — 选择正确的盾牌！</div>
@@ -700,11 +708,16 @@
                     <div class="adv-shield-options" id="advShieldOptions"></div>
                     <div class="adv-shield-timer"><div class="adv-shield-timer-fill" id="advShieldTimerFill"></div></div>
                 </div>
+
+                <!-- ★ 答题石碑：页面内弹窗 -->
                 <div class="adv-quiz-ui" id="advQuizUI">
-                    <div class="adv-quiz-title">📜 答题石碑</div>
-                    <div class="adv-quiz-question" id="advQuizQuestion"></div>
-                    <div class="adv-quiz-options" id="advQuizOptions"></div>
+                    <div class="adv-quiz-panel">
+                        <div class="adv-quiz-title">📜 答题石碑</div>
+                        <div class="adv-quiz-question" id="advQuizQuestion"></div>
+                        <div class="adv-quiz-options" id="advQuizOptions"></div>
+                    </div>
                 </div>
+
                 <div class="adv-slowmo" id="advSlowmo"><div class="slowmo-text">SLOW MOTION</div></div>
                 <div class="adv-banner" id="advBanner"></div>
                 <div class="adv-skill-bar" id="advSkillBar"></div>
@@ -714,11 +727,13 @@
             <div class="adv-controls">
                 <div class="adv-ctrl"><kbd>A</kbd><kbd>D</kbd> 移动</div>
                 <div class="adv-ctrl"><kbd>空格</kbd> 跳跃</div>
-                <div class="adv-ctrl"><kbd>E</kbd> 交互</div>
                 <div class="adv-ctrl"><kbd>Shift</kbd> 二段跳</div>
-                <div class="adv-ctrl"><kbd>J</kbd> / 鼠标左键 射击</div>
-                <div class="adv-ctrl"><kbd>K</kbd> 护盾</div>
+                <div class="adv-ctrl"><kbd>Q</kbd> 冲刺</div>
+                <div class="adv-ctrl"><kbd>E</kbd> 护盾</div>
                 <div class="adv-ctrl"><kbd>L</kbd> 减速</div>
+                <div class="adv-ctrl"><kbd>F</kbd> 交互</div>
+                <div class="adv-ctrl"><kbd>左键</kbd> 射击</div>
+                <div class="adv-ctrl"><kbd>J</kbd> 取消 / 关闭</div>
                 <div class="adv-ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 盾牌/选项</div>
             </div>`;
         document.body.appendChild(wrapper);
@@ -728,7 +743,7 @@
         document.getElementById('advBackBtn').addEventListener('click', exitAdventure);
         document.getElementById('advShopBtn').addEventListener('click', openShop);
         document.getElementById('advAchBtn').addEventListener('click', openAchievements);
-        document.getElementById('advSaveBtn').addEventListener('click', () => { persistProgress(); showBanner('💾 已保存'); });
+        document.getElementById('advSaveBtn').addEventListener('click', manualSave);
         AD.canvas.addEventListener('mousemove', e => {
             const r = AD.canvas.getBoundingClientRect();
             AD.mouse.x = (e.clientX - r.left) * (AD.canvas.width / r.width);
@@ -748,33 +763,62 @@
 
     function onKeyDown(e) {
         if (!AD.active) return;
-        if (AD.tutorialActive) { if (e.code === 'KeyE' || e.code === 'Space') { e.preventDefault(); closeTutorial(); } return; }
-        if (AD.choiceActive) {
-            if (e.code === 'Digit1') { e.preventDefault(); chooseEnding('purify'); }
-            if (e.code === 'Digit2') { e.preventDefault(); chooseEnding('seize'); }
-            if (e.code === 'Digit3') { e.preventDefault(); chooseEnding('peace'); }
+
+        /* 教程弹窗 */
+        if (AD.tutorialActive) {
+            if (e.code === 'KeyF' || e.code === 'KeyJ' || e.code === 'Space' || e.code === 'Escape') {
+                e.preventDefault(); closeTutorial();
+            }
             return;
         }
+        /* 结局选择 */
+        if (AD.choiceActive) {
+            if (e.code === 'Digit1') { e.preventDefault(); chooseEnding('purify'); }
+            if (e.code === 'Digit2') { e.preventDefault(); chooseEnding('seize');  }
+            if (e.code === 'Digit3') { e.preventDefault(); chooseEnding('peace');  }
+            if (e.code === 'KeyJ')     { e.preventDefault(); closeEndingChoice();  }
+            return;
+        }
+        /* 石碑答题 */
         if (AD.quizActive) {
             if (e.code === 'Digit1') { e.preventDefault(); answerQuiz(0); }
             if (e.code === 'Digit2') { e.preventDefault(); answerQuiz(1); }
             if (e.code === 'Digit3') { e.preventDefault(); answerQuiz(2); }
-            if (e.code === 'Escape') { e.preventDefault(); closeQuiz(); }
+            if (e.code === 'KeyJ' || e.code === 'Escape') { e.preventDefault(); closeQuiz(); }
             return;
         }
+
         AD.keysPressed[e.code] = true;
         if (e.code === 'Escape') { exitAdventure(); return; }
-        if (AD.dialog) { if (e.code === 'KeyE' || e.code === 'Space') { e.preventDefault(); advanceDialog(); } return; }
-        if (e.code === 'KeyE') tryInteract();
-        if (e.code === 'KeyJ') shoot();
-        if (Save.hasSkill('shield') && e.code === 'KeyK') useShield();
+
+        if (AD.dialog) {
+            if (e.code === 'KeyF' || e.code === 'Space') { e.preventDefault(); advanceDialog(); }
+            return;
+        }
+
+        if (e.code === 'KeyF') tryInteract();        // ★ 交互
+        if (e.code === 'KeyJ') cancelTopPanel();     // ★ 取消 / 关闭弹窗
+
+        if (Save.hasSkill('dash')   && e.code === 'KeyQ') useDash();      // ★ 冲刺
+        if (Save.hasSkill('shield') && e.code === 'KeyE') useShield();    // ★ 护盾
         if (Save.hasSkill('slowmo') && e.code === 'KeyL') useSlowmo();
+
         if (AD.shieldQuestion && (e.code === 'Digit1' || e.code === 'Digit2' || e.code === 'Digit3')) {
             e.preventDefault();
             pickShield(Number(e.code.replace('Digit', '')) - 1);
         }
     }
     function onKeyUp(e) { AD.keysPressed[e.code] = false; }
+
+    function cancelTopPanel() {
+        if (AD.shieldQuestion) { pickShield(-1); return; }
+        if (AD.quizActive)     { closeQuiz();     return; }
+        if (AD.tutorialActive) { closeTutorial(); return; }
+        const shop = document.getElementById('advShopModal');
+        if (shop && shop.classList.contains('active')) { shop.classList.remove('active'); return; }
+        const ach = document.getElementById('advAchModal');
+        if (ach && ach.classList.contains('active')) { ach.classList.remove('active'); return; }
+    }
 
     /* ============================================================
        枪械系统
@@ -786,19 +830,16 @@
         const worldMouseX = AD.mouse.x + AD.camera.x;
         const worldMouseY = AD.mouse.y;
         p.gunAngle = Math.atan2(worldMouseY - gunY, worldMouseX - gunX);
-        // 面向鼠标方向（用于精灵镜像）
         p.facing = Math.cos(p.gunAngle) >= 0 ? 1 : -1;
     }
 
     function shoot() {
         const p = AD.player;
         if (p.gunCooldown > 0) return;
-
-        // ★ 弹药检查（不弹提示，靠左下角弹药条显示）
         if (p.ammo <= 0) return;
 
         p.ammo--;
-        p.gunCooldown = 20;      // ★ 射速改慢（从 8 帧 → 20 帧，约 0.33 秒/发）
+        p.gunCooldown = 20;
         p.shootAnimTimer = 8;
 
         const gunX = p.x + p.w / 2 + Math.cos(p.gunAngle) * 20;
@@ -824,7 +865,6 @@
         const p = AD.player;
         for (let i = AD.playerBullets.length - 1; i >= 0; i--) {
             const b = AD.playerBullets[i];
-            // 记录拖尾
             b.trail.push({ x: b.x, y: b.y, life: 0.15 });
             if (b.trail.length > 6) b.trail.shift();
             b.trail.forEach(t => t.life -= dt);
@@ -834,7 +874,7 @@
             b.y += b.vy * 60 * dt;
             b.life -= dt;
 
-            // 命中 Boss
+            // 命中 Boss 弱点
             if (AD.boss && AD.bossState === 'expose-weakness') {
                 for (let j = AD.weaknesses.length - 1; j >= 0; j--) {
                     const w = AD.weaknesses[j];
@@ -845,8 +885,9 @@
                         shakeScreen(3);
                         AD.runStats.hits++;
                         if (w.hp <= 0) {
-                            AD.boss.hp -= 12; updateBossHpBar();
-                            spawnDamageText(AD.boss.x, AD.boss.y - 60, '-12', '#ff2e88');
+                            /* ★ 弱点击破伤害从 12 降到 5 */
+                            AD.boss.hp -= 5; updateBossHpBar();
+                            spawnDamageText(AD.boss.x, AD.boss.y - 60, '-5', '#ff2e88');
                             spawnParticles(AD.boss.x, AD.boss.y, '#ff2e88', 25);
                             showBanner('💥 弱点击破！', '#ff2e88');
                             shakeScreen(8);
@@ -864,13 +905,12 @@
             }
             // 命中 Boss 本体（普通伤害）
             else if (AD.boss && Math.hypot(b.x - AD.boss.x, b.y - AD.boss.y) < 60) {
-                // 普通命中减少 1 血
                 AD.boss.hp -= 1; updateBossHpBar();
                 spawnParticles(b.x, b.y, '#ffcc00', 4);
                 AD.playerBullets.splice(i, 1);
                 continue;
             }
-            // 命中弹幕（消除）
+            // 命中弹幕
             for (let j = AD.bossBullets.length - 1; j >= 0; j--) {
                 const bb = AD.bossBullets[j];
                 if (Math.hypot(b.x - bb.x, b.y - bb.y) < bb.r + b.r) {
@@ -887,9 +927,7 @@
 
     function checkBossDeath() {
         if (!AD.boss) return;
-        if (AD.boss.hp <= 0) {
-            setTimeout(triggerBossVictory, 300);
-        }
+        if (AD.boss.hp <= 0) setTimeout(triggerBossVictory, 300);
     }
 
     /* ============================================================
@@ -993,10 +1031,31 @@
                         </div>`;
                     }).join('')}
                 </div>
-                <button class="adv-shop-close" id="advAchClose">关闭</button>
+                <button class="adv-shop-close" id="advAchClose">关闭 (J)</button>
             </div>`;
         panel.classList.add('active');
         panel.querySelector('#advAchClose').addEventListener('click', () => panel.classList.remove('active'));
+    }
+
+    /* ============================================================
+       手动存档
+       ============================================================ */
+    function manualSave() {
+        const p = AD.player;
+        Save.save({
+            coins: AD.coins,
+            keys: AD.keys,
+            currentScene: AD.scene,
+            playerX: p.x,
+            playerY: p.y,
+            playerHp: p.hp,
+            playerMaxHp: p.maxHp,
+            checkpoint: AD.checkpoint,
+            sceneEntry: AD.sceneEntry,
+            totalPlayTime: Save.data.totalPlayTime + Math.floor((Date.now() - AD.sessionStart) / 1000)
+        });
+        showBanner('💾 已保存当前进度', '#00ff88');
+        spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#00ff88', 18);
     }
 
     /* ============================================================
@@ -1009,7 +1068,28 @@
         AD.runCoins = 0;
         AD.runStats = { shots: 0, hits: 0 };
         document.getElementById('advWrapper').classList.add('active');
+
+        /* 恢复存档点与场景位置 */
+        if (Save.data.checkpoint && Save.data.checkpoint.scene) {
+            AD.checkpoint = Save.data.checkpoint;
+        }
+        if (Save.data.sceneEntry && typeof Save.data.sceneEntry === 'object') {
+            AD.sceneEntry = Save.data.sceneEntry;
+        }
+
         loadScene(Save.data.currentScene || 'village');
+
+        /* 恢复玩家位置和血量（若手动存档过） */
+        if (typeof Save.data.playerX === 'number') {
+            AD.player.x = Save.data.playerX;
+            AD.player.y = Save.data.playerY || 380;
+        }
+        if (typeof Save.data.playerHp === 'number') {
+            AD.player.maxHp = Save.data.playerMaxHp || AD.player.maxHp;
+            AD.player.hp = Math.min(Save.data.playerHp, AD.player.maxHp);
+            updateHpBar();
+        }
+
         AD.lastTime = performance.now();
         requestAnimationFrame(loop);
         showBanner('冒险开始', '#00f0ff');
@@ -1017,7 +1097,6 @@
         setTimeout(() => {
             const firstNpc = AD.npcs[0];
             if (firstNpc && !firstNpc.isShop) startDialog(firstNpc);
-            // 首次进入冒险时教学枪
             if (!hasSeenTutorial('gun')) showTutorial('gun');
         }, 800);
     }
@@ -1026,7 +1105,6 @@
         if (AD.runCoins > (Save.data.maxCoinsOneRun || 0)) {
             Save.save({ maxCoinsOneRun: AD.runCoins });
         }
-        // 计算命中率
         if (AD.runStats.shots > 5) {
             const acc = AD.runStats.hits / AD.runStats.shots;
             if (acc > (Save.data.bestAccuracy || 0)) Save.save({ bestAccuracy: acc });
@@ -1041,12 +1119,14 @@
     function persistProgress() {
         Save.save({
             coins: AD.coins, keys: AD.keys, currentScene: AD.scene,
+            checkpoint: AD.checkpoint,
+            sceneEntry: AD.sceneEntry,
             totalPlayTime: Save.data.totalPlayTime + Math.floor((Date.now() - AD.sessionStart) / 1000)
         });
     }
 
     /* ============================================================
-       场景加载
+       场景加载（★ 支持场景位置记忆）
        ============================================================ */
     function loadScene(sceneId, spawnX) {
         const data = SCENES[sceneId]; if (!data) return;
@@ -1058,8 +1138,16 @@
         AD.gadgets = JSON.parse(JSON.stringify(data.gadgets || []));
         data.coins = (data.coins || []).map(c => ({ ...c, collected: false }));
 
-        AD.player.x = spawnX != null ? spawnX : 100;
-        AD.player.y = 380;
+        /* ★ 优先使用进入该场景的入口记忆 */
+        const entry = AD.sceneEntry[sceneId];
+        if (entry && typeof entry.x === 'number') {
+            AD.player.x = entry.x;
+            AD.player.y = (typeof entry.y === 'number') ? entry.y : 380;
+            delete AD.sceneEntry[sceneId];
+        } else {
+            AD.player.x = spawnX != null ? spawnX : 100;
+            AD.player.y = 380;
+        }
         AD.player.vx = 0; AD.player.vy = 0; AD.player.jumpCount = 0;
         AD.player.maxHp = 100 + (Save.data.upgradeStats.maxHpBonus || 0);
         AD.player.hp = AD.player.maxHp;
@@ -1067,17 +1155,15 @@
 
         AD.bullets = []; AD.particles = []; AD.damageTexts = []; AD.weaknesses = [];
         AD.missiles = []; AD.bossBullets = []; AD.playerBullets = [];
-        AD.clones = []; AD.blackholes = [];
+        AD.clones = []; AD.blackholes = []; AD.bossLasers = []; AD.bossSpikes = [];
         AD.timeScale = 1; AD.slowmoTimer = 0;
         document.getElementById('advSlowmo').classList.remove('active');
+        document.getElementById('advSlowmo').classList.remove('strong');
 
         AD.boss = null; AD.bossState = 'idle'; AD.bossTriggered = false; AD.barrageTimer = 0;
         AD.bossExtraSkillTimer = 0; AD.bossExtraSkill = null;
 
-        // 重置存档点状态
-        if (data.checkpoint) {
-            data.checkpoint.active = false;
-        }
+        if (data.checkpoint) data.checkpoint.active = false;
 
         document.getElementById('advSceneName').textContent = data.name;
         document.getElementById('advSceneIco').textContent = data.icon;
@@ -1087,15 +1173,6 @@
         hideBossHud();
         Save.save({ currentScene: sceneId });
         preloadSceneImages();
-    }
-
-    function updateAmmoHud() {
-        const el = document.getElementById('advAmmoText');
-        if (el) {
-            el.textContent = AD.player.ammo + ' / ' + AD.player.maxAmmo;
-            // 空仓时变红
-            el.style.color = AD.player.ammo <= 0 ? '#ff2e88' : (AD.player.ammo <= 2 ? '#ffcc00' : '#64d2ff');
-        }
     }
 
     function updateHpBar() {
@@ -1123,9 +1200,17 @@
         }
     }
 
+    /* ★ 顺序轮换的题库 */
+    function getNextQuiz() {
+        const q = QUIZ_BANK[AD.quizBankIndex % QUIZ_BANK.length];
+        AD.quizBankIndex++;
+        return q;
+    }
+
+    /* ★ 答题石碑：页面内弹窗 */
     function openQuizStone(stone) {
         AD.quizStone = stone;
-        AD.quizData = QUIZ_BANK[stone.quizIndex % QUIZ_BANK.length];
+        AD.quizData = getNextQuiz();
         AD.quizActive = true;
         const ui = document.getElementById('advQuizUI');
         document.getElementById('advQuizQuestion').textContent = AD.quizData.q;
@@ -1166,7 +1251,10 @@
         if (AD.quizStone) { AD.quizStone.used = true; AD.quizStone.quizIndex++; }
         setTimeout(closeQuiz, 1400);
     }
-    function closeQuiz() { AD.quizActive = false; AD.quizData = null; AD.quizStone = null; document.getElementById('advQuizUI').classList.remove('active'); }
+    function closeQuiz() {
+        AD.quizActive = false; AD.quizData = null; AD.quizStone = null;
+        document.getElementById('advQuizUI').classList.remove('active');
+    }
 
     function tryInteract() {
         if (AD.dialog || AD.tutorialActive || AD.quizActive || AD.choiceActive) return;
@@ -1202,6 +1290,8 @@
         }
         for (const door of AD.doors) {
             if (p.x + p.w > door.x - 20 && p.x < door.x + door.w + 20) {
+                /* ★ 记录离开当前场景的位置 */
+                AD.sceneEntry[AD.scene] = { x: p.x, y: p.y };
                 showBanner(door.label);
                 setTimeout(() => loadScene(door.to, 120), 350);
                 return;
@@ -1233,6 +1323,7 @@
         AD.bossState = 'intro'; AD.bossTimer = 0; AD.bossVictoryCalled = false;
         AD.bossNoDamage = true; AD.bossTriggered = true; AD.barrageTimer = 0;
         AD.bossExtraSkillTimer = 0; AD.bossExtraSkill = null;
+        AD.bossLasers = []; AD.bossSpikes = [];
         showBossHud();
         showBanner('⚔️ BOSS 战 ⚔️', '#ff2e88');
         if (!hasSeenTutorial('boss-barrage')) showTutorial('boss-barrage');
@@ -1260,7 +1351,6 @@
         if (!AD.boss) return;
         AD.bossTimer += dt;
 
-        // ★ 额外技能触发（每 6 秒一次）
         if (AD.boss.extraSkills && AD.boss.extraSkills.length > 0) {
             AD.bossExtraSkillTimer += dt;
             if (AD.bossExtraSkillTimer > 6 && AD.bossState !== 'shield-pick') {
@@ -1297,20 +1387,17 @@
         }
     }
 
-    /* ---------- Boss 额外技能 ---------- */
     function triggerBossExtraSkill(skill) {
         const b = AD.boss;
         const p = AD.player;
         if (!b) return;
         if (skill === 'teleport') {
-            // 瞬移到玩家附近
             b.x = p.x + rand(-200, 200);
             b.x = clamp(b.x, b.arenaX + 100, b.arenaX + b.arenaWidth - 100);
             spawnParticles(b.x, b.y, '#a855f7', 30);
             showBanner('⚡ Boss 瞬移！', '#a855f7');
         }
         else if (skill === 'summon') {
-            // 召唤 3 个小怪（当作弹幕）
             for (let i = 0; i < 3; i++) {
                 AD.bossBullets.push({
                     x: b.x + rand(-80, 80), y: b.y + rand(-40, 40),
@@ -1321,7 +1408,6 @@
             showBanner('☠ Boss 召唤小怪！', '#a855f7');
         }
         else if (skill === 'clone') {
-            // 生成 2 个分身（会发射弹幕）
             for (let i = 0; i < 2; i++) {
                 AD.clones.push({
                     x: b.x + rand(-150, 150), y: b.y + rand(-50, 50),
@@ -1332,7 +1418,6 @@
             showBanner('👥 Boss 分身出现！', '#ff8a00');
         }
         else if (skill === 'blackhole') {
-            // 生成黑洞，吸引玩家
             AD.blackholes.push({
                 x: b.x + rand(-100, 100), y: b.y + rand(-40, 40),
                 r: 80, life: 5, maxLife: 5, pullForce: 0.08
@@ -1340,7 +1425,6 @@
             showBanner('🕳️ 黑洞出现！', '#00f0ff');
         }
         else if (skill === 'rewind') {
-            // 时间倒流 - 玩家屏幕变红，短暂无法移动
             AD.player.stunned = 1.2;
             showBanner('⏪ 时间倒流！', '#ff2e88');
             triggerSlowmo(2, true);
@@ -1349,14 +1433,12 @@
 
     function updateBossExtraSkills(dt) {
         const p = AD.player;
-        // 分身
         for (let i = AD.clones.length - 1; i >= 0; i--) {
             const c = AD.clones[i];
             c.life -= dt;
             c.fireTimer -= dt;
             if (c.fireTimer <= 0) {
                 c.fireTimer = 1.4;
-                // 分身发射朝玩家的子弹
                 const angle = Math.atan2(p.y + p.h / 2 - c.y, p.x + p.w / 2 - c.x);
                 AD.bossBullets.push({
                     x: c.x, y: c.y,
@@ -1365,7 +1447,6 @@
                     r: 8, life: 4, color: '#ff8a00', symbol: '◆'
                 });
             }
-            // 玩家子弹命中
             for (let j = AD.playerBullets.length - 1; j >= 0; j--) {
                 const b = AD.playerBullets[j];
                 if (Math.hypot(b.x - c.x, b.y - c.y) < 25) {
@@ -1381,7 +1462,6 @@
             }
             if (c.life <= 0) AD.clones.splice(i, 1);
         }
-        // 黑洞
         for (let i = AD.blackholes.length - 1; i >= 0; i--) {
             const bh = AD.blackholes[i];
             bh.life -= dt;
@@ -1396,48 +1476,110 @@
         }
     }
 
-    /* ---------- 弹幕 ---------- */
+    /* ---------- 弹幕（★ 大幅扩充模式） ---------- */
     function fireBarrage() {
-        const b = AD.boss;
-        const p = AD.player;
-        const types = b.barrageTypes || ['ring'];
+        const b = AD.boss, p = AD.player;
+        const types = b.barrageTypes && b.barrageTypes.length
+            ? b.barrageTypes.concat(['laser', 'spikes', 'rain', 'bounce', 'wall'])
+            : ['ring', 'sector', 'tracking', 'spiral', 'random', 'laser', 'spikes', 'rain', 'bounce', 'wall'];
         const type = types[Math.floor(Math.random() * types.length)];
-        const cx = b.x, cy = b.y;
+
         if (type === 'ring') {
             const n = 12;
             for (let i = 0; i < n; i++) {
-                const angle = (i / n) * Math.PI * 2;
-                AD.bossBullets.push({ x: cx, y: cy, vx: Math.cos(angle) * 3.5, vy: Math.sin(angle) * 3.5, r: 8, life: 4, color: '#ff2e88', symbol: '●' });
+                const a = (i / n) * Math.PI * 2;
+                AD.bossBullets.push({ x: b.x, y: b.y, vx: Math.cos(a) * 3.5, vy: Math.sin(a) * 3.5,
+                    r: 8, life: 4, color: '#ff2e88', symbol: '●' });
             }
-            shakeScreen(6); triggerSlowmo(1.2, false);
+            shakeScreen(6); triggerSlowmo(1.0, false);
         }
         else if (type === 'sector') {
-            const baseAngle = Math.atan2(p.y + p.h / 2 - cy, p.x + p.w / 2 - cx);
+            const base = Math.atan2(p.y + p.h / 2 - b.y, p.x + p.w / 2 - b.x);
             for (let i = -2; i <= 2; i++) {
-                const angle = baseAngle + i * 0.25;
-                AD.bossBullets.push({ x: cx, y: cy, vx: Math.cos(angle) * 4.2, vy: Math.sin(angle) * 4.2, r: 9, life: 4, color: '#ff8a00', symbol: '◆' });
+                const a = base + i * 0.25;
+                AD.bossBullets.push({ x: b.x, y: b.y, vx: Math.cos(a) * 4.2, vy: Math.sin(a) * 4.2,
+                    r: 9, life: 4, color: '#ff8a00', symbol: '◆' });
             }
         }
         else if (type === 'tracking') {
             for (let i = 0; i < 3; i++) {
-                AD.bossBullets.push({ x: cx + rand(-30, 30), y: cy + rand(-30, 30), vx: 0, vy: 0, r: 10, life: 5, color: '#a855f7', symbol: '★', tracking: true, speed: 3.2, trackingAccel: 0.18 });
+                AD.bossBullets.push({ x: b.x + rand(-30, 30), y: b.y + rand(-30, 30), vx: 0, vy: 0,
+                    r: 10, life: 5, color: '#a855f7', symbol: '★',
+                    tracking: true, speed: 3.2, trackingAccel: 0.18 });
             }
         }
         else if (type === 'spiral') {
-            const baseAngle = performance.now() / 300;
+            const base = performance.now() / 300;
             for (let i = 0; i < 8; i++) {
-                const angle = baseAngle + (i / 8) * Math.PI * 2;
-                AD.bossBullets.push({ x: cx, y: cy, vx: Math.cos(angle) * 3, vy: Math.sin(angle) * 3, r: 7, life: 4, color: '#00f0ff', symbol: '○' });
+                const a = base + (i / 8) * Math.PI * 2;
+                AD.bossBullets.push({ x: b.x, y: b.y, vx: Math.cos(a) * 3, vy: Math.sin(a) * 3,
+                    r: 7, life: 4, color: '#00f0ff', symbol: '○' });
             }
         }
         else if (type === 'random') {
             for (let i = 0; i < 10; i++) {
-                const angle = rand(0, Math.PI * 2);
-                const speed = rand(2.5, 4.5);
-                AD.bossBullets.push({ x: cx, y: cy, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, r: rand(6, 10), life: 4, color: '#ffcc00', symbol: '✦' });
+                const a = rand(0, Math.PI * 2), sp = rand(2.5, 4.5);
+                AD.bossBullets.push({ x: b.x, y: b.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp,
+                    r: rand(6, 10), life: 4, color: '#ffcc00', symbol: '✦' });
             }
         }
-        spawnParticles(cx, cy, b.phase >= 3 ? '#ff2e88' : '#ff8a00', 12);
+        else if (type === 'laser') {
+            /* ★ Undertale 风格纵向激光 */
+            for (let i = 0; i < 3; i++) {
+                AD.bossLasers.push({
+                    x: p.x + p.w / 2 + rand(-120, 120) + i * 40,
+                    y: 0, h: AD.canvas.height,
+                    warnTimer: 0.9 + i * 0.25,
+                    active: false, fireTimer: 0.55, dmg: 25
+                });
+            }
+            showBanner('⚡ 激光扫描！', '#ff2e88');
+            triggerSlowmo(1.8, true);
+        }
+        else if (type === 'spikes') {
+            /* ★ 地刺 */
+            const baseX = p.x + p.w / 2;
+            for (let i = -4; i <= 4; i++) {
+                AD.bossSpikes.push({
+                    x: baseX + i * 70,
+                    y: 460, w: 56, h: 70,
+                    warnTimer: Math.abs(i) * 0.12 + 0.5,
+                    active: false, life: 0.9, dmg: 20
+                });
+            }
+            showBanner('🌵 地刺！', '#ff8a00');
+        }
+        else if (type === 'rain') {
+            for (let i = 0; i < 8; i++) {
+                AD.bossBullets.push({
+                    x: p.x + rand(-450, 450), y: -40 - i * 30,
+                    vx: 0, vy: rand(3.5, 5.5),
+                    r: 9, life: 6, color: '#00f0ff', symbol: '▼'
+                });
+            }
+        }
+        else if (type === 'bounce') {
+            for (let i = 0; i < 5; i++) {
+                AD.bossBullets.push({
+                    x: b.x - 100 - i * 40, y: rand(150, 400),
+                    vx: rand(-5, -3), vy: rand(-3, 3),
+                    r: 9, life: 6, color: '#a855f7', symbol: '●',
+                    bounce: true
+                });
+            }
+        }
+        else if (type === 'wall') {
+            const gap = Math.floor(rand(1, 7));
+            for (let i = 0; i < 9; i++) {
+                if (i === gap || i === gap + 1) continue;
+                AD.bossBullets.push({
+                    x: b.x, y: 40 + i * 45,
+                    vx: -3.2, vy: 0,
+                    r: 14, life: 6, color: '#ff2e88', symbol: '■'
+                });
+            }
+        }
+        spawnParticles(b.x, b.y, b.phase >= 3 ? '#ff2e88' : '#ff8a00', 12);
     }
 
     function updateBossBullets(dt) {
@@ -1455,6 +1597,11 @@
             }
             b.x += b.vx * 60 * dt;
             b.y += b.vy * 60 * dt;
+            /* 反弹弹幕 */
+            if (b.bounce) {
+                if (b.y < 30) { b.y = 30; b.vy = Math.abs(b.vy); }
+                if (b.y > 460) { b.y = 460; b.vy = -Math.abs(b.vy); }
+            }
             b.life -= dt;
             if (p.invincible <= 0 && Math.hypot(p.x + p.w / 2 - b.x, p.y + p.h / 2 - b.y) < b.r + p.w / 2) {
                 if (p.shieldActive) { p.shieldActive = false; p.shieldTime = 0; spawnParticles(p.x + p.w / 2, p.y + p.h / 2, '#00f0ff', 15); }
@@ -1471,6 +1618,69 @@
                 continue;
             }
             if (b.life <= 0) AD.bossBullets.splice(i, 1);
+        }
+    }
+
+    /* ★ 激光 / 地刺更新 */
+    function updateBossLasers(dt) {
+        const p = AD.player;
+        for (let i = AD.bossLasers.length - 1; i >= 0; i--) {
+            const L = AD.bossLasers[i];
+            if (!L.active) {
+                L.warnTimer -= dt;
+                if (L.warnTimer <= 0) {
+                    L.active = true; L.fireTimer = 0.55;
+                    shakeScreen(6); spawnParticles(L.x, 200, '#ffcc00', 12);
+                }
+            } else {
+                L.fireTimer -= dt;
+                if (p.invincible <= 0 &&
+                    p.x + p.w > L.x - 12 && p.x < L.x + 12) {
+                    if (p.shieldActive) {
+                        p.shieldActive = false; p.shieldTime = 0;
+                        showBanner('🛡️ 护盾抵挡', '#00f0ff');
+                    } else {
+                        p.hp -= L.dmg; updateHpBar();
+                        spawnDamageText(p.x, p.y, '-' + L.dmg, '#ff2e88');
+                        shakeScreen(10);
+                        triggerSlowmo(0.8, true);
+                        if (p.hp <= 0) { onPlayerDeath(); return; }
+                    }
+                    p.invincible = Math.round(60 * (Save.data.upgradeStats.invinMul || 1));
+                }
+                if (L.fireTimer <= 0) AD.bossLasers.splice(i, 1);
+            }
+        }
+    }
+
+    function updateBossSpikes(dt) {
+        const p = AD.player;
+        for (let i = AD.bossSpikes.length - 1; i >= 0; i--) {
+            const S = AD.bossSpikes[i];
+            if (!S.active) {
+                S.warnTimer -= dt;
+                if (S.warnTimer <= 0) {
+                    S.active = true;
+                    spawnParticles(S.x + S.w / 2, S.y, '#ff8a00', 8);
+                }
+            } else {
+                S.life -= dt;
+                if (p.invincible <= 0 &&
+                    p.x + p.w > S.x && p.x < S.x + S.w &&
+                    p.y + p.h > S.y - S.h) {
+                    if (p.shieldActive) {
+                        p.shieldActive = false; p.shieldTime = 0;
+                        showBanner('🛡️ 护盾抵挡', '#00f0ff');
+                    } else {
+                        p.hp -= S.dmg; updateHpBar();
+                        spawnDamageText(p.x, p.y, '-' + S.dmg, '#ff2e88');
+                        shakeScreen(6);
+                        if (p.hp <= 0) { onPlayerDeath(); return; }
+                    }
+                    p.invincible = Math.round(60 * (Save.data.upgradeStats.invinMul || 1));
+                }
+                if (S.life <= 0) AD.bossSpikes.splice(i, 1);
+            }
         }
     }
 
@@ -1503,24 +1713,46 @@
         shakeScreen(6);
     }
 
+    /* ---------- 护盾选择 ---------- */
     function openShieldPicker() {
         const q = AD.shieldQuestion; if (!q) return;
         const opts = [...q.opts].sort(() => Math.random() - 0.5).slice(0, 3);
         if (!opts.includes(q.answer)) opts[0] = q.answer;
         opts.sort(() => Math.random() - 0.5);
         AD.shieldOptions = opts; AD.shieldTimeLeft = 5;
+
         const ui = document.getElementById('advShieldUI');
-        document.getElementById('advShieldCode').innerHTML = escapeHtml(q.code) + `\n<span class="blank">= ?</span>`;
+        document.getElementById('advShieldCode').innerHTML =
+            escapeHtml(q.code) + `\n<span class="blank">= ?</span>`;
+
         const optBox = document.getElementById('advShieldOptions');
         optBox.innerHTML = opts.map((o, i) => `
             <button class="adv-shield-opt" data-idx="${i}" data-key="[${i + 1}]">
+                <span class="shield-preview shield-${['a', 'b', 'c'][i]}">🛡️</span>
                 <span class="opt-value">${o}</span>
                 <span class="opt-label">盾牌 ${String.fromCharCode(65 + i)}</span>
             </button>`).join('');
+
         optBox.querySelectorAll('.adv-shield-opt').forEach(btn => {
+            btn.addEventListener('mouseenter', () => btn.classList.add('hovered'));
+            btn.addEventListener('mouseleave', () => btn.classList.remove('hovered'));
             btn.addEventListener('click', () => pickShield(Number(btn.dataset.idx)));
         });
+
         ui.classList.add('active');
+    }
+
+    /* ★ 盾牌破碎特效 */
+    function shieldBreakFx(clientX, clientY, color) {
+        const fx = document.createElement('div');
+        fx.className = 'shield-break-fx';
+        fx.textContent = '🛡️';
+        fx.style.left = (clientX - 35) + 'px';
+        fx.style.top = (clientY - 35) + 'px';
+        fx.style.color = color;
+        fx.style.filter = `drop-shadow(0 0 18px ${color})`;
+        document.body.appendChild(fx);
+        setTimeout(() => fx.remove(), 650);
     }
 
     function pickShield(idx) {
@@ -1529,17 +1761,24 @@
         const ui = document.getElementById('advShieldUI');
         const opts = AD.shieldOptions;
         ui.querySelectorAll('.adv-shield-opt').forEach(b => b.style.pointerEvents = 'none');
+
+        const clickedEl = idx >= 0 ? ui.querySelector(`.adv-shield-opt[data-idx="${idx}"]`) : null;
+        const rect = clickedEl ? clickedEl.getBoundingClientRect() : null;
+
         let correct = false;
         if (idx >= 0 && opts[idx] === q.answer) {
             correct = true;
-            ui.querySelector(`.adv-shield-opt[data-idx="${idx}"]`).classList.add('correct');
+            clickedEl.classList.add('correct');
+            if (rect) shieldBreakFx(rect.left + rect.width / 2, rect.top + rect.height / 2, '#00ff88');
         } else {
             opts.forEach((v, i) => {
                 const el = ui.querySelector(`.adv-shield-opt[data-idx="${i}"]`);
                 if (v === q.answer) el.classList.add('correct');
                 else if (i === idx) el.classList.add('wrong');
             });
+            if (rect) shieldBreakFx(rect.left + rect.width / 2, rect.top + rect.height / 2, '#ff2e88');
         }
+
         if (correct) {
             AD.boss.hp -= 8; updateBossHpBar();
             spawnDamageText(AD.boss.x, AD.boss.y - 40, '-8', '#00ff88');
@@ -1552,11 +1791,15 @@
         } else {
             AD.bossNoDamage = false;
             const p = AD.player;
-            if (p.shieldActive) { p.shieldActive = false; p.shieldTime = 0; showBanner('🛡️ 护盾抵挡', '#00f0ff'); }
-            else {
-                p.hp -= 12; updateHpBar();
-                spawnDamageText(p.x, p.y, '-12', '#ff2e88');
-                showBanner('✗ 光波命中！', '#ff2e88');
+            if (p.shieldActive) {
+                p.shieldActive = false; p.shieldTime = 0;
+                showBanner('🛡️ 护盾抵挡', '#00f0ff');
+            } else {
+                /* ★ 防御失败只扣 25 血 */
+                const DMG = 25;
+                p.hp -= DMG; updateHpBar();
+                spawnDamageText(p.x, p.y, '-' + DMG, '#ff2e88');
+                showBanner('✗ 光波命中！-25', '#ff2e88');
                 shakeScreen(10);
                 if (p.hp <= 0) { setTimeout(onPlayerDeath, 500); return; }
             }
@@ -1587,12 +1830,11 @@
         const wasNoDamage = AD.bossNoDamage;
         const isFinal = AD.boss.isFinal, isTutorial = AD.boss.isTutorial;
         AD.bossBullets = []; AD.clones = []; AD.blackholes = [];
+        AD.bossLasers = []; AD.bossSpikes = [];
         hideBossHud();
-        // ★ Boss 击败后，在房间右侧生成通往下一关的门
         if (AD.boss.nextDoor) {
             const doorX = AD.sceneData.width - 220;
             const doorY = 380;
-            // 避免重复添加
             if (!AD.doors.some(d => d.isRewardDoor)) {
                 AD.doors.push({
                     x: doorX, y: doorY, w: 60, h: 80,
@@ -1626,10 +1868,9 @@
         else if (isTutorial) setTimeout(() => showBanner('🎉 新手村毕业！去森林冒险吧', '#00f0ff'), 2000);
     }
 
+    /* ★ 死亡：扣 80% 金币 + 最近存档点复活 */
     function onPlayerDeath() {
-        // ★ 清除慢动作
-        AD.slowmoTimer = 0;
-        AD.timeScale = 1;
+        AD.slowmoTimer = 0; AD.timeScale = 1;
         document.getElementById('advSlowmo').classList.remove('active');
         document.getElementById('advSlowmo').classList.remove('strong');
 
@@ -1643,16 +1884,29 @@
             AD.player.invincible = 120;
             return;
         }
-        showBanner('💀 你被击倒了，返回存档点…', '#ff2e88');
 
-        // ★ 检查存档点
+        /* 扣除 80% 金币 */
+        const lost = Math.floor(AD.coins * 0.8);
+        if (lost > 0) {
+            AD.coins -= lost;
+            Save.data.coins = AD.coins;
+            Save.save({});
+            document.getElementById('advCoins').textContent = AD.coins;
+            showBanner(`💀 损失 ${lost} 金币`, '#ff2e88');
+        } else {
+            showBanner('💀 你被击倒了…', '#ff2e88');
+        }
+
         const cp = AD.checkpoint;
-        if (cp && cp.scene === AD.scene) {
-            setTimeout(() => {
-                // 重置 Boss 状态
+
+        setTimeout(() => {
+            AD.boss = null; AD.bossState = 'idle'; AD.bossTriggered = false;
+            AD.bossBullets = []; AD.clones = []; AD.blackholes = [];
+            AD.weaknesses = []; AD.bossLasers = []; AD.bossSpikes = [];
+
+            if (cp && cp.scene === AD.scene) {
+                /* 同场景存档点复活 */
                 const data = SCENES[AD.scene];
-                AD.boss = null; AD.bossState = 'idle'; AD.bossTriggered = false;
-                AD.bossBullets = []; AD.clones = []; AD.blackholes = []; AD.weaknesses = [];
                 AD.player.hp = AD.player.maxHp;
                 AD.player.x = cp.x;
                 AD.player.y = cp.y;
@@ -1664,11 +1918,19 @@
                     data.coins = (data.coins || []).map(c => ({ ...c, collected: false }));
                 }
                 hideBossHud();
-            }, 900);
-        } else {
-            // 无存档点，回到村庄
-            setTimeout(() => loadScene('village'), 1200);
-        }
+            } else if (cp && cp.scene) {
+                /* 跨场景回到存档点 */
+                AD.sceneEntry[cp.scene] = { x: cp.x, y: cp.y };
+                loadScene(cp.scene, cp.x);
+                AD.player.hp = AD.player.maxHp;
+                updateHpBar();
+            } else {
+                /* 无存档，回村庄初始点 */
+                loadScene('village', 120);
+                AD.player.hp = AD.player.maxHp;
+                updateHpBar();
+            }
+        }, 900);
     }
 
     function showEndingChoice() {
@@ -1703,6 +1965,10 @@
         modal.querySelectorAll('.adv-choice-opt').forEach(btn => {
             btn.addEventListener('click', () => chooseEnding(btn.dataset.choice));
         });
+    }
+    function closeEndingChoice() {
+        AD.choiceActive = false;
+        $('#advChoiceModal').classList.remove('active');
     }
     function chooseEnding(choice) {
         if (!AD.choiceActive) return;
@@ -1808,7 +2074,7 @@
                     ${tabs.map(t => `<button class="adv-shop-tab ${tab === t.id ? 'active' : ''}" data-tab="${t.id}">${t.label}</button>`).join('')}
                 </div>
                 <div class="adv-shop-list">${contentHtml}</div>
-                <button class="adv-shop-close" id="advShopClose">关闭商店</button>
+                <button class="adv-shop-close" id="advShopClose">关闭商店 (J)</button>
             </div>`;
         panel.querySelectorAll('.adv-shop-tab').forEach(t => {
             t.addEventListener('click', () => renderShop(panel, t.dataset.tab));
@@ -1910,12 +2176,10 @@
         const data = AD.sceneData;
         const keys = AD.keysPressed;
 
-        // 枪口追踪
         updateGunAim();
         if (p.gunCooldown > 0) p.gunCooldown--;
         if (p.shootAnimTimer > 0) p.shootAnimTimer--;
 
-        // ★ 弹药自动恢复（每 0.9 秒 +1）
         if (p.ammo < p.maxAmmo) {
             p.ammoRegenTimer = (p.ammoRegenTimer || 0) + dt;
             if (p.ammoRegenTimer >= 0.9) {
@@ -1925,24 +2189,20 @@
         } else {
             p.ammoRegenTimer = 0;
         }
-        // 鼠标按住左键连射
         if (AD.mouse.leftDown) shoot();
         if (p.stunned > 0) {
             p.stunned -= dt;
             p.vx *= 0.5;
             p.vy += 0.7 * 60 * dt;
         } else {
-            // 移动
             if (keys['KeyA'] || keys['ArrowLeft']) { p.vx = -p.speed; }
             else if (keys['KeyD'] || keys['ArrowRight']) { p.vx = p.speed; }
             else p.vx *= 0.78;
         }
 
-        // 冲刺
         if (p.dashCooldown > 0) p.dashCooldown--;
         if (p.dashing > 0) { p.vx = (p.facing) * 16; p.dashing--; }
 
-        // 跳跃
         const jumpPressed = keys['Space'] || keys['KeyW'] || keys['ArrowUp'];
         const doubleJumpPressed = keys['ShiftLeft'] || keys['ShiftRight'];
         if (jumpPressed && p.onGround && p.stunned <= 0) { p.vy = p.jumpPower; p.onGround = false; p.jumpCount = 1; }
@@ -1958,7 +2218,6 @@
         p.x = clamp(p.x, 0, data.width - p.w);
         if (p.teleportCooldown > 0) p.teleportCooldown--;
 
-        // 平台碰撞
         p.onGround = false;
         for (const plat of data.platforms) {
             if (p.x < plat.x + plat.w && p.x + p.w > plat.x &&
@@ -1973,19 +2232,18 @@
 
         if (p.y > 700) { onPlayerDeath(); return; }
 
-        // ★ 检查存档点
         if (data.checkpoint && !data.checkpoint.active) {
             if (Math.abs(p.x + p.w / 2 - data.checkpoint.x) < 80 &&
                 Math.abs(p.y + p.h - data.checkpoint.y) < 100) {
                 data.checkpoint.active = true;
                 AD.checkpoint = { scene: AD.scene, x: data.checkpoint.x, y: data.checkpoint.y - 40 };
+                Save.save({ checkpoint: AD.checkpoint });
                 showBanner('💾 存档点已激活', '#00ff88');
                 spawnParticles(data.checkpoint.x, data.checkpoint.y, '#00ff88', 20);
                 if (!hasSeenTutorial('checkpoint')) showTutorial('checkpoint');
             }
         }
 
-        // ★ 检查 Boss 触发线
         if (data.boss && !AD.bossTriggered && data.boss.triggerX != null) {
             if (p.x >= data.boss.triggerX) {
                 startBossFight();
@@ -1996,6 +2254,8 @@
         updateMemoryLeak(dt);
         updateMissiles(dt);
         updateBossBullets(dt);
+        updateBossLasers(dt);
+        updateBossSpikes(dt);
         updatePlayerBullets(dt);
         updateBossExtraSkills(dt);
 
@@ -2008,7 +2268,6 @@
 
         AD.camera.x = clamp(p.x + p.w / 2 - AD.canvas.width / 2, 0, data.width - AD.canvas.width);
 
-        // 金币
         if (data.coins) {
             const magnetRange = (Save.hasSkill('magnet') ? 200 : 100) * (Save.data.upgradeStats.magnetMul || 1);
             for (const coin of data.coins) {
@@ -2027,7 +2286,6 @@
             }
         }
 
-        // 粒子
         for (let i = AD.particles.length - 1; i >= 0; i--) {
             const pt = AD.particles[i];
             pt.x += pt.vx * 60 * dt; pt.y += pt.vy * 60 * dt;
@@ -2060,9 +2318,7 @@
         for (const g of AD.gadgets) {
             checkTutorial(g);
 
-            /* ★ 变量平台（悬崖版） */
             if (g.type === 'variable-platform') {
-                // 只有稳定后才有碰撞
                 if (g.stable) {
                     if (p.x < g.x + g.w && p.x + p.w > g.x &&
                         p.y < g.y + 10 && p.y + p.h > g.y) {
@@ -2071,13 +2327,11 @@
                         }
                     }
                 } else {
-                    // 检测玩家是否踩到（用整个身体碰撞，脚下必须在其上方 8 像素）
                     const onIt = p.x + p.w > g.x && p.x < g.x + g.w &&
                                  p.y + p.h > g.y - 6 && p.y + p.h < g.y + 12 && p.vy >= 0;
                     if (onIt && !g._wasOn) {
                         g.counter++;
                         spawnParticles(g.x + g.w / 2, g.y - 10, '#ffcc00', 8);
-                        // 临时弹起，让玩家能再次落下
                         p.vy = -8;
                         if (g.counter >= g.target) {
                             g.stable = true;
@@ -2096,7 +2350,6 @@
                     g._wasOn = onIt;
                 }
             }
-            /* 地刺 */
             else if (g.type === 'loop-spikes') {
                 const phase = (t / g.period + g.phase) % 1;
                 g.currentY = g.y + Math.sin(phase * Math.PI * 2) * g.amplitude;
@@ -2114,7 +2367,6 @@
                     }
                 }
             }
-            /* 传送门 */
             else if (g.type === 'pointer-teleport') {
                 if (g.cooldown > 0) { g.cooldown--; continue; }
                 if (p.x + p.w > g.x - 20 && p.x < g.x + 40 &&
@@ -2126,10 +2378,8 @@
                     shakeScreen(6);
                 }
             }
-            /* ★ 数组平台（必须按顺序，未激活的虚化不能踩） */
             else if (g.type === 'array-platforms') {
                 if (g.completed) {
-                    // 完成后全部实体
                     g.items.forEach(it => {
                         if (p.x < it.x + it.w && p.x + p.w > it.x &&
                             p.y < it.y + 10 && p.y + p.h > it.y) {
@@ -2142,9 +2392,7 @@
                 }
                 const curIdx = g.currentProgress;
                 g.items.forEach((it) => {
-                    const isNext = it.order === curIdx;
                     const isDone = it.order < curIdx;
-                    // 只有已完成的平台才有碰撞
                     if (isDone) {
                         if (p.x < it.x + it.w && p.x + p.w > it.x &&
                             p.y < it.y + 10 && p.y + p.h > it.y) {
@@ -2153,13 +2401,11 @@
                             }
                         }
                     }
-                    // 检测踩到
                     const onIt = p.x + p.w > it.x && p.x < it.x + it.w &&
                                  p.y + p.h > it.y - 6 && p.y + p.h < it.y + 12 && p.vy >= 0;
                     if (onIt && !it._stood) {
                         it._stood = true;
                         if (it.order === curIdx) {
-                            // 正确顺序
                             g.currentProgress++;
                             spawnParticles(it.x + it.w / 2, it.y, '#00ff88', 12);
                             if (g.currentProgress >= g.items.length) {
@@ -2173,19 +2419,16 @@
                                 }
                             }
                         } else if (it.order > curIdx) {
-                            // 踩错，全部重置
                             g.currentProgress = 0;
                             g.items.forEach(o => o._stood = false);
                             showBanner('✗ 数组越界，全部重置！', '#ff2e88');
                             shakeScreen(10);
-                            // 玩家弹回起点（可选：临时击退）
                             p.vy = -5;
                         }
                     }
                     if (!onIt) it._stood = false;
                 });
             }
-            /* 内存池 */
             else if (g.type === 'memory-pool') {
                 const onIt = p.x + p.w > g.x && p.x < g.x + g.w &&
                              p.y + p.h > g.y - 4 && p.y + p.h < g.y + 12 && p.vy >= 0;
@@ -2208,7 +2451,6 @@
                     }
                 } else { g._healAcc = 0; g._costAcc = 0; }
             }
-            /* 条件门 */
             else if (g.type === 'conditional-gate') {
                 if (!g.opened && AD.keys >= g.requiresKeys) {
                     g.opened = true;
@@ -2223,7 +2465,6 @@
                     }
                 }
             }
-            /* switch 平台 */
             else if (g.type === 'switch-platform') {
                 const target = g.active ? g.targetY : g.closedY;
                 g.current += (target - g.current) * 0.12;
@@ -2234,7 +2475,6 @@
                     }
                 }
             }
-            /* 递归陷阱 */
             else if (g.type === 'recursive-trap') {
                 const first = g.platforms[0];
                 const onFirst = p.x + p.w > first.x && p.x < first.x + first.w &&
@@ -2263,7 +2503,6 @@
                     }
                 }
             }
-            /* 追踪导弹 */
             else if (g.type === 'pointer-missile') {
                 if (!g.active && Math.abs(p.x - g.x) < 300) g.active = true;
                 if (g.active) {
@@ -2274,7 +2513,6 @@
                     }
                 }
             }
-            /* 激光 */
             else if (g.type === 'laser-sweep') {
                 g.stateTimer = (g.stateTimer || 0) + dt;
                 if (g.state === 'warning') {
@@ -2403,7 +2641,6 @@
         ctx.save();
         ctx.translate(-AD.camera.x + shakeX, shakeY);
 
-        // 平台
         for (const plat of data.platforms) {
             ctx.fillStyle = data.groundColor;
             ctx.fillRect(plat.x, plat.y, plat.w, plat.h);
@@ -2411,10 +2648,8 @@
             ctx.fillRect(plat.x, plat.y, plat.w, 3);
         }
 
-        // 机关
         for (const g of AD.gadgets) renderGadget(ctx, g, t);
 
-        // 存档点
         if (data.checkpoint) {
             const cp = data.checkpoint;
             const pulse = Math.sin(t * 4) * 0.5 + 0.5;
@@ -2428,12 +2663,10 @@
             ctx.font = 'bold 12px JetBrains Mono, monospace';
             ctx.textAlign = 'center';
             ctx.fillText(active ? '💾 已激活' : '💾 存档点', cp.x, cp.y - 90);
-            // 顶部光柱
             ctx.fillStyle = active ? `rgba(0,255,136,${0.1 + pulse * 0.15})` : `rgba(100,210,255,${0.1 + pulse * 0.15})`;
             ctx.fillRect(cp.x - 15, 0, 30, cp.y - 80);
         }
 
-        // Boss 触发线
         if (data.boss && !AD.bossTriggered) {
             const tx = data.boss.triggerX;
             if (Math.abs(p.x - tx) < 600) {
@@ -2452,7 +2685,6 @@
             }
         }
 
-        // 门
         for (const door of AD.doors) {
             const grad = ctx.createLinearGradient(door.x, door.y, door.x + door.w, door.y + door.h);
             grad.addColorStop(0, '#00f0ff'); grad.addColorStop(1, '#7b2cbf');
@@ -2468,21 +2700,19 @@
             ctx.fillText(door.label, door.x + door.w / 2, door.y - 12);
         }
 
-        // 隐藏房
         for (const s of (data.secrets || [])) {
             if (s.discovered) continue;
             if (Math.abs(p.x + p.w / 2 - s.x) < 80) {
                 ctx.fillStyle = 'rgba(196,181,253,0.9)';
                 ctx.font = 'bold 11px JetBrains Mono, monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText('按 E 探索', s.x, 300);
+                ctx.fillText('按 F 探索', s.x, 300);
                 const pulse = Math.sin(t * 4) * 0.5 + 0.5;
                 ctx.fillStyle = `rgba(196,181,253,${0.4 + pulse * 0.6})`;
                 ctx.beginPath(); ctx.arc(s.x, 340, 6, 0, Math.PI * 2); ctx.fill();
             }
         }
 
-        // 金币
         if (data.coins) for (const coin of data.coins) {
             if (coin.collected) continue;
             ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 14;
@@ -2493,18 +2723,16 @@
             ctx.beginPath(); ctx.arc(coin.x - 2, coin.y - 2, 3.5, 0, Math.PI * 2); ctx.fill();
         }
 
-        // NPC
         for (const npc of AD.npcs) {
             ctx.font = '36px Arial'; ctx.textAlign = 'center';
             ctx.fillText(npc.icon, npc.x, npc.y);
             if (Math.abs(p.x - npc.x) < 70) {
                 ctx.fillStyle = 'rgba(0,240,255,0.9)';
                 ctx.font = 'bold 11px JetBrains Mono, monospace';
-                ctx.fillText('按 E 交互', npc.x, npc.y - 52);
+                ctx.fillText('按 F 交互', npc.x, npc.y - 52);
             }
         }
 
-        // Boss
         if (AD.boss) {
             const b = AD.boss;
             if (AD.bossState === 'barrage') {
@@ -2516,20 +2744,17 @@
             ctx.shadowBlur = 0;
         }
 
-        // Boss 分身
         for (const c of AD.clones) {
             ctx.globalAlpha = 0.75;
             ctx.font = '70px Arial'; ctx.textAlign = 'center';
             ctx.fillText('👥', c.x, c.y);
             ctx.globalAlpha = 1;
-            // 血条
             ctx.fillStyle = 'rgba(0,0,0,0.6)';
             ctx.fillRect(c.x - 25, c.y - 60, 50, 4);
             ctx.fillStyle = '#ff8a00';
             ctx.fillRect(c.x - 25, c.y - 60, 50 * (c.hp / c.maxHp), 4);
         }
 
-        // 黑洞
         for (const bh of AD.blackholes) {
             const grad = ctx.createRadialGradient(bh.x, bh.y, 0, bh.x, bh.y, bh.r);
             grad.addColorStop(0, 'rgba(0,0,0,0.9)');
@@ -2537,7 +2762,6 @@
             grad.addColorStop(1, 'rgba(100,210,255,0)');
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(bh.x, bh.y, bh.r, 0, Math.PI * 2); ctx.fill();
-            // 旋转粒子
             for (let i = 0; i < 6; i++) {
                 const a = (performance.now() / 300 + i * Math.PI / 3) % (Math.PI * 2);
                 const r = bh.r * 0.8;
@@ -2546,7 +2770,6 @@
             }
         }
 
-        // 弱点
         for (const w of AD.weaknesses) {
             const ringColor = w.hit ? '#ff2e88' : '#ffcc00';
             ctx.strokeStyle = ringColor; ctx.lineWidth = 4;
@@ -2557,20 +2780,17 @@
             grad.addColorStop(0, '#fff8c2'); grad.addColorStop(1, '#ffcc00');
             ctx.fillStyle = grad;
             ctx.beginPath(); ctx.arc(w.x, w.y, w.r * 0.7, 0, Math.PI * 2); ctx.fill();
-            // 十字准心
             ctx.strokeStyle = 'rgba(0,0,0,0.6)'; ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(w.x - w.r * 0.5, w.y); ctx.lineTo(w.x + w.r * 0.5, w.y);
             ctx.moveTo(w.x, w.y - w.r * 0.5); ctx.lineTo(w.x, w.y + w.r * 0.5);
             ctx.stroke();
-            // HP
             ctx.fillStyle = 'rgba(0,0,0,0.6)';
             ctx.fillRect(w.x - w.r, w.y + w.r + 6, w.r * 2, 4);
             ctx.fillStyle = '#ffcc00';
             ctx.fillRect(w.x - w.r, w.y + w.r + 6, w.r * 2 * (w.hp / w.maxHp), 4);
         }
 
-        // 光波子弹（Boss）
         for (const b of AD.bullets) {
             ctx.shadowColor = b.color; ctx.shadowBlur = 25;
             ctx.fillStyle = b.color;
@@ -2582,7 +2802,6 @@
             ctx.fillText(b.text || '0xFF', b.x, b.y + 3);
         }
 
-        // Boss 弹幕
         for (const b of AD.bossBullets) {
             ctx.shadowColor = b.color; ctx.shadowBlur = 16;
             ctx.fillStyle = b.color;
@@ -2598,9 +2817,57 @@
             }
         }
 
-        // 玩家子弹（含拖尾）
+        /* ★ Boss 激光可视化 */
+        for (const L of AD.bossLasers) {
+            if (!L.active) {
+                const pulse = Math.sin(performance.now() / 60) * 0.5 + 0.5;
+                ctx.strokeStyle = `rgba(255,46,136,${0.35 + pulse * 0.5})`;
+                ctx.lineWidth = 3;
+                ctx.setLineDash([14, 10]);
+                ctx.beginPath();
+                ctx.moveTo(L.x, 0); ctx.lineTo(L.x, canvas.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.fillStyle = `rgba(255,46,136,${0.6 + pulse * 0.4})`;
+                ctx.font = 'bold 18px JetBrains Mono, monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText('⚠', L.x, 40);
+            } else {
+                ctx.save();
+                ctx.shadowColor = '#ff2e88';
+                ctx.shadowBlur = 45;
+                ctx.fillStyle = '#fff8c2';
+                ctx.fillRect(L.x - 14, 0, 28, canvas.height);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(L.x - 6, 0, 12, canvas.height);
+                ctx.restore();
+            }
+        }
+
+        /* ★ Boss 地刺可视化 */
+        for (const S of AD.bossSpikes) {
+            if (!S.active) {
+                const pulse = Math.sin(performance.now() / 80) * 0.5 + 0.5;
+                ctx.strokeStyle = `rgba(255,138,0,${0.5 + pulse * 0.5})`;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([6, 6]);
+                ctx.strokeRect(S.x, S.y - 12, S.w, 12);
+                ctx.setLineDash([]);
+            } else {
+                ctx.fillStyle = 'rgba(255,138,0,0.9)';
+                for (let k = 0; k < 3; k++) {
+                    const sx = S.x + k * (S.w / 3);
+                    ctx.beginPath();
+                    ctx.moveTo(sx, S.y);
+                    ctx.lineTo(sx + S.w / 6, S.y - S.h);
+                    ctx.lineTo(sx + S.w / 3, S.y);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+        }
+
         for (const b of AD.playerBullets) {
-            // 拖尾
             for (let i = 0; i < b.trail.length; i++) {
                 const tr = b.trail[i];
                 ctx.globalAlpha = tr.life / 0.15 * 0.5;
@@ -2608,7 +2875,6 @@
                 ctx.beginPath(); ctx.arc(tr.x, tr.y, b.r * (i / b.trail.length), 0, Math.PI * 2); ctx.fill();
             }
             ctx.globalAlpha = 1;
-            // 主体
             ctx.shadowColor = b.color; ctx.shadowBlur = 20;
             ctx.fillStyle = '#fff8c2';
             ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
@@ -2617,7 +2883,6 @@
             ctx.shadowBlur = 0;
         }
 
-        // 追踪导弹
         for (const m of AD.missiles) {
             const pulse = Math.sin(t * 12) * 0.5 + 0.5;
             ctx.shadowColor = '#ff2e88'; ctx.shadowBlur = 20 + pulse * 15;
@@ -2632,7 +2897,6 @@
             ctx.fillText('*', m.x, m.y + 4);
         }
 
-        // 玩家
         if (p.invincible === 0 || Math.floor(p.invincible / 4) % 2 === 0) {
             if (p.shieldActive) {
                 ctx.strokeStyle = 'rgba(0,240,255,0.8)';
@@ -2643,7 +2907,6 @@
             drawPlayer(ctx);
         }
 
-        // 粒子
         for (const pt of AD.particles) {
             ctx.globalAlpha = pt.life / pt.maxLife;
             ctx.fillStyle = pt.color;
@@ -2651,7 +2914,6 @@
         }
         ctx.globalAlpha = 1;
 
-        // 伤害数字
         for (const txt of AD.damageTexts) {
             ctx.globalAlpha = txt.life / 60;
             ctx.fillStyle = txt.color;
@@ -2665,9 +2927,7 @@
 
         ctx.restore();
 
-        // ★ 枪口方向准星（在屏幕坐标系绘制）
         drawCrosshair(ctx);
-        // ★ 左下角弹药条
         drawAmmoBar(ctx);
     }
 
@@ -2675,7 +2935,6 @@
         const p = AD.player;
         const gunX = p.x + p.w / 2 - AD.camera.x + Math.cos(p.gunAngle) * 30;
         const gunY = p.y + p.h / 2 + Math.sin(p.gunAngle) * 30;
-        // 准星
         ctx.strokeStyle = '#00f0ff';
         ctx.lineWidth = 1.5;
         ctx.shadowColor = '#00f0ff';
@@ -2685,7 +2944,6 @@
         ctx.moveTo(gunX, gunY - 8); ctx.lineTo(gunX, gunY + 8);
         ctx.stroke();
         ctx.shadowBlur = 0;
-        // 鼠标位置准星
         ctx.strokeStyle = 'rgba(255,46,136,0.8)';
         ctx.lineWidth = 1.5;
         ctx.beginPath();
@@ -2701,7 +2959,6 @@
         const barW = 220;
         const barH = 18;
 
-        // ---- 外框背景 ----
         ctx.save();
         ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
         ctx.strokeStyle = 'rgba(0, 240, 255, 0.5)';
@@ -2711,14 +2968,12 @@
         ctx.fill();
         ctx.stroke();
 
-        // ---- 标题 ----
         ctx.fillStyle = '#64d2ff';
         ctx.font = 'bold 12px JetBrains Mono, monospace';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillText('🔫 弹 夹', barX, barY - 18);
 
-        // ---- 数值 ----
         let numColor = '#64d2ff';
         if (p.ammo <= 2) numColor = '#ffcc00';
         if (p.ammo === 0) numColor = '#ff2e88';
@@ -2727,11 +2982,9 @@
         ctx.textAlign = 'right';
         ctx.fillText(p.ammo + ' / ' + p.maxAmmo, barX + barW, barY - 18);
 
-        // ---- 进度条底 ----
         ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
         ctx.fillRect(barX, barY, barW, barH);
 
-        // ---- 恢复进度（半透明填充） ----
         if (p.ammo < p.maxAmmo) {
             const regenPct = (p.ammoRegenTimer || 0) / 0.9;
             const regenW = (barW / p.maxAmmo) * regenPct;
@@ -2740,7 +2993,6 @@
             ctx.fillRect(startX, barY, regenW, barH);
         }
 
-        // ---- 已装弹（发光） ----
         const fillW = (p.ammo / p.maxAmmo) * barW;
         ctx.shadowColor = numColor;
         ctx.shadowBlur = 12;
@@ -2748,7 +3000,6 @@
         ctx.fillRect(barX, barY, fillW, barH);
         ctx.shadowBlur = 0;
 
-        // ---- 分段线（每发一格） ----
         ctx.strokeStyle = 'rgba(10, 14, 26, 0.85)';
         ctx.lineWidth = 1.5;
         for (let i = 1; i < p.maxAmmo; i++) {
@@ -2759,7 +3010,6 @@
             ctx.stroke();
         }
 
-        // ---- 空仓闪烁警示 ----
         if (p.ammo === 0) {
             const pulse = Math.sin(performance.now() / 150) * 0.5 + 0.5;
             ctx.strokeStyle = `rgba(255, 46, 136, ${0.5 + pulse * 0.5})`;
@@ -2780,7 +3030,6 @@
         const p = AD.player;
         const sprite = AD._sprite;
 
-        // 绘制枪
         const gunX = p.x + p.w / 2;
         const gunY = p.y + p.h / 2;
         const gunLen = 26;
@@ -2795,7 +3044,6 @@
         ctx.moveTo(gx, gy);
         ctx.lineTo(gx2, gy2);
         ctx.stroke();
-        // 枪管发光（射击时）
         if (p.shootAnimTimer > 0) {
             ctx.strokeStyle = '#00f0ff';
             ctx.shadowColor = '#00f0ff';
@@ -2809,7 +3057,6 @@
         }
 
         if (!sprite || !sprite.complete) {
-            // fallback 绘制
             ctx.fillStyle = '#00f0ff';
             ctx.fillRect(p.x + 4, p.y + 14, p.w - 8, p.h - 20);
             ctx.fillStyle = '#ffdbac';
@@ -2842,7 +3089,6 @@
     function renderGadget(ctx, g, t) {
         const p = AD.player;
 
-        /* 变量平台 */
         if (g.type === 'variable-platform') {
             const color = g.stable ? '#00ff88' : '#ffcc00';
             ctx.fillStyle = g.stable ? 'rgba(0,255,136,0.7)' : 'rgba(255,204,0,0.5)';
@@ -2861,7 +3107,6 @@
                 ctx.fillText('⚠ 悬崖', g.x + g.w / 2, g.y + 30);
             }
         }
-        /* 地刺 */
         else if (g.type === 'loop-spikes') {
             const y = g.currentY != null ? g.currentY : g.y;
             ctx.fillStyle = 'rgba(255,46,136,0.85)';
@@ -2875,7 +3120,6 @@
             ctx.fillStyle = 'rgba(255,46,136,0.2)';
             ctx.fillRect(g.x, y + g.h - 6, g.w, 6);
         }
-        /* 传送门 */
         else if (g.type === 'pointer-teleport') {
             const pulse = Math.sin(t * 3) * 0.5 + 0.5;
             ctx.strokeStyle = `rgba(168,85,247,${0.5 + pulse * 0.5})`;
@@ -2887,13 +3131,11 @@
             ctx.textAlign = 'center';
             ctx.fillText(g.label, g.x + 20, g.y - 34);
         }
-        /* ★ 数组平台（虚化未激活） */
         else if (g.type === 'array-platforms') {
             const curIdx = g.currentProgress;
             g.items.forEach(it => {
                 const isNext = it.order === curIdx;
                 const isDone = it.order < curIdx || g.completed;
-                // 未激活的虚化
                 if (!isDone && !isNext) {
                     ctx.globalAlpha = 0.25;
                     ctx.fillStyle = 'rgba(100,210,255,0.4)';
@@ -2905,14 +3147,12 @@
                     ctx.strokeRect(it.x, it.y, it.w, 8);
                     ctx.setLineDash([]);
                 } else if (isNext) {
-                    // 下一个目标：金色脉冲
                     const pulse = Math.sin(t * 6) * 0.5 + 0.5;
                     ctx.shadowColor = '#ffcc00'; ctx.shadowBlur = 20 + pulse * 15;
                     ctx.fillStyle = 'rgba(255,204,0,0.8)';
                     ctx.fillRect(it.x, it.y, it.w, 8);
                     ctx.shadowBlur = 0;
                 } else {
-                    // 已完成：绿色实心
                     ctx.fillStyle = 'rgba(0,255,136,0.7)';
                     ctx.fillRect(it.x, it.y, it.w, 8);
                 }
@@ -2922,7 +3162,6 @@
                 ctx.fillText(`[${it.order}]`, it.x + it.w / 2, it.y - 6);
             });
         }
-        /* 内存池 */
         else if (g.type === 'memory-pool') {
             const pulse = Math.sin(t * 2) * 0.5 + 0.5;
             const grad = ctx.createLinearGradient(g.x, g.y, g.x + g.w, g.y);
@@ -2936,7 +3175,6 @@
             ctx.textAlign = 'center';
             ctx.fillText('malloc()', g.x + g.w / 2, g.y + g.h / 2 + 4);
         }
-        /* 条件门 */
         else if (g.type === 'conditional-gate') {
             const opened = g.opened;
             ctx.fillStyle = opened ? 'rgba(0,255,136,0.15)' : 'rgba(255,46,136,0.35)';
@@ -2953,7 +3191,6 @@
             ctx.fillText(opened ? '' : g.label, 0, 8);
             ctx.restore();
         }
-        /* switch 平台 */
         else if (g.type === 'switch-platform') {
             ctx.fillStyle = g.active ? 'rgba(0,255,136,0.7)' : 'rgba(100,210,255,0.5)';
             ctx.fillRect(g.x, g.current, g.w, 8);
@@ -2966,10 +3203,9 @@
             ctx.fillText('switch', g.x + g.w / 2, g.current - 6);
             if (Math.abs(p.x + p.w / 2 - (g.x + g.w / 2)) < 80) {
                 ctx.fillStyle = 'rgba(0,240,255,0.9)';
-                ctx.fillText('按 E 切换', g.x + g.w / 2, g.current - 22);
+                ctx.fillText('按 F 切换', g.x + g.w / 2, g.current - 22);
             }
         }
-        /* 递归陷阱 */
         else if (g.type === 'recursive-trap') {
             g.platforms.forEach((pl, i) => {
                 if (pl._gone) return;
@@ -2993,7 +3229,6 @@
                 ctx.fillText(`f(${g.platforms.length - 1 - i})`, pl.x + pl.w / 2, pl.y + pl.h / 2 + 4);
             });
         }
-        /* 追踪导弹 */
         else if (g.type === 'pointer-missile') {
             const pulse = Math.sin(t * 4) * 0.5 + 0.5;
             ctx.fillStyle = `rgba(255,46,136,${0.3 + pulse * 0.3})`;
@@ -3005,7 +3240,6 @@
             ctx.textAlign = 'center';
             ctx.fillText('&x', g.x + 20, g.y + 24);
         }
-        /* 内存泄漏 */
         else if (g.type === 'memory-leak') {
             const pulse = Math.sin(t * 1.5) * 0.5 + 0.5;
             const grad = ctx.createRadialGradient(g.x + g.w / 2, g.y + g.h / 2, 0, g.x + g.w / 2, g.y + g.h / 2, g.w / 2);
@@ -3022,7 +3256,6 @@
             ctx.fillText('malloc without free()', g.x + g.w / 2, g.y + g.h / 2);
             ctx.fillText('内存泄漏区', g.x + g.w / 2, g.y + g.h / 2 + 20);
         }
-        /* 答题石碑 */
         else if (g.type === 'quiz-stone') {
             const pulse = Math.sin(t * 3) * 0.5 + 0.5;
             const used = g.used;
@@ -3038,10 +3271,9 @@
             if (!used && Math.abs(p.x + p.w / 2 - (g.x + g.w / 2)) < 70) {
                 ctx.fillStyle = 'rgba(0,240,255,0.95)';
                 ctx.font = 'bold 11px JetBrains Mono, monospace';
-                ctx.fillText('按 E 答题', g.x + g.w / 2, g.y - 10);
+                ctx.fillText('按 F 答题', g.x + g.w / 2, g.y - 10);
             }
         }
-        /* 激光 */
         else if (g.type === 'laser-sweep') {
             const baseY = g.currentY || g.y;
             if (g.state === 'warning') {
