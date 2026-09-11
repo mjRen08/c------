@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第5章 · 编写第一个完整程序 - CodeMaster</title>
+    <link rel="stylesheet" href="../assets/css/reset.css"><link rel="stylesheet" href="../assets/css/style.css"><link rel="stylesheet" href="../assets/css/course.css">
+</head>
+<body>
+<div id="starField"></div><nav class="navbar"><div class="nav-container"><a href="../index.html" class="logo"><div class="logo-icon">Cm</div><span>CodeMaster</span></a><ul class="nav-links"><li><a href="../index.html">首页</a></li><li><a href="../list.html" class="active">课程中心</a></li><li><a href="../quiz.html">在线小测</a></li><li><a href="../oj.html">OJ 练习场</a></li><li><a href="../game.html">编程游戏</a></li><li><a href="../profile.html">个人中心</a></li><li><a href="../team.html">制作团队</a></li></ul><div class="nav-actions"><button class="btn btn-ghost" id="logoutBtn">退出登录</button><div class="user-avatar" id="userAvatar" onclick="location.href='../profile.html'">U</div></div></div></nav>
+<main class="page-shell"><div class="lesson-card"><div class="breadcrumb"><a href="../list.html">课程中心</a><span>/</span><a href="../detail.html?course=basics">C语言基础入门</a><span>/</span><span>第5章 · 编写第一个完整程序</span></div><div class="lesson-header"><h1>第5章 · 编写第一个完整程序</h1><div class="lesson-badge">可学习</div></div><div class="meta-row"><span>📘 课程：C语言基础入门</span><span>⏱ 预计 25 分钟</span><span>🎯 难度：入门</span></div>
+<div class="lesson-layout single-column"><aside class="panel learning-goals"><h3>学习目标</h3><ul class="checklist"><li>能够拆解一个小程序的需求</li><li>综合使用变量、运算和输入输出</li><li>理解函数、注释与调试过程</li><li>独立完成一个简单成绩统计程序</li></ul></aside><section class="panel lesson-panel-full"><h3>课程内容</h3><div class="lesson-text">
+<div class="story-card"><h4>先来一个小场景</h4><p>现在要写一个成绩统计程序：用户输入三门课成绩，程序计算总分和平均分，并告诉用户是否达到及格线。这个任务会把前面学过的知识串成一条完整流程。</p></div>
+<div class="focus-box"><h4>为什么要学这个</h4><p>完整程序不只是把代码堆在一起，而是要经过需求分析、数据设计、计算处理、结果输出和测试。学会这个过程，才能把零散语法真正用于解决问题。</p></div>
+<p>写程序前先明确需求：需要哪些输入、需要保存哪些数据、要进行什么计算、最后输出什么结果。对于成绩统计程序，可以准备三个浮点变量保存成绩，再用表达式计算总分和平均分。</p>
+<div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>score_report.c</span></div><pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    double chinese, math, english;
+    double total, average;
+
+    printf("请输入三门成绩：");
+    scanf("%lf %lf %lf", &amp;chinese, &amp;math, &amp;english);
+
+    total = chinese + math + english;
+    average = total / 3;
+
+    printf("总分：%.2f\\n", total);
+    printf("平均分：%.2f\\n", average);
+    return 0;
+}</code></pre></div>
+<div class="tip-box">提示：先让程序完成一个清晰、可运行的版本，再逐步增加校验和扩展功能。</div>
+<p>这段代码可以分成四个部分：声明变量、读取输入、计算结果、输出结果。这样的<span class="term" data-term="程序分解">程序分解</span>能帮助我们逐段检查问题，而不是面对整页代码无从下手。</p>
+<p>变量的命名应该表达用途，<code>average</code> 比 <code>x</code> 更容易理解。对于重复出现且含义固定的数值，可以使用<span class="term" data-term="常量">常量</span>，例如把及格线定义为 <code>const double PASS_LINE = 60.0;</code>。</p>
+<div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>check_result.c</span></div><pre><code>const double PASS_LINE = 60.0;
+
+if (average &gt;= PASS_LINE) {
+    printf("结果：通过\\n");
+} else {
+    printf("结果：需要继续练习\\n");
+}</code></pre></div>
+<p>这里出现了条件判断，它会根据平均分选择不同的输出。大括号中的代码称为代码块，缩进能帮助读者看出哪些语句属于同一个条件分支。</p>
+<p>程序写完后要进行测试。可以准备正常成绩、满分成绩、刚好 60 分和包含小数的成绩，检查输出是否符合预期。测试不是只看程序能否运行，还要观察边界数据时结果是否正确。</p>
+<p>遇到问题时，先区分<span class="term" data-term="语法错误">语法错误</span>和逻辑错误。语法错误通常会阻止编译，例如缺少分号或括号不匹配；逻辑错误可以编译运行，但结果不正确，例如把总分除以 2 而不是 3。</p>
+<div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>debug_steps.txt</span></div><pre><code>1. 先阅读编译器提示
+2. 缩小出错范围
+3. 输出关键变量检查中间结果
+4. 用一组简单数据重新验证</code></pre></div>
+<p>注释可以记录代码的目的，但不应重复描述每一行显而易见的操作。好的注释更适合解释“为什么这样设计”，例如说明及格线的业务规则或某个计算公式的来源。</p>
+<div class="mini-quiz"><h4>小挑战</h4><ul><li>成绩统计程序需要哪些变量？它们分别应该使用什么类型？</li><li>如果把平均分除以 2，程序能运行但结果错误，这属于哪一类问题？</li><li>如何测试“刚好达到及格线”的情况？为什么边界测试很重要？</li><li>你还能为这个程序增加什么功能，例如最高分、最低分或等级评价？</li></ul></div>
+<p>从需求到代码的过程可以反复练习：先写出输入和输出，再补充数据和计算，最后增加判断与校验。每次只增加一个小功能，程序更容易保持可运行状态。</p>
+<div class="summary-box"><h4>一句话总结</h4><p>完整程序需要把数据、表达式、输入输出、判断和测试组织成一条清晰的解决问题流程。</p></div>
+<p>完成这一章后，你已经走完了 C 语言基础入门的第一轮学习。接下来可以继续学习循环、数组和函数，把小程序扩展成更有能力的项目。</p>
+</div></section></div><div class="chapter-actions"><button class="btn btn-ghost" onclick="location.href='../detail.html?course=basics'">返回课程专题</button></div></div></main>
+<footer class="footer"><div class="container"><div class="footer-bottom"><p>©2026 CodeMaster 北京理工大学</p></div></div></footer><div id="termNote" class="term-note" aria-live="polite"></div>
+<script src="../assets/js/main.js"></script><script>
+(function(){const field=document.getElementById('starField');if(!field)return;for(let i=0;i<60;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';s.style.opacity=Math.random()*0.5+0.1;const size=Math.random()*2+1;s.style.width=size+'px';s.style.height=size+'px';field.appendChild(s);}})();const termNote=document.getElementById('termNote');const termMap={'程序分解':'把复杂任务拆成输入、处理、输出等更容易管理的部分。','常量':'在程序运行期间保持不变的数据，通常使用 const 定义。','语法错误':'不符合 C 语言书写规则，通常会导致编译失败。'};document.querySelectorAll('.term').forEach(term=>term.addEventListener('click',event=>{const name=term.dataset.term;termNote.innerHTML=`<strong>${name}</strong><span>${termMap[name]}</span>`;termNote.classList.add('visible');const rect=term.getBoundingClientRect();termNote.style.left=`${Math.min(window.innerWidth-276,Math.max(16,rect.left+rect.width/2-130))}px`;termNote.style.top=`${Math.max(16,rect.top-10)}px`;event.stopPropagation();}));document.addEventListener('click',event=>{if(!event.target.closest('.term'))termNote.classList.remove('visible');});const params=new URLSearchParams(location.search);const course=params.get('course')||'basics';const chapter=Number(params.get('chapter')||5);const lessonBadge=document.querySelector('.lesson-badge');let progressRecorded=false;function updateLessonBadge(){const user=typeof getFromStorage==='function'?getFromStorage('currentUser'):null;const lessons=user&&user.courseLessons&&user.courseLessons[course]||[];if(lessons.indexOf(chapter-1)===-1)return;lessonBadge.textContent='已学习';lessonBadge.classList.add('completed');progressRecorded=true;}function recordLesson(){if(progressRecorded||window.scrollY+window.innerHeight<document.documentElement.scrollHeight-24)return;progressRecorded=true;if(typeof completeCourseChapter==='function'){completeCourseChapter(course,chapter);updateLessonBadge();}}window.addEventListener('scroll',recordLesson,{passive:true});window.addEventListener('resize',recordLesson);updateLessonBadge();recordLesson();
+</script></body></html>

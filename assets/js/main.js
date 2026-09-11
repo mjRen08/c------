@@ -933,7 +933,10 @@ function getCourseProgress(course, user) {
     if (user.completedCourses && user.completedCourses.indexOf(course.id) !== -1) return 100;
     if (!course.branches) return 0;
     const completedLessons = user.courseLessons && user.courseLessons[course.id] || [];
-    return Math.round((completedLessons.length / course.branches.length) * 100);
+    const validLessons = Array.from(new Set(completedLessons)).filter(function (index) {
+        return Number.isInteger(index) && index >= 0 && index < course.branches.length;
+    });
+    return Math.max(0, Math.min(100, Math.round((validLessons.length / course.branches.length) * 100)));
 }
 
 function completeCourseChapter(courseId, chapterNumber) {
@@ -1949,7 +1952,19 @@ function renderCourseDetail() {
         const unlocked = index === 0 || completedLessons.indexOf(index - 1) !== -1;
         const statusText = isCompleted ? '已学习' : (unlocked ? '可学习' : '未解锁');
         const statusIcon = isCompleted ? '✅' : (unlocked ? '▶' : '🔒');
-        const chapterHref = unlocked ? `course/1.1.html?course=${detailId}&chapter=${index + 1}` : null;
+        const coursePagePrefix = {
+            basics: 1,
+            'control-flow': 2,
+            'io-array': 3,
+            functions: 4,
+            strings: 5,
+            pointers: 6,
+            algorithms: 7,
+            'file-io': 8,
+            project: 9
+        }[detailId] || 1;
+        const chapterFile = `${coursePagePrefix}.${index + 1}.html`;
+        const chapterHref = unlocked ? `course/${chapterFile}?course=${detailId}&chapter=${index + 1}` : null;
         const tagName = unlocked ? 'a' : 'div';
 
         return `

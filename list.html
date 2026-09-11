@@ -577,35 +577,35 @@
         { id: 'control-flow', title: '循环与分支结构', icon: '🔄', level: '入门', size: 'sm',
           accent: '#ff8a00',
           desc: 'if-else、switch、for、while，掌握程序逻辑控制。',
-          chapters: 8, hours: 2, rating: 4.8 },
+          chapters: 5, hours: 2, rating: 4.8 },
         { id: 'io-array', title: '输入输出与数组', icon: '📥', level: '入门', size: 'sm',
           accent: '#00ff88',
           desc: 'printf/scanf 与数组，学会处理一组相关数据。',
-          chapters: 9, hours: 2.5, rating: 4.8 },
+          chapters: 5, hours: 2.5, rating: 4.8 },
         { id: 'functions', title: '函数与模块化编程', icon: '📦', level: '进阶', size: 'md',
           accent: '#a855f7',
           desc: '函数定义、参数传递、递归调用，掌握模块化编程思想。',
-          chapters: 10, hours: 2.5, rating: 4.9 },
+          chapters: 5, hours: 2.5, rating: 4.9 },
         { id: 'strings', title: '数组与字符串', icon: '📋', level: '进阶', size: 'md',
           accent: '#22d3ee',
           desc: '一维/二维数组、字符数组与字符串处理，掌握批量数据处理。',
-          chapters: 9, hours: 2.5, rating: 4.7 },
+          chapters: 5, hours: 2.5, rating: 4.7 },
         { id: 'pointers', title: '指针与内存管理', icon: '🔧', level: '进阶', size: 'sm',
           accent: '#ff4757',
           desc: '地址、指针运算、动态内存，深入理解C语言核心。',
-          chapters: 8, hours: 3, rating: 4.9 },
+          chapters: 5, hours: 3, rating: 4.9 },
         { id: 'algorithms', title: '数据结构与算法', icon: '🌲', level: '高级', size: 'md',
           accent: '#7b2cbf',
           desc: '链表、栈、队列、树、排序查找，夯实算法基础。',
-          chapters: 15, hours: 5, rating: 5.0 },
+          chapters: 5, hours: 5, rating: 5.0 },
         { id: 'file-io', title: '文件操作与IO', icon: '📁', level: '高级', size: 'sm',
           accent: '#f472b6',
           desc: '文件读写、缓冲IO，掌握数据持久化存储技术。',
-          chapters: 6, hours: 1.5, rating: 4.6 },
+          chapters: 5, hours: 1.5, rating: 4.6 },
         { id: 'project', title: '项目实战：学生管理系统', icon: '💻', level: '实战', size: 'lg',
           accent: '#fbbf24',
           desc: '综合运用函数、结构体、文件、菜单交互，分阶段完成一个可运行的学生管理系统项目，从需求分析到代码重构全流程。',
-          chapters: 10, hours: 4, rating: 5.0 }
+          chapters: 5, hours: 4, rating: 5.0 }
     ];
 
     let currentFilter = 'all';
@@ -638,7 +638,7 @@
         grid.innerHTML = filtered.map((c, i) => {
             const done = completedCourses.includes(c.id);
             const lessonCount = (courseLessons[c.id] || []).length;
-            const progress = done ? 100 : Math.round((lessonCount / c.chapters) * 100);
+            const progress = done ? 100 : Math.max(0, Math.min(100, Math.round((lessonCount / c.chapters) * 100)));
             const circumference = 2 * Math.PI * 18;
 
             return `
