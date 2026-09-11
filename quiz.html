@@ -8,40 +8,6 @@
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <style>
-/* ============ 页面基础 ============ */
-body.quiz-home-page {
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background:
-        radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
-        radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
-        radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
-        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-    overflow-x: hidden;
-}
-
-#starField {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-}
-#starField span {
-    position: absolute;
-    width: 2px;
-    height: 2px;
-    border-radius: 50%;
-    background: #64d2ff;
-    box-shadow: 0 0 6px #64d2ff;
-    animation: twinkle 3s infinite ease-in-out;
-}
-@keyframes twinkle {
-    0%,100% { opacity: 0.15; transform: scale(0.8); }
-    50% { opacity: 0.9; transform: scale(1.2); }
-}
-
 /* ============ 页面容器 ============ */
 .quiz-home-wrap {
     position: relative;

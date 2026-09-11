@@ -13,17 +13,6 @@
     box-sizing:border-box;
     font-family:"Microsoft Yahei",sans-serif;
 }
-body{
-    padding:0;
-    background:
-        radial-gradient(circle at 10% 10%, rgba(100,210,255,0.08), transparent 25%),
-        radial-gradient(circle at 90% 18%, rgba(120,80,255,0.06), transparent 28%),
-        radial-gradient(circle at 50% 90%, rgba(100,210,255,0.06), transparent 28%),
-        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-    min-height:100vh;
-    display:flex;
-    flex-direction:column;
-}
 
 #quiz-page{
     display:block;
@@ -209,7 +198,9 @@ button{
     padding:32px;
     border-radius:24px;
     max-height:85vh;
-    overflow:auto;
+    overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior: contain;
     box-shadow:
         0 0 35px rgba(0,0,0,0.45),
         0 0 18px rgba(100,210,255,0.18);
@@ -247,12 +238,15 @@ button{
 }
 </style>
 </head>
-<body>
+<body class="home-page-bg">
+    <div id="scrollProgress"></div>
+    <div id="starField"></div>
+
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
-                <div class="logo-icon">{ }</div>
-                <span>C-Learn</span>
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
             </a>
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
@@ -260,11 +254,11 @@ button{
                 <li><a href="quiz.html" class="active">在线小测</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
             </ul>
             <div class="nav-actions">
-                <a href="login.html" id="loginBtn" class="btn btn-ghost">登录</a>
-                <a href="register.html" id="registerBtn" class="btn btn-outline">注册</a>
-                <div class="user-avatar" id="userAvatar" style="display:none;" onclick="location.href='profile.html'">U</div>
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div>
             </div>
         </div>
     </nav>
@@ -305,6 +299,43 @@ button{
 
     <footer class="footer">
         <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">Cm</div>
+                        <span>CodeMaster</span>
+                    </div>
+                    <p>专注于C语言编程教育，致力于打造最优质的在线学习体验。让每一位学员都能享受编程的乐趣。</p>
+                </div>
+                <div class="footer-col">
+                    <h4>课程学习</h4>
+                    <ul>
+                        <li><a href="list.html">全部课程</a></li>
+                        <li><a href="list.html">基础入门</a></li>
+                        <li><a href="list.html">进阶提升</a></li>
+                        <li><a href="list.html">实战项目</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>互动学习</h4>
+                    <ul>
+                        <li><a href="quiz.html">在线小测</a></li>
+                        <li><a href="game.html">编程游戏</a></li>
+                        <li><a href="quiz.html">代码挑战</a></li>
+                        <li><a href="team.html">学习社区</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="team.html">制作团队</a></li>
+                        <li><a href="index.html">关于平台</a></li>
+                        <li><a href="team.html">联系方式</a></li>
+                        <li><a href="team.html">帮助中心</a></li>
+                        <li><a href="team.html">意见反馈</a></li>
+                    </ul>
+                </div>
+            </div>
             <div class="footer-bottom">
                 <p>©2026 CodeMaster 北京理工大学</p>
             </div>
@@ -313,6 +344,42 @@ button{
 
 <script src="assets/js/quiz.js"></script>
 <script>
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 80; i++) {
+            const s = document.createElement('span');
+            const size = Math.random() * 2 + 1;
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.animationDuration = (2 + Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            field.appendChild(s);
+        }
+    })();
+
+    const bar = document.getElementById('scrollProgress');
+    if (bar) {
+        let ticking = false;
+        function updateScrollProgress() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            bar.style.width = pct + '%';
+            ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScrollProgress);
+                ticking = true;
+            }
+        }, { passive: true });
+        updateScrollProgress();
+    }
+
 // 题目数据【这里是专题1简单】
 const questions = [
     {q:"HTML段落标签是？",opts:["<p>","<div>","<span>","<b>"],ans:0},

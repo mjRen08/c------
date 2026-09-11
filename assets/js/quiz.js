@@ -100,6 +100,25 @@ function showResultPopup(){
     document.getElementById("score-text").innerText = `总分：${score}/100`
     document.getElementById("result-detail").innerHTML = html;
     document.getElementById("resultModal").style.display = "flex";
+    document.body.style.overflow = 'hidden';
+
+    const modal = document.getElementById("resultModal");
+    const modalContent = modal.querySelector(".result-content");
+    modal.addEventListener('wheel', function (event) {
+        if (event.target === modal || event.target.closest('.result-content')) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, { passive: false });
+    if (modalContent) {
+        modalContent.addEventListener('wheel', function (event) {
+            const atTop = modalContent.scrollTop <= 0 && event.deltaY < 0;
+            const atBottom = modalContent.scrollTop + modalContent.clientHeight >= modalContent.scrollHeight && event.deltaY > 0;
+            if (!atTop && !atBottom) {
+                event.stopPropagation();
+            }
+        }, { passive: false });
+    }
 }
 
 // 查看成绩按钮点击事件
@@ -156,6 +175,7 @@ document.getElementById("submit-btn").onclick = function(){
 //关闭弹窗
 function closeModal(){
     document.getElementById("resultModal").style.display = "none";
+    document.body.style.overflow = '';
 }
 
 //返回专题首页

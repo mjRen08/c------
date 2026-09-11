@@ -7,26 +7,6 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* ================= 页面背景 ================= */
-        body.course-page-bg {
-            background:
-                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.08), transparent 30%),
-                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.08), transparent 35%),
-                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.05), transparent 40%),
-                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        #starField { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-        #starField span {
-            position: absolute; border-radius: 50%;
-            background: #64d2ff; box-shadow: 0 0 6px #64d2ff;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%,100% { opacity: 0.15; transform: scale(0.8); }
-            50% { opacity: 0.9; transform: scale(1.2); }
-        }
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(28px); }
             to { opacity: 1; transform: translateY(0); }
@@ -170,12 +150,12 @@
             grid-auto-flow: dense;
         }
 
-        /* 大卡占 4 列 */
-        .bento-card.size-lg { grid-column: span 4; }
+        /* 大卡占 3 列 */
+        .bento-card.size-lg { grid-column: span 3; }
         /* 中卡占 3 列 */
         .bento-card.size-md { grid-column: span 3; }
-        /* 小卡占 2 列 */
-        .bento-card.size-sm { grid-column: span 2; }
+        /* 小卡占 3 列 */
+        .bento-card.size-sm { grid-column: span 3; }
 
         /* ================= 卡片 ================= */
         .bento-card {
@@ -401,8 +381,8 @@
         /* 悬浮操作按钮组 */
         .bento-actions {
             position: absolute;
-            bottom: 22px;
-            right: 22px;
+            bottom: 29px;
+            right: 80px;
             display: flex;
             gap: 8px;
             opacity: 0;
@@ -701,8 +681,6 @@
                     <div class="bento-actions">
                         <button class="bento-action-btn" title="学习" 
                                 onclick="event.stopPropagation(); goDetail('${c.id}')">学</button>
-                        <button class="bento-action-btn" title="练习" 
-                                onclick="event.stopPropagation(); goDetail('${c.id}')">练</button>
                         <button class="bento-action-btn" title="测试" 
                                 onclick="event.stopPropagation(); goQuiz()">测</button>
                     </div>

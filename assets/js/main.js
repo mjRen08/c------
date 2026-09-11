@@ -1896,8 +1896,14 @@ function renderCourseDetail() {
     const title = $('#detailTitle');
     if (!title) return;
     const params = new URLSearchParams(window.location.search);
-    const course = courseCatalog[params.get('course')] || courseCatalog.basics;
     const detailId = params.get('course') || 'basics';
+    const course = courseCatalog[detailId] || courseCatalog.basics;
+    const user = getFromStorage('currentUser');
+    const completedLessons = user && user.courseLessons && user.courseLessons[detailId]
+        ? user.courseLessons[detailId]
+        : [];
+    const completedChapterCount = completedLessons.length;
+
     $('#detailBreadcrumb').textContent = course.title;
     title.textContent = course.title;
     $('#detailMeta').textContent = `${course.icon} ${course.level}课程 · ${course.chapters.length}章`;
@@ -1905,12 +1911,24 @@ function renderCourseDetail() {
     $('#detailDescription').textContent = course.description;
     $('#detailFavoriteBtn').dataset.courseId = detailId;
     $('#chapterList').innerHTML = course.chapters.map(function (chapter, index) {
-        const unlocked = index < 2;
-        return `<div class="chapter-item ${unlocked ? 'completed' : ''}">
-            <div class="chapter-title">${unlocked ? '✅' : '🔒'} 第${index + 1}章：${chapter}
-                <span class="chapter-status ${unlocked ? 'completed' : 'locked'}">${unlocked ? '可学习' : '未解锁'}</span>
-            </div>
-        </div>`;
+        const isFirstChapter = index === 0;
+        const unlocked = isFirstChapter || completedChapterCount >= index;
+        const statusText = unlocked ? '可学习' : '未解锁';
+        const statusIcon = unlocked ? '✅' : '🔒';
+        const chapterHref = unlocked ? `course/1.1.html?course=${detailId}&chapter=${index + 1}` : null;
+        const tagName = unlocked ? 'a' : 'div';
+
+        return `
+            <${tagName}
+                class="chapter-item ${unlocked ? 'completed' : 'locked'}"
+                ${unlocked ? `href="${chapterHref}"` : ''}
+                ${unlocked ? 'title="点击进入章节学习"' : 'title="请先完成前一章"'}
+            >
+                <div class="chapter-title">${statusIcon} 第${index + 1}章：${chapter}
+                    <span class="chapter-status ${unlocked ? 'completed' : 'locked'}">${statusText}</span>
+                </div>
+            </${tagName}>
+        `;
     }).join('');
     $('#learningGoals').innerHTML = course.learn.map(function (item) {
         return `<li>✓ ${item}</li>`;

@@ -7,31 +7,6 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* 沿用 login.html 的整套样式（共享） */
-        body.auth-page {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 80px 20px;
-            position: relative;
-            overflow: hidden;
-            background:
-                radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
-                radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
-                radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
-                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-        }
-        #starField { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-        #starField span {
-            position: absolute; border-radius: 50%;
-            background: #64d2ff; box-shadow: 0 0 6px #64d2ff;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%,100% { opacity: 0.15; transform: scale(0.8); }
-            50% { opacity: 0.9; transform: scale(1.2); }
-        }
         .auth-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; z-index: 0; }
         .auth-orb.orb-a { width: 480px; height: 480px; background: rgba(123,44,191,0.16); top: -120px; left: -120px; animation: orbFloat 16s ease-in-out infinite; }
         .auth-orb.orb-b { width: 420px; height: 420px; background: rgba(0,212,255,0.18); bottom: -140px; right: -100px; animation: orbFloat 20s ease-in-out infinite reverse; }
