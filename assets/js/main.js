@@ -936,6 +936,28 @@ function getCourseProgress(course, user) {
     return Math.round((completedLessons.length / course.branches.length) * 100);
 }
 
+function completeCourseChapter(courseId, chapterNumber) {
+    const user = getFromStorage('currentUser');
+    const course = courseCatalog[courseId];
+    const chapterIndex = Number(chapterNumber) - 1;
+    if (!user || !course || chapterIndex < 0 || chapterIndex >= course.chapters.length) return false;
+
+    user.courseLessons = user.courseLessons || {};
+    user.courseLessons[courseId] = user.courseLessons[courseId] || [];
+    const lessons = user.courseLessons[courseId];
+    if (lessons.indexOf(chapterIndex) !== -1) return false;
+
+    lessons.push(chapterIndex);
+    lessons.sort(function (first, second) { return first - second; });
+    user.completedCourses = user.completedCourses || [];
+    if (lessons.length >= course.chapters.length && user.completedCourses.indexOf(courseId) === -1) {
+        user.completedCourses.push(courseId);
+    }
+    saveUserData(user);
+    addExp(50);
+    return true;
+}
+
 // ==================================================
 // ========== 横板跳跃闯关游戏引擎 ==========
 // ==================================================
@@ -1850,7 +1872,19 @@ function updateHealthBar() {
 }
 
 function getCourseFavorites() {
-    return getFromStorage('courseFavorites') || [];
+    let favorites = getFromStorage('courseFavorites') || [];
+    let legacyFavorites = [];
+    try {
+        legacyFavorites = JSON.parse(localStorage.getItem('cm_course_favorites') || '[]');
+    } catch (error) {
+        legacyFavorites = [];
+    }
+    if (legacyFavorites.length) {
+        favorites = Array.from(new Set(favorites.concat(legacyFavorites)));
+        saveToStorage('courseFavorites', favorites);
+        localStorage.removeItem('cm_course_favorites');
+    }
+    return favorites;
 }
 
 function saveCourseFavorites(favorites) {
@@ -1896,8 +1930,14 @@ function renderCourseDetail() {
     const title = $('#detailTitle');
     if (!title) return;
     const params = new URLSearchParams(window.location.search);
-    const course = courseCatalog[params.get('course')] || courseCatalog.basics;
     const detailId = params.get('course') || 'basics';
+    const course = courseCatalog[detailId] || courseCatalog.basics;
+    const user = getFromStorage('currentUser');
+    const completedLessons = user && user.courseLessons && user.courseLessons[detailId]
+        ? user.courseLessons[detailId]
+        : [];
+    const completedChapterCount = completedLessons.length;
+
     $('#detailBreadcrumb').textContent = course.title;
     title.textContent = course.title;
     $('#detailMeta').textContent = `${course.icon} ${course.level}课程 · ${course.chapters.length}章`;
@@ -1905,12 +1945,24 @@ function renderCourseDetail() {
     $('#detailDescription').textContent = course.description;
     $('#detailFavoriteBtn').dataset.courseId = detailId;
     $('#chapterList').innerHTML = course.chapters.map(function (chapter, index) {
-        const unlocked = index < 2;
-        return `<div class="chapter-item ${unlocked ? 'completed' : ''}">
-            <div class="chapter-title">${unlocked ? '✅' : '🔒'} 第${index + 1}章：${chapter}
-                <span class="chapter-status ${unlocked ? 'completed' : 'locked'}">${unlocked ? '可学习' : '未解锁'}</span>
-            </div>
-        </div>`;
+        const isCompleted = completedLessons.indexOf(index) !== -1;
+        const unlocked = index === 0 || completedLessons.indexOf(index - 1) !== -1;
+        const statusText = isCompleted ? '已学习' : (unlocked ? '可学习' : '未解锁');
+        const statusIcon = isCompleted ? '✅' : (unlocked ? '▶' : '🔒');
+        const chapterHref = unlocked ? `course/1.1.html?course=${detailId}&chapter=${index + 1}` : null;
+        const tagName = unlocked ? 'a' : 'div';
+
+        return `
+            <${tagName}
+                class="chapter-item ${isCompleted ? 'completed' : ''} ${unlocked ? '' : 'locked'}"
+                ${unlocked ? `href="${chapterHref}"` : ''}
+                ${unlocked ? 'title="点击进入章节学习"' : 'title="请先完成前一章"'}
+            >
+                <div class="chapter-title">${statusIcon} 第${index + 1}章：${chapter}
+                    <span class="chapter-status ${unlocked ? 'completed' : 'locked'}">${statusText}</span>
+                </div>
+            </${tagName}>
+        `;
     }).join('');
     $('#learningGoals').innerHTML = course.learn.map(function (item) {
         return `<li>✓ ${item}</li>`;
@@ -1939,6 +1991,73 @@ function renderProfileFavorites() {
         : '<div class="favorites-empty-icon">☆</div><p>暂时还没有收藏课程</p>';
 }
 
+function renderWrongBook() {
+    const list = $('#wrongBookList');
+    if (!list) return;
+
+    const count = $('#wrongBookCount');
+    const topicNames = [
+        'C语言基础编程', '循环与分支结构', '函数与模块化', '指针与内存管理',
+        '数组与字符串', '结构体与共同体', '数据结构与算法', '文件操作与IO'
+    ];
+    const difficultyNames = ['简单', '中等', '困难'];
+    let wrongBook = [];
+    try {
+        wrongBook = JSON.parse(localStorage.getItem('quizWrongBook') || '[]');
+    } catch (error) {
+        wrongBook = [];
+    }
+
+    if (count) count.textContent = `${wrongBook.length} 题`;
+    if (!wrongBook.length) {
+        list.innerHTML = '<div class="favorites-empty"><div class="favorites-empty-icon">✓</div><p>暂时没有错题，继续保持！</p></div>';
+        return;
+    }
+
+    list.innerHTML = wrongBook.map(function (item) {
+        const topicIndex = Number(item.topic);
+        const difficultyIndex = Number(item.difficulty);
+        return `<article class="wrong-book-item">
+            <div class="wrong-book-meta">
+                <span>${topicNames[topicIndex] || 'C语言专题'}</span>
+                <span>${difficultyNames[difficultyIndex] || '练习'}题</span>
+            </div>
+            <p class="wrong-book-question">${item.question || '题目内容不可用'}</p>
+            <div class="wrong-book-answer">
+                <span>你的答案：${item.userAnswer || '未记录'}</span>
+                <span>正确答案：<strong>${item.correctAnswer || '未记录'}</strong></span>
+            </div>
+            <div class="wrong-book-actions"><button type="button" data-wrong-id="${item.id}">我已掌握</button></div>
+        </article>`;
+    }).join('');
+
+    list.onclick = function (event) {
+        const button = event.target.closest('button[data-wrong-id]');
+        if (!button) return;
+        removeWrongBookItem(button.getAttribute('data-wrong-id'));
+    };
+}
+
+function removeWrongBookItem(id) {
+    let wrongBook = [];
+    try {
+        wrongBook = JSON.parse(localStorage.getItem('quizWrongBook') || '[]');
+    } catch (error) {
+        wrongBook = [];
+    }
+    localStorage.setItem('quizWrongBook', JSON.stringify(wrongBook.filter(function (item) {
+        return item.id !== id;
+    })));
+    renderWrongBook();
+    showToast('已从错题本移除', 'success');
+}
+
+function clearWrongBook() {
+    localStorage.removeItem('quizWrongBook');
+    renderWrongBook();
+    showToast('错题本已清空', 'info');
+}
+
 function initCourseFeatures() {
     $$('.course-favorite').forEach(function (button) {
         button.addEventListener('click', function () {
@@ -1956,6 +2075,7 @@ function initCourseFeatures() {
     renderHomeCourseProgress();
     updateDetailFavoriteButton();
     renderProfileFavorites();
+    renderWrongBook();
 }
 
 function renderHomeCourseProgress() {

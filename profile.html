@@ -7,36 +7,6 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* ================= 页面背景 ================= */
-        body.profile-page-bg {
-            background:
-                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.08), transparent 30%),
-                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.08), transparent 35%),
-                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.05), transparent 40%),
-                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* 星空粒子 */
-        #starField {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        #starField span {
-            position: absolute;
-            border-radius: 50%;
-            background: #64d2ff;
-            box-shadow: 0 0 6px #64d2ff;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%,100% { opacity: 0.15; transform: scale(0.8); }
-            50% { opacity: 0.9; transform: scale(1.2); }
-        }
-
         /* 入场动画 */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(28px); }
@@ -680,6 +650,76 @@
             font-size: 20px;
         }
 
+        /* 错题本 */
+        .wrong-book-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .wrong-book-header h3 { margin-bottom: 6px; }
+        .wrong-book-description { color: #718096; font-size: 13px; }
+        .wrong-book-count {
+            padding: 5px 12px;
+            border: 1px solid rgba(229,57,53,0.35);
+            border-radius: 14px;
+            color: #ff8b8b;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .wrong-book-list { display: grid; gap: 12px; }
+        .wrong-book-item {
+            padding: 16px;
+            border: 1px solid #2a3447;
+            border-left: 3px solid #e53935;
+            border-radius: 12px;
+            background: rgba(10,14,26,0.6);
+        }
+        .wrong-book-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-bottom: 8px;
+            color: #ff9a9a;
+            font-size: 12px;
+        }
+        .wrong-book-question {
+            color: #fff;
+            font-size: 14px;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+        .wrong-book-answer {
+            display: grid;
+            gap: 5px;
+            color: #a0aec0;
+            font-size: 13px;
+        }
+        .wrong-book-answer strong { color: #69ff9a; }
+        .wrong-book-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+        .wrong-book-actions a,
+        .wrong-book-actions button,
+        .wrong-book-clear {
+            padding: 6px 12px;
+            border: 1px solid rgba(0,212,255,0.35);
+            border-radius: 8px;
+            background: transparent;
+            color: #64d2ff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .wrong-book-actions a:hover,
+        .wrong-book-actions button:hover,
+        .wrong-book-clear:hover {
+            background: rgba(0,212,255,0.1);
+            border-color: #00d4ff;
+        }
+
         /* ================= 昵称编辑弹窗 ================= */
         .nickname-modal {
             position: fixed;
@@ -802,6 +842,7 @@
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="oj.html">OJ 练习场</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html" class="active">个人中心</a></li>
                 <li><a href="team.html">制作团队</a></li>
@@ -962,6 +1003,25 @@
                     <div class="favorites-empty" id="favoritesList">
                         <div class="favorites-empty-icon">☆</div>
                         <p>暂时还没有收藏内容</p>
+                    </div>
+                </section>
+
+                <section class="profile-section wrong-book-section" aria-labelledby="wrongBookTitle">
+                    <div class="wrong-book-header">
+                        <div>
+                            <h3 id="wrongBookTitle">📕 我的错题本</h3>
+                            <p class="wrong-book-description">答错的题目会自动收录，重新作答正确后自动移除</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="wrong-book-count" id="wrongBookCount">0 题</span>
+                            <button class="wrong-book-clear" type="button" onclick="clearWrongBook()">清空</button>
+                        </div>
+                    </div>
+                    <div class="wrong-book-list" id="wrongBookList">
+                        <div class="favorites-empty">
+                            <div class="favorites-empty-icon">✓</div>
+                            <p>暂时没有错题，继续保持！</p>
+                        </div>
                     </div>
                 </section>
             </div>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>专题6 - 中等试卷</title>
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/quiz.css">
+</head>
+<body class="home-page-bg">
+    <div id="scrollProgress"></div>
+    <div id="starField"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="../list.html">课程中心</a></li>
+                <li><a href="../quiz.html" class="active">在线小测</a></li>
+                <li><a href="../oj.html">OJ 练习场</a></li>
+                <li><a href="../game.html">编程游戏</a></li>
+                <li><a href="../profile.html">个人中心</a></li>
+                <li><a href="../team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar" onclick="location.href='../profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+<!-- 答题页面 -->
+<div id="quiz-page">
+    <div class="quiz-header">
+        <div class="quiz-title" id="quiz-title">专题6 - 中等试卷</div>
+        <div id="readonlyTip" class="tip-readonly" style="display:none;">本试卷已有成绩，点击“重新答题”可以再次作答</div>
+        <div id="q-index">第1题 / 共5题</div>
+        <div class="progress-wrap" style="margin-top:10px;">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+    </div>
+    <div class="question-block">
+        <div class="question-text" id="q-text"></div>
+        <div id="option-container"></div>
+    </div>
+    <div class="btn-group">
+        <button id="prev-btn">上一题</button>
+        <button id="next-btn">下一题</button>
+        <button id="submit-btn">提交试卷</button>
+        <button id="showResultBtn" style="display:none;">查看成绩</button>
+        <button id="resetQuizBtn" style="display:none;">重新答题</button>
+        <button id="back-home">返回专题</button>
+    </div>
+</div>
+</section>
+
+<!-- 成绩弹窗 -->
+<div class="result-modal" id="resultModal">
+    <div class="result-content">
+        <h2>测试结果</h2>
+        <p id="score-text"></p>
+        <div id="result-detail"></div>
+        <button onclick="closeModal()" style="margin-top:15px;">关闭</button>
+    </div>
+</div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">Cm</div>
+                        <span>CodeMaster</span>
+                    </div>
+                    <p>专注于C语言编程教育，致力于打造最优质的在线学习体验。让每一位学员都能享受编程的乐趣。</p>
+                </div>
+                <div class="footer-col">
+                    <h4>课程学习</h4>
+                    <ul>
+                        <li><a href="../list.html">全部课程</a></li>
+                        <li><a href="../list.html">基础入门</a></li>
+                        <li><a href="../list.html">进阶提升</a></li>
+                        <li><a href="../list.html">实战项目</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>互动学习</h4>
+                    <ul>
+                        <li><a href="../quiz.html">在线小测</a></li>
+                        <li><a href="../game.html">编程游戏</a></li>
+                        <li><a href="../quiz.html">代码挑战</a></li>
+                        <li><a href="../team.html">学习社区</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="../team.html">制作团队</a></li>
+                        <li><a href="../index.html">关于平台</a></li>
+                        <li><a href="../team.html">联系方式</a></li>
+                        <li><a href="../team.html">帮助中心</a></li>
+                        <li><a href="../team.html">意见反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>©2026 CodeMaster 北京理工大学</p>
+            </div>
+        </div>
+    </footer>
+
+<script src="../assets/js/quiz.js"></script>
+<script>
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 80; i++) {
+            const s = document.createElement('span');
+            const size = Math.random() * 2 + 1;
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.animationDuration = (2 + Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            field.appendChild(s);
+        }
+    })();
+
+    const bar = document.getElementById('scrollProgress');
+    if (bar) {
+        let ticking = false;
+        function updateScrollProgress() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            bar.style.width = pct + '%';
+            ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScrollProgress);
+                ticking = true;
+            }
+        }, { passive: true });
+        updateScrollProgress();
+    }
+
+// 题目数据【结构体与共同体·中等】
+const questions = [
+    {q:"struct Point p = {2, 3}; 中，p.x 和 p.y 的值分别是多少？",opts:["2和3","3和2","都是2","都是3"],ans:0},
+    {q:"若 struct Student *p 指向结构体，访问其 age 成员应使用？",opts:["p.age","p->age","*p.age","p::age"],ans:1},
+    {q:"结构体数组 struct Student list[10] 可以表示什么？",opts:["10个 Student 结构体对象","一个长度为10的整数","10个函数","一个字符数组"],ans:0},
+    {q:"typedef struct { int x; int y; } Point; 的作用是什么？",opts:["为匿名结构体定义类型别名 Point","创建一个函数","释放结构体内存","定义枚举"],ans:0},
+    {q:"union 中的多个成员通常有什么特点？",opts:["各自拥有独立空间","共享同一段存储空间","只能保存字符串","不能定义成员"],ans:1},
+];
+// 参数：initQuiz(专题编号,难度编号,题目数组)
+// 专题从0开始，难度0=简单,1=中等,2=困难
+initQuiz(5,1,questions);
+</script>
+</body>
+</html>

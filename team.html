@@ -7,36 +7,6 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        /* ================= 页面背景 ================= */
-        body.team-page-bg {
-            background:
-                radial-gradient(circle at 10% 10%, rgba(0,212,255,0.10), transparent 30%),
-                radial-gradient(circle at 90% 20%, rgba(123,44,191,0.10), transparent 35%),
-                radial-gradient(circle at 50% 90%, rgba(0,212,255,0.06), transparent 40%),
-                linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* 星空粒子 */
-        #starField {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        #starField span {
-            position: absolute;
-            border-radius: 50%;
-            background: #64d2ff;
-            box-shadow: 0 0 6px #64d2ff;
-            animation: twinkle 3s infinite ease-in-out;
-        }
-        @keyframes twinkle {
-            0%,100% { opacity: 0.15; transform: scale(0.8); }
-            50% { opacity: 0.9; transform: scale(1.2); }
-        }
-
         /* 入场动画 */
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(28px); }
@@ -730,6 +700,7 @@
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="oj.html">OJ 练习场</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
                 <li><a href="team.html" class="active">制作团队</a></li>
