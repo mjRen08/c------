@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OJ 练习场 - CodeMaster</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/oj.css">
+</head>
+<body class="oj-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo"><div class="logo-icon">Cm</div><span>CodeMaster</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="oj.html" class="active">OJ 练习场</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions"><button class="btn btn-ghost" id="logoutBtn">退出登录</button><div class="user-avatar" id="userAvatar" onclick="location.href='profile.html'">U</div></div>
+        </div>
+    </nav>
+
+    <main class="oj-shell">
+        <header class="oj-heading">
+            <div><span class="oj-kicker">CODEMASTER / ONLINE JUDGE</span><h1>C 语言 OJ 练习场</h1><p>从格式化输出到算法思维，写下代码，立即得到结果。</p></div>
+            <div class="oj-live"><span></span> 浏览器判题器在线</div>
+        </header>
+
+        <section class="oj-toolbar" aria-label="题目筛选">
+            <div class="oj-progress-copy"><strong id="solvedCount">0</strong><span>/ 6 题已通过</span></div>
+            <div class="filter-tabs" role="tablist"><button class="filter-tab active" data-filter="all">全部</button><button class="filter-tab" data-filter="easy">入门</button><button class="filter-tab" data-filter="medium">进阶</button><button class="filter-tab" data-filter="hard">挑战</button></div>
+        </section>
+
+        <div class="oj-layout">
+            <aside class="problem-panel"><div class="panel-title"><span>题目列表</span><span class="panel-count">6 problems</span></div><div id="problemList"></div></aside>
+            <section class="workspace-panel">
+                <div class="problem-detail" id="problemDetail"></div>
+                <div class="editor-head"><span><i></i><i></i><i></i> main.c</span><span class="language-tag">C11</span></div>
+                <textarea id="codeEditor" class="code-editor" spellcheck="false" aria-label="C语言代码编辑器"></textarea>
+                <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn" id="submitCode">▶ 提交并运行</button></div>
+                <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，查看你的代码能否通过测试样例。</p></div></div></div>
+            </section>
+        </div>
+    </main>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/oj.js"></script>
+</body>
+</html>
