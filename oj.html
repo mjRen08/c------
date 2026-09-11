@@ -27,8 +27,8 @@
 
     <main class="oj-shell">
         <header class="oj-heading">
-            <div><span class="oj-kicker">CODEMASTER / ONLINE JUDGE</span><h1>C 语言 OJ 练习场</h1><p>从格式化输出到算法思维，写下代码，立即得到结果。</p></div>
-            <div class="oj-live"><span></span> 浏览器判题器在线</div>
+            <div><span class="oj-kicker">CODEMASTER / ONLINE JUDGE</span><h1>C 语言 OJ 练习场</h1><p>在浏览器内使用 Wasm 编译并运行 C11 代码，逐个挑战公开与隐藏测试点。</p></div>
+            <div class="oj-live"><span></span> Wasm 编译器待加载</div>
         </header>
 
         <section class="oj-toolbar" aria-label="题目筛选">
@@ -43,7 +43,7 @@
                 <div class="editor-head"><span><i></i><i></i><i></i> main.c</span><span class="language-tag">C11</span></div>
                 <textarea id="codeEditor" class="code-editor" spellcheck="false" aria-label="C语言代码编辑器"></textarea>
                 <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn" id="submitCode">▶ 提交并运行</button></div>
-                <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，查看你的代码能否通过测试样例。</p></div></div></div>
+                <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，浏览器会加载 Wasm 编译器并运行全部测试点。</p></div></div></div>
             </section>
         </div>
     </main>
