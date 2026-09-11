@@ -844,9 +844,9 @@ function renderTopicDetail(topicIndex){
 
     const record = getQuizRecord();
     const difficulties = [
-        { level: 's', label: '简单', title: '基础题', desc: '适合刚学完知识点', href: `${data.base}-s.html` },
-        { level: 'm', label: '中', title: '进阶题', desc: '综合应用能力', href: `${data.base}-m.html` },
-        { level: 'h', label: '难', title: '挑战题', desc: '深入原理细节', href: `${data.base}-h.html` }
+        { level: 's', label: '简单', title: '基础题', desc: '适合刚学完知识点', href: `test/${data.base}-s.html` },
+        { level: 'm', label: '中', title: '进阶题', desc: '综合应用能力', href: `test/${data.base}-m.html` },
+        { level: 'h', label: '难', title: '挑战题', desc: '深入原理细节', href: `test/${data.base}-h.html` }
     ];
 
     const diffHtml = difficulties.map(function(d, i){
@@ -894,8 +894,6 @@ function renderTopicDetail(topicIndex){
 }
 
 // ========== 胶囊悬停与点击联动 ==========
-let lockedTopic = 0;   // 用户点击锁定的专题
-let hoverTopic = null; // 当前鼠标悬停的专题
 
 function switchDetail(index){
     const panel = document.getElementById('topicDetail');
@@ -915,22 +913,12 @@ function applyActive(index){
 
 const capsuleItems = document.querySelectorAll('.item');
 capsuleItems.forEach(function(el, i){
-    el.addEventListener('mouseenter', function(){
-        hoverTopic = i;
+    function activateTopic(){
         applyActive(i);
         switchDetail(i);
-    });
-    el.addEventListener('mouseleave', function(){
-        hoverTopic = null;
-        // 恢复到已锁定（或默认第一个）的专题
-        applyActive(lockedTopic);
-        switchDetail(lockedTopic);
-    });
-    el.addEventListener('click', function(){
-        lockedTopic = i;
-        applyActive(i);
-        switchDetail(i);
-    });
+    }
+    el.addEventListener('mouseenter', activateTopic);
+    el.addEventListener('click', activateTopic);
 });
 
 // 初始渲染第一个专题

@@ -573,7 +573,7 @@
         { id: 'basics', title: 'C语言基础入门', icon: '📘', level: '入门', size: 'lg',
           accent: '#00d4ff',
           desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块地基。',
-          chapters: 12, hours: 3, rating: 4.9 },
+          chapters: 5, hours: 3, rating: 4.9 },
         { id: 'control-flow', title: '循环与分支结构', icon: '🔄', level: '入门', size: 'sm',
           accent: '#ff8a00',
           desc: 'if-else、switch、for、while，掌握程序逻辑控制。',
@@ -718,6 +718,9 @@
 
     // ================= 收藏 =================
     function getFavs() {
+        if (typeof getCourseFavorites === 'function') {
+            return getCourseFavorites();
+        }
         try {
             return JSON.parse(localStorage.getItem('cm_course_favorites') || '[]');
         } catch (e) { return []; }
@@ -743,7 +746,11 @@
             btn.classList.add('active');
             if (typeof showToast === 'function') showToast('已加入收藏', 'success');
         }
-        localStorage.setItem('cm_course_favorites', JSON.stringify(favs));
+        if (typeof saveCourseFavorites === 'function') {
+            saveCourseFavorites(favs);
+        } else {
+            localStorage.setItem('cm_course_favorites', JSON.stringify(favs));
+        }
     };
 
     // ================= 筛选与搜索 =================

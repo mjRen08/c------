@@ -8,6 +8,40 @@ function saveRecord(obj){
     localStorage.setItem("quizRecord", JSON.stringify(obj));
 }
 
+function getWrongBook(){
+    try {
+        return JSON.parse(localStorage.getItem("quizWrongBook") || "[]");
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveWrongBook(items){
+    localStorage.setItem("quizWrongBook", JSON.stringify(items));
+}
+
+function updateWrongBook(key, wrongIndexes){
+    const wrongBook = getWrongBook().filter(function(item){
+        return item.quizKey !== key;
+    });
+
+    wrongIndexes.forEach(function(index){
+        const question = quizList[index];
+        if (!question) return;
+        wrongBook.push({
+            id: `${key}-${index}`,
+            quizKey: key,
+            topic: currentTopic,
+            difficulty: currentDiff,
+            question: question.q,
+            userAnswer: question.opts[userSelect[index]],
+            correctAnswer: question.opts[question.ans],
+            updatedAt: new Date().toLocaleString()
+        });
+    });
+    saveWrongBook(wrongBook);
+}
+
 // 全局答题变量
 let currentTopic;
 let currentDiff;
@@ -124,6 +158,27 @@ function showResultPopup(){
 // 查看成绩按钮点击事件
 document.getElementById("showResultBtn").onclick = showResultPopup;
 
+// 清除当前试卷记录，恢复可编辑状态
+function resetQuiz(){
+    const record = getRecord();
+    const key = `${currentTopic}-${currentDiff}`;
+    delete record[key];
+    saveRecord(record);
+    refreshHomeMark();
+
+    currentQ = 0;
+    userSelect = Array(quizList.length).fill(null);
+    isReadOnly = false;
+    document.getElementById("readonlyTip").style.display = "none";
+    document.getElementById("submit-btn").style.display = "block";
+    document.getElementById("showResultBtn").style.display = "none";
+    document.getElementById("resetQuizBtn").style.display = "none";
+    closeModal();
+    renderQuestion();
+}
+
+document.getElementById("resetQuizBtn").onclick = resetQuiz;
+
 //提交试卷：保存本次答题记录
 document.getElementById("submit-btn").onclick = function(){
     //检查有没有漏答
@@ -160,16 +215,18 @@ document.getElementById("submit-btn").onclick = function(){
         finishTime: new Date().toLocaleString()
     };
     saveRecord(record);
+    updateWrongBook(key, wrongList);
     refreshHomeMark();
 
     document.getElementById("score-text").innerText = `总分：${score}/100`
     document.getElementById("result-detail").innerHTML = html;
     document.getElementById("resultModal").style.display = "flex";
-    //提交完成后切换只读模式，隐藏提交按钮，显示查看成绩按钮
+    //提交完成后保留成绩，同时提供重新答题入口
     isReadOnly = true;
     document.getElementById("readonlyTip").style.display = "block";
     document.getElementById("submit-btn").style.display = "none";
     document.getElementById("showResultBtn").style.display = "inline-block";
+    document.getElementById("resetQuizBtn").style.display = "inline-block";
 }
 
 //关闭弹窗
@@ -178,9 +235,9 @@ function closeModal(){
     document.body.style.overflow = '';
 }
 
-//返回专题首页
+//返回在线小测专题页
 document.getElementById("back-home").onclick = function(){
-    window.location.href = "index.html";
+    window.location.href = window.location.pathname.includes('/test/') ? "../quiz.html" : "quiz.html";
 }
 
 // 更新首页：已经做完的试卷小圆标绿色（首页调用）
@@ -206,15 +263,14 @@ function initQuiz(topicId,diffId,questionData){
     const key = `${topicId}-${diffId}`;
 
     if(record[key]){
-        // 已有作答记录：只读查看模式
+        // 已有作答记录：展示成绩，并提供重新答题入口
         userSelect = [...record[key].answers];
         isReadOnly = true;
         document.getElementById("readonlyTip").style.display = "block";
         document.getElementById("submit-btn").style.display = "none";
         document.getElementById("showResultBtn").style.display = "inline-block";
+        document.getElementById("resetQuizBtn").style.display = "inline-block";
         renderQuestion();
-        // 打开已完成试卷，自动弹出成绩弹窗
-        showResultPopup();
     }else{
         //无记录：正常答题模式
         userSelect = Array(quizList.length).fill(null);

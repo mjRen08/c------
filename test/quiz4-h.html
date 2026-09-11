@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>专题4 - 困难试卷</title>
+<link rel="stylesheet" href="../assets/css/reset.css">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/quiz.css">
+</head>
+<body class="home-page-bg">
+    <div id="scrollProgress"></div>
+    <div id="starField"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="../list.html">课程中心</a></li>
+                <li><a href="../quiz.html" class="active">在线小测</a></li>
+                <li><a href="../oj.html">OJ 练习场</a></li>
+                <li><a href="../game.html">编程游戏</a></li>
+                <li><a href="../profile.html">个人中心</a></li>
+                <li><a href="../team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar" onclick="location.href='../profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+<!-- 答题页面 -->
+<div id="quiz-page">
+    <div class="quiz-header">
+        <div class="quiz-title" id="quiz-title">专题4 - 困难试卷</div>
+        <div id="readonlyTip" class="tip-readonly" style="display:none;">本试卷已有成绩，点击“重新答题”可以再次作答</div>
+        <div id="q-index">第1题 / 共5题</div>
+        <div class="progress-wrap" style="margin-top:10px;">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+    </div>
+    <div class="question-block">
+        <div class="question-text" id="q-text"></div>
+        <div id="option-container"></div>
+    </div>
+    <div class="btn-group">
+        <button id="prev-btn">上一题</button>
+        <button id="next-btn">下一题</button>
+        <button id="submit-btn">提交试卷</button>
+        <button id="showResultBtn" style="display:none;">查看成绩</button>
+        <button id="resetQuizBtn" style="display:none;">重新答题</button>
+        <button id="back-home">返回专题</button>
+    </div>
+</div>
+</section>
+
+<!-- 成绩弹窗 -->
+<div class="result-modal" id="resultModal">
+    <div class="result-content">
+        <h2>测试结果</h2>
+        <p id="score-text"></p>
+        <div id="result-detail"></div>
+        <button onclick="closeModal()" style="margin-top:15px;">关闭</button>
+    </div>
+</div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-icon">Cm</div>
+                        <span>CodeMaster</span>
+                    </div>
+                    <p>专注于C语言编程教育，致力于打造最优质的在线学习体验。让每一位学员都能享受编程的乐趣。</p>
+                </div>
+                <div class="footer-col">
+                    <h4>课程学习</h4>
+                    <ul>
+                        <li><a href="../list.html">全部课程</a></li>
+                        <li><a href="../list.html">基础入门</a></li>
+                        <li><a href="../list.html">进阶提升</a></li>
+                        <li><a href="../list.html">实战项目</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>互动学习</h4>
+                    <ul>
+                        <li><a href="../quiz.html">在线小测</a></li>
+                        <li><a href="../game.html">编程游戏</a></li>
+                        <li><a href="../quiz.html">代码挑战</a></li>
+                        <li><a href="../team.html">学习社区</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>关于我们</h4>
+                    <ul>
+                        <li><a href="../team.html">制作团队</a></li>
+                        <li><a href="../index.html">关于平台</a></li>
+                        <li><a href="../team.html">联系方式</a></li>
+                        <li><a href="../team.html">帮助中心</a></li>
+                        <li><a href="../team.html">意见反馈</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>©2026 CodeMaster 北京理工大学</p>
+            </div>
+        </div>
+    </footer>
+
+<script src="../assets/js/quiz.js"></script>
+<script>
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 80; i++) {
+            const s = document.createElement('span');
+            const size = Math.random() * 2 + 1;
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.animationDuration = (2 + Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            field.appendChild(s);
+        }
+    })();
+
+    const bar = document.getElementById('scrollProgress');
+    if (bar) {
+        let ticking = false;
+        function updateScrollProgress() {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+            bar.style.width = pct + '%';
+            ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) {
+                window.requestAnimationFrame(updateScrollProgress);
+                ticking = true;
+            }
+        }, { passive: true });
+        updateScrollProgress();
+    }
+
+// 题目数据【指针与内存管理·困难】
+const questions = [
+    {q:"执行 int a[] = {1,2,3}; int *p = a; ++p; printf(\"%d\", *p); 输出什么？",opts:["1","2","3","地址"],ans:1},
+    {q:"若 int **pp;，表达式 **pp 表示什么？",opts:["指针 pp 的地址","经过两次解引用得到的 int 值","pp 指向的指针地址","数组长度"],ans:1},
+    {q:"函数返回局部数组首元素地址后，调用者继续使用该地址的主要风险是什么？",opts:["数组自动变大","局部数组生命周期已结束，指针可能失效","返回值自动变成常量","编译器会补充分配"],ans:1},
+    {q:"对同一块动态内存执行两次 free，可能导致什么问题？",opts:["内存翻倍","未定义行为或运行时错误","自动恢复内存","程序一定正常结束"],ans:1},
+    {q:"若 realloc 失败直接把返回值赋给原指针，可能造成什么后果？",opts:["原指针丢失导致内存泄漏","数组自动复制成功","指针变成常量","程序只少一个字节"],ans:0},
+];
+// 参数：initQuiz(专题编号,难度编号,题目数组)
+// 专题从0开始，难度0=简单,1=中等,2=困难
+initQuiz(3,2,questions);
+</script>
+</body>
+</html>

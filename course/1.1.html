@@ -98,6 +98,11 @@
             font-size: 12px;
             font-weight: 600;
         }
+        .lesson-badge.completed {
+            border-color: rgba(0, 255, 136, 0.35);
+            background: rgba(0, 255, 136, 0.08);
+            color: var(--success);
+        }
 
         .meta-row {
             display: flex;
@@ -534,6 +539,7 @@ int main() {
 
     <div id="termNote" class="term-note" aria-live="polite"></div>
 
+    <script src="../assets/js/main.js"></script>
     <script>
         (function () {
             const field = document.getElementById('starField');
@@ -609,6 +615,24 @@ int main() {
         document.getElementById('chapterName').textContent = `第${chapter}章 · ${title}`;
         document.getElementById('lessonTitle').textContent = `第${chapter}章 · ${title}`;
         document.getElementById('lessonTitle').setAttribute('data-course', course);
+
+        const lessonBadge = document.querySelector('.lesson-badge');
+        let progressRecorded = false;
+        function recordLessonWhenAtBottom() {
+            if (progressRecorded) return;
+            const reachedBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 24;
+            if (!reachedBottom) return;
+
+            progressRecorded = true;
+            if (typeof completeCourseChapter === 'function' && completeCourseChapter(course, chapter)) {
+                lessonBadge.textContent = '已学习';
+                lessonBadge.classList.add('completed');
+            }
+        }
+
+        window.addEventListener('scroll', recordLessonWhenAtBottom, { passive: true });
+        window.addEventListener('resize', recordLessonWhenAtBottom);
+        recordLessonWhenAtBottom();
     </script>
 </body>
 </html>
