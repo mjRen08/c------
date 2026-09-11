@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第3章 · 运算符与表达式 - CodeMaster</title>
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/course.css">
+</head>
+<body>
+    <div id="starField"></div>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="logo"><div class="logo-icon">Cm</div><span>CodeMaster</span></a>
+            <ul class="nav-links">
+                <li><a href="../index.html">首页</a></li><li><a href="../list.html" class="active">课程中心</a></li>
+                <li><a href="../quiz.html">在线小测</a></li><li><a href="../oj.html">OJ 练习场</a></li>
+                <li><a href="../game.html">编程游戏</a></li><li><a href="../profile.html">个人中心</a></li><li><a href="../team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions"><button class="btn btn-ghost" id="logoutBtn">退出登录</button><div class="user-avatar" id="userAvatar" onclick="location.href='../profile.html'">U</div></div>
+        </div>
+    </nav>
+    <main class="page-shell"><div class="lesson-card">
+        <div class="breadcrumb"><a href="../list.html">课程中心</a><span>/</span><a href="../detail.html?course=basics">C语言基础入门</a><span>/</span><span>第3章 · 运算符与表达式</span></div>
+        <div class="lesson-header"><h1>第3章 · 运算符与表达式</h1><div class="lesson-badge">可学习</div></div>
+        <div class="meta-row"><span>📘 课程：C语言基础入门</span><span>⏱ 预计 20 分钟</span><span>🎯 难度：入门</span></div>
+        <div class="lesson-layout single-column">
+            <aside class="panel learning-goals"><h3>学习目标</h3><ul class="checklist"><li>掌握算术、关系和逻辑运算符</li><li>理解表达式的值与运算顺序</li><li>学会使用自增、自减和复合赋值</li><li>能够写出简单的计算表达式</li></ul></aside>
+            <section class="panel lesson-panel-full"><h3>课程内容</h3><div class="lesson-text">
+                <div class="story-card"><h4>先来一个小场景</h4><p>程序保存了商品单价和数量，但只有把它们进行运算，才能得到总价。运算符就是连接数据的符号，表达式则是由数据和运算符组成的计算过程。</p></div>
+                <div class="focus-box"><h4>为什么要学这个</h4><p>变量只是保存信息，<span class="term" data-term="表达式">表达式</span>让信息产生结果。掌握运算符之后，程序才能完成计算、比较和条件判断。</p></div>
+                <p>C 语言中的运算符可以对一个或多个数据进行操作。最常见的是算术运算符：<code>+</code>、<code>-</code>、<code>*</code>、<code>/</code> 和 <code>%</code>。其中 <code>%</code> 表示取余，常用于判断一个整数是否能被另一个整数整除。</p>
+                <div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>arithmetic.c</span></div><pre><code>int total = 17;
+int groups = 5;
+
+printf("商：%d\\n", total / groups);
+printf("余数：%d\\n", total % groups);</code></pre></div>
+                <div class="tip-box">提示：整数相除时结果仍是整数，17 / 5 的结果是 3，小数部分不会自动保留。</div>
+                <p><span class="term" data-term="关系运算符">关系运算符</span>用于比较两个值，例如 <code>==</code>、<code>!=</code>、<code>&gt;</code>、<code>&lt;</code>、<code>&gt;=</code> 和 <code>&lt;=</code>。比较结果只有真或假，在 C 语言中通常用 1 表示真，用 0 表示假。</p>
+                <p>不要把 <code>=</code> 和 <code>==</code> 混淆。<code>=</code> 是赋值，把右边的值放入左边的变量；<code>==</code> 是相等比较，用来判断两边是否相等。</p>
+                <div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>compare.c</span></div><pre><code>int score = 86;
+int passed = score &gt;= 60;
+
+printf("是否及格：%d\\n", passed);</code></pre></div>
+                <p>逻辑运算符可以把多个判断组合起来：<code>&amp;&amp;</code> 表示并且，<code>||</code> 表示或者，<code>!</code> 表示取反。例如，只有年龄大于等于 18 且拥有有效证件时，两个条件同时成立，结果才为真。</p>
+                <p>表达式的计算顺序由<span class="term" data-term="优先级">优先级</span>决定。乘除通常先于加减，括号可以明确改变顺序。面对较复杂的表达式，主动加括号比依赖记忆优先级更清楚，也更不容易出错。</p>
+                <div class="code-box"><div class="code-top"><div class="code-dots"><span></span><span></span><span></span></div><span>order.c</span></div><pre><code>int result = 2 + 3 * 4;
+int clearResult = (2 + 3) * 4;
+
+printf("%d %d\\n", result, clearResult);</code></pre></div>
+                <p>自增运算符 <code>++</code> 会让变量增加 1，自减运算符 <code>--</code> 会让变量减少 1。它们可以写在变量前面或后面，但在复杂表达式中容易造成阅读困难，初学时建议单独成句。</p>
+                <p>复合赋值运算符把运算和赋值合在一起，例如 <code>score += 5</code> 等价于 <code>score = score + 5</code>，<code>count *= 2</code> 等价于 <code>count = count * 2</code>。它们能让更新变量的代码更简洁。</p>
+                <div class="mini-quiz"><h4>小挑战</h4><ul><li>为什么 <code>17 / 5</code> 和 <code>17.0 / 5</code> 的结果不同？</li><li><code>=</code> 与 <code>==</code> 分别表示什么？</li><li>如何判断一个整数是偶数？可以使用哪个运算符？</li><li>表达式 <code>2 + 3 * 4</code> 和 <code>(2 + 3) * 4</code> 为什么结果不同？</li></ul></div>
+                <p>写表达式时，可以先把每个数据的含义说清楚，再选择对应运算符。算术运算负责计算，关系运算负责比较，逻辑运算负责组合条件，三类运算共同构成了程序处理问题的基础。</p>
+                <div class="summary-box"><h4>一句话总结</h4><p>运算符规定如何处理数据，表达式把数据和运算规则组合起来并产生结果。</p></div>
+                <p>下一章将把变量、类型和表达式连接到用户输入与程序输出，让程序不再只处理写死在代码里的数据。</p>
+            </div></section>
+        </div>
+        <div class="chapter-actions"><button class="btn btn-ghost" onclick="location.href='../detail.html?course=basics'">返回课程专题</button><button class="btn btn-primary" onclick="location.href='1.4.html?course=basics&chapter=4'">学习下一章</button></div>
+    </div></main>
+    <footer class="footer"><div class="container"><div class="footer-bottom"><p>©2026 CodeMaster 北京理工大学</p></div></div></footer>
+    <div id="termNote" class="term-note" aria-live="polite"></div>
+    <script src="../assets/js/main.js"></script><script>
+        (function(){const field=document.getElementById('starField');if(!field)return;for(let i=0;i<60;i++){const s=document.createElement('span');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=Math.random()*3+'s';s.style.opacity=Math.random()*0.5+0.1;const size=Math.random()*2+1;s.style.width=size+'px';s.style.height=size+'px';field.appendChild(s);}})();
+        const termNote=document.getElementById('termNote');const termMap={'表达式':'由数据、变量和运算符组成的计算式。','关系运算符':'用于比较两个值大小或是否相等的运算符。','优先级':'多个运算符同时出现时决定计算先后的规则。'};
+        document.querySelectorAll('.term').forEach(term=>term.addEventListener('click',event=>{const name=term.dataset.term;termNote.innerHTML=`<strong>${name}</strong><span>${termMap[name]}</span>`;termNote.classList.add('visible');const rect=term.getBoundingClientRect();termNote.style.left=`${Math.min(window.innerWidth-276,Math.max(16,rect.left+rect.width/2-130))}px`;termNote.style.top=`${Math.max(16,rect.top-10)}px`;event.stopPropagation();}));
+        document.addEventListener('click',event=>{if(!event.target.closest('.term'))termNote.classList.remove('visible');});
+        const params=new URLSearchParams(location.search);const course=params.get('course')||'basics';const chapter=Number(params.get('chapter')||3);const lessonBadge=document.querySelector('.lesson-badge');let progressRecorded=false;
+        function updateLessonBadge(){const user=typeof getFromStorage==='function'?getFromStorage('currentUser'):null;const lessons=user&&user.courseLessons&&user.courseLessons[course]||[];if(lessons.indexOf(chapter-1)===-1)return;lessonBadge.textContent='已学习';lessonBadge.classList.add('completed');progressRecorded=true;}
+        function recordLesson(){if(progressRecorded||window.scrollY+window.innerHeight<document.documentElement.scrollHeight-24)return;progressRecorded=true;if(typeof completeCourseChapter==='function'){completeCourseChapter(course,chapter);updateLessonBadge();}}
+        window.addEventListener('scroll',recordLesson,{passive:true});window.addEventListener('resize',recordLesson);updateLessonBadge();recordLesson();
+    </script>
+</body>
+</html>

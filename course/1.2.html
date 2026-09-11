@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>第2章 · 变量、常量与数据类型 - CodeMaster</title>
+    <link rel="stylesheet" href="../assets/css/reset.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/course.css">
+</head>
+<body>
+    <div id="starField"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="../index.html">首页</a></li>
+                <li><a href="../list.html" class="active">课程中心</a></li>
+                <li><a href="../quiz.html">在线小测</a></li>
+                <li><a href="../oj.html">OJ 练习场</a></li>
+                <li><a href="../game.html">编程游戏</a></li>
+                <li><a href="../profile.html">个人中心</a></li>
+                <li><a href="../team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar" onclick="location.href='../profile.html'">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="page-shell">
+        <div class="lesson-card">
+            <div class="breadcrumb">
+                <a href="../list.html">课程中心</a>
+                <span>/</span>
+                <a href="../detail.html?course=basics">C语言基础入门</a>
+                <span>/</span>
+                <span id="chapterName">第2章 · 变量、常量与数据类型</span>
+            </div>
+
+            <div class="lesson-header">
+                <h1 id="lessonTitle">第2章 · 变量、常量与数据类型</h1>
+                <div class="lesson-badge">可学习</div>
+            </div>
+
+            <div class="meta-row">
+                <span>📘 课程：C语言基础入门</span>
+                <span>⏱ 预计 20 分钟</span>
+                <span>🎯 难度：入门</span>
+            </div>
+
+            <div class="lesson-layout single-column">
+                <aside class="panel learning-goals">
+                    <h3>学习目标</h3>
+                    <ul class="checklist">
+                        <li>理解变量、常量和数据类型的区别</li>
+                        <li>掌握 int、float、double 与 char 的基本用法</li>
+                        <li>学会声明、初始化和修改变量</li>
+                        <li>能够根据数据特点选择合适的类型</li>
+                    </ul>
+                </aside>
+
+                <section class="panel lesson-panel-full">
+                    <h3>课程内容</h3>
+                    <div class="lesson-text">
+                        <div class="story-card">
+                            <h4>先来一个小场景</h4>
+                            <p>想象你在制作一个成绩记录程序：学生姓名不会随时改变，但分数可能更新，班级人数还需要参与计算。程序必须知道每份数据是什么、能不能修改，以及应该占用怎样的存储空间。</p>
+                        </div>
+
+                        <div class="focus-box">
+                            <h4>为什么要学这个</h4>
+                            <p>变量就像程序里的储物盒，<span class="term" data-term="数据类型">数据类型</span>决定盒子能放什么，<span class="term" data-term="常量">常量</span>则表示创建后不应随意改变的数据。把三者分清楚，才能让程序计算正确，也能避免不必要的内存浪费。</p>
+                        </div>
+
+                        <p>上一章我们认识了 C 程序的入口和基本结构，这一章开始学习程序要处理的“材料”：数字、字符以及由它们组成的数据。C 语言不会把所有数据都当成同一种东西，而是要求我们在声明变量时明确写出类型。</p>
+                        <p><span class="term" data-term="变量">变量</span>是一个有名字的存储空间，它的值在程序运行过程中可以改变。例如，游戏分数、商品数量和当前温度都适合使用变量保存。声明变量时通常要写出类型和名称，初始化则是在声明时给它一个起始值。</p>
+
+                        <p>一个记录商品信息的小程序可以这样写：</p>
+
+                        <div class="code-box">
+                            <div class="code-top">
+                                <div class="code-dots"><span></span><span></span><span></span></div>
+                                <span>data.c</span>
+                            </div>
+                            <pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int quantity = 3;
+    double price = 12.5;
+
+    printf("数量：%d\n", quantity);
+    printf("单价：%.2f\n", price);
+    return 0;
+}</code></pre>
+                        </div>
+
+                        <div class="tip-box">提示：先判断数据是什么，再选择类型。数量通常是整数，带小数的价格则更适合使用浮点类型。</div>
+
+                        <p>上面的 <code>quantity</code> 是 <code>int</code> 类型，适合保存没有小数部分的整数；<code>price</code> 是 <code>double</code> 类型，可以保存更精确的小数。变量名应当表达含义，像 <code>price</code> 比 <code>x</code> 更容易让别人读懂。</p>
+
+                        <p>C 语言常见的基本类型包括：<code>int</code> 表示整数，<code>float</code> 表示单精度浮点数，<code>double</code> 表示精度更高的浮点数，<code>char</code> 表示单个字符。类型不只是标签，它还会影响数据的表示范围、精度以及程序为它分配的存储空间。</p>
+
+                        <div class="code-box">
+                            <div class="code-top">
+                                <div class="code-dots"><span></span><span></span><span></span></div>
+                                <span>types.c</span>
+                            </div>
+                            <pre><code>int count = 20;
+float temperature = 36.5f;
+double distance = 128.75;
+char grade = 'A';</code></pre>
+                        </div>
+
+                        <p>字符要使用单引号，例如 <code>'A'</code>；字符串则是多个字符组成的文本，要使用双引号，例如 <code>"CodeMaster"</code>。字符和字符串看起来相似，但在 C 语言中不是同一种数据，写错引号可能导致编译错误或得到完全不同的结果。</p>
+
+                        <p>有些数据在程序运行期间不应该被修改，例如圆周率、月份数量或一年的天数。这时可以使用<span class="term" data-term="常量">常量</span>。使用 <code>const</code> 修饰变量后，程序会把它当作只读数据处理：</p>
+
+                        <div class="code-box">
+                            <div class="code-top">
+                                <div class="code-dots"><span></span><span></span><span></span></div>
+                                <span>constant.c</span>
+                            </div>
+                            <pre><code>const double PI = 3.1415926;
+const int DAYS_IN_WEEK = 7;
+
+double circleArea(double radius) {
+    return PI * radius * radius;
+}</code></pre>
+                        </div>
+
+                        <p>常量名通常使用大写字母和下划线，这是一种便于识别的命名习惯。把固定值集中定义为常量，可以避免在代码中重复写数字，也能让修改规则变得更简单。</p>
+
+                        <p>变量的值可以通过赋值语句改变，但赋值两边的类型要尽量匹配。例如，<code>count = count + 1;</code> 会让整数增加 1，而把小数直接放进整数变量时，小数部分可能被舍弃。编写程序时要留意这种<span class="term" data-term="类型转换">类型转换</span>，不要让数据在不知不觉中丢失精度。</p>
+
+                        <p>输出不同类型的数据时，也要选择对应的<span class="term" data-term="格式说明符">格式说明符</span>。<code>%d</code> 常用于整数，<code>%f</code> 用于浮点数，<code>%c</code> 用于字符，<code>%s</code> 用于字符串。例如，输出 <code>double</code> 时可以写成 <code>printf("%.2f", price);</code>，其中 <code>.2</code> 表示保留两位小数。</p>
+
+                        <p>选择类型时不必只看“能不能存下”，还要考虑数据的含义。年龄、人数和数组下标通常是整数；身高、价格和平均分通常需要小数；性别标记或等级字符可以用 <code>char</code>。类型选择越准确，代码表达的信息就越清楚。</p>
+
+                        <div class="mini-quiz">
+                            <h4>小挑战</h4>
+                            <ul>
+                                <li>如果要保存图书数量、图书价格和图书等级，分别适合选择哪些类型？为什么？</li>
+                                <li>变量和常量有什么区别？把 <code>const int MAX_SCORE = 100;</code> 再赋值为 120 会发生什么？</li>
+                                <li>为什么字符 <code>'A'</code> 和字符串 <code>"A"</code> 不能简单看成同一种数据？</li>
+                                <li>如果用 <code>int</code> 保存带小数的平均分，可能产生什么问题？应该怎样改进？</li>
+                            </ul>
+                        </div>
+
+                        <p>理解变量、常量和数据类型之后，可以用“名称 + 类型 + 值”来检查一段声明：名称说明数据是谁，类型说明它是什么，值说明它当前保存的内容。这个思路会贯穿后面的输入、数组、函数和结构体学习。</p>
+
+                        <p>学习这一章时，可以主动修改示例中的初始值，观察不同类型对输出的影响。把 <code>quantity</code> 改成别的整数，把 <code>price</code> 改成不同的小数，再尝试修改常量，编译器的反馈会帮助你理解“哪些数据可以改变，哪些数据应该保持固定”。</p>
+
+                        <div class="summary-box">
+                            <h4>一句话总结</h4>
+                            <p>变量保存会变化的数据，常量保存不应变化的数据，数据类型则告诉 C 语言如何理解和存储这些数据。</p>
+                        </div>
+
+                        <p>这一章的重点不是记住所有类型的细节，而是形成选择类型的习惯：先分析数据的含义，再考虑它是否需要小数、是否允许修改以及输出时使用什么格式。这样写出来的程序会更准确，也更容易维护。</p>
+
+                        <p>当你能够熟练声明变量、使用常量，并区分整数、浮点数和字符之后，就已经为下一步的运算符与表达式做好准备。后面的计算，本质上就是让这些不同类型的数据按照规则参与运算。</p>
+                    </div>
+                </section>
+            </div>
+
+            <div class="chapter-actions">
+                <button class="btn btn-ghost" onclick="location.href='../detail.html?course=basics'">返回课程专题</button>
+                <button class="btn btn-primary" onclick="location.href='1.3.html?course=basics&chapter=3'">学习下一章</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>©2026 CodeMaster 北京理工大学</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="termNote" class="term-note" aria-live="polite"></div>
+
+    <script src="../assets/js/main.js"></script>
+    <script>
+        (function () {
+            const field = document.getElementById('starField');
+            if (!field) return;
+            for (let i = 0; i < 60; i++) {
+                const s = document.createElement('span');
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.animationDelay = (Math.random() * 3) + 's';
+                s.style.opacity = Math.random() * 0.5 + 0.1;
+                const size = Math.random() * 2 + 1;
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                field.appendChild(s);
+            }
+        })();
+
+        const termNote = document.getElementById('termNote');
+        const termMap = {
+            '变量': '用于保存数据的名称，程序运行时可以读取或修改它的值。',
+            '数据类型': '规定数据是什么形式、如何存储以及可以进行哪些操作。',
+            '常量': '在程序运行过程中保持不变的数据，通常使用 const 定义。',
+            '类型转换': '把一种数据类型转换成另一种数据类型的过程。',
+            '格式说明符': '用于告诉 printf 按什么类型和格式输出数据的占位符。'
+        };
+
+        document.querySelectorAll('.term').forEach((term) => {
+            term.addEventListener('click', (event) => {
+                const name = term.dataset.term;
+                const text = termMap[name] || '这里是重点术语说明。';
+                termNote.innerHTML = `<strong>${name}</strong><span>${text}</span>`;
+                termNote.classList.add('visible');
+
+                const rect = term.getBoundingClientRect();
+                const noteWidth = 260;
+                const left = Math.min(window.innerWidth - noteWidth - 16, rect.left + rect.width / 2 - noteWidth / 2);
+                const top = Math.max(16, rect.top - 10);
+                termNote.style.left = `${left}px`;
+                termNote.style.top = `${top}px`;
+                event.stopPropagation();
+            });
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.term')) {
+                termNote.classList.remove('visible');
+            }
+        });
+
+        const params = new URLSearchParams(location.search);
+        const course = params.get('course') || 'basics';
+        const chapter = Number(params.get('chapter') || 2);
+        const chapterMap = {
+            1: '认识C语言与程序结构',
+            2: '变量、常量与数据类型',
+            3: '运算符与表达式',
+            4: '基本输入与输出',
+            5: '编写第一个完整程序'
+        };
+
+        const title = chapterMap[chapter] || '变量、常量与数据类型';
+        document.getElementById('chapterName').textContent = `第${chapter}章 · ${title}`;
+        document.getElementById('lessonTitle').textContent = `第${chapter}章 · ${title}`;
+        document.getElementById('lessonTitle').setAttribute('data-course', course);
+
+        const lessonBadge = document.querySelector('.lesson-badge');
+        let progressRecorded = false;
+        function updateLessonBadge() {
+            const user = typeof getFromStorage === 'function' ? getFromStorage('currentUser') : null;
+            const completedLessons = user && user.courseLessons && user.courseLessons[course] || [];
+            const isCompleted = completedLessons.indexOf(chapter - 1) !== -1;
+            if (!isCompleted) return;
+
+            lessonBadge.textContent = '已学习';
+            lessonBadge.classList.add('completed');
+            progressRecorded = true;
+        }
+
+        function recordLessonWhenAtBottom() {
+            if (progressRecorded) return;
+            const reachedBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 24;
+            if (!reachedBottom) return;
+
+            progressRecorded = true;
+            if (typeof completeCourseChapter === 'function') {
+                completeCourseChapter(course, chapter);
+                updateLessonBadge();
+            }
+        }
+
+        window.addEventListener('scroll', recordLessonWhenAtBottom, { passive: true });
+        window.addEventListener('resize', recordLessonWhenAtBottom);
+        updateLessonBadge();
+        recordLessonWhenAtBottom();
+    </script>
+</body>
+</html>
