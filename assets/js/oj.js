@@ -13,6 +13,15 @@
     ];
     const state = { current: 1, filter: 'all', passed: JSON.parse(localStorage.getItem('cm_oj_passed') || '[]') };
     const $ = selector => document.querySelector(selector);
+    function setCompilerStatus(label, ready) {
+        const status = $('#compilerStatus');
+        if (!status) return;
+        status.classList.toggle('is-ready', ready);
+        status.classList.toggle('is-error', !ready);
+        status.querySelector('span').style.background = ready ? '#00ff88' : '#ffc857';
+        status.querySelector('span').style.boxShadow = ready ? '0 0 10px #00ff88' : '0 0 10px #ffc857';
+        status.lastChild.textContent = ` ${label}`;
+    }
     function loadCompiler() {
         if (!compilerPromise) {
             compilerPromise = Promise.all([import(COMPILER_URL), import(WASI_URL)]).then(([compiler, wasi]) => ({
@@ -21,7 +30,13 @@
                 OpenFile: wasi.OpenFile,
                 ConsoleStdout: wasi.ConsoleStdout,
                 WASI: wasi.WASI
-            }));
+            })).then(runtime => {
+                setCompilerStatus('Wasm 编译器已就绪', true);
+                return runtime;
+            }).catch(error => {
+                setCompilerStatus('Wasm 加载失败，将使用结构检查', false);
+                throw error;
+            });
         }
         return compilerPromise;
     }
@@ -67,7 +82,7 @@
         if (!/\bint\s+main\s*\(/.test(code)) return '没有找到有效的 int main() 函数。';
         const lines = code.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
         const missingSemicolon = lines.find(line => {
-            if (/^(#|\{|\}|else\b|if\s*\(|for\s*\(|while\s*\(|switch\s*\(|case\b|default\s*:)/.test(line)) return false;
+            if (/^(#|\{|\}|else\b|if\s*\(|for\s*\(|while\s*\(|switch\s*\(|case\b|default\s*:)/.test(line) || /}\s*$/.test(line)) return false;
             if (/[;,{:]$/.test(line)) return false;
             return /\b(return|break|continue|printf|scanf|int|char|float|double)\b|\w+\s*=/.test(line);
         });
@@ -111,8 +126,8 @@
         const runtime = await loadCompiler();
         setStatus('正在编译 C11 代码...');
         const compiled = await Promise.race([
-            runtime.compile({ source, fileName: 'main.c', flags: ['-x=c', '-std=c11'] }),
-            new Promise((resolve, reject) => setTimeout(() => reject(new Error('Wasm 编译器响应超时，已准备切换到 JS 严格结构检查。')), 30000))
+            runtime.compile({ source, fileName: 'main.c', flags: [] }),
+            new Promise((resolve, reject) => setTimeout(() => reject(new Error('Wasm 编译器响应超时，已准备切换到 JS 严格结构检查。')), 120000))
         ]);
         if (!compiled.module) {
             return { ok: false, status: 'Compile Error', message: compiled.compileOutput || '编译失败，请检查 C 代码。' };
@@ -154,7 +169,7 @@
             const fallback = judgeStructure(source, p, error.message || 'Wasm 编译器未能完成初始化。');
             $('#resultBox').innerHTML = fallback.ok
                 ? `<div class="result-success result-title">✓ Structure Accepted · 结构检查通过</div><pre>${fallback.message}\nWasm 编译器不可用，已切换为 JS 严格结构检查。</pre>`
-                : `<div class="result-fail result-title">× ${fallback.status} · 未通过</div><pre>${fallback.message}</pre>`;
+                : `<div class="result-fail result-title">× ${fallback.status} · 未通过</div><pre>${fallback.message}\nWasm 判题失败原因：${error.message || '未知错误'}</pre>`;
             if (fallback.ok && !state.passed.includes(p.id)) { state.passed.push(p.id); localStorage.setItem('cm_oj_passed', JSON.stringify(state.passed)); renderList(); $('#solvedCount').textContent = state.passed.length; }
         } finally {
             $('#submitCode').disabled = false;

@@ -8,7 +8,7 @@ body.oj-page {
 .oj-kicker { color:#64d2ff; font:600 11px/1.2 'Consolas',monospace; letter-spacing:2px; }
 .oj-heading h1 { margin:10px 0 8px; font-size:42px; line-height:1.1; color:#fff; }
 .oj-heading p { color:#93a4bb; font-size:15px; }
-.oj-live { color:#76e8b0; border:1px solid rgba(0,255,136,.3); background:rgba(0,255,136,.07); padding:10px 14px; border-radius:8px; white-space:nowrap; font-size:13px; }
+.oj-live { color:#76e8b0; border:1px solid rgba(0,255,136,.3); background:rgba(0,255,136,.07); padding:10px 14px; border-radius:8px; white-space:nowrap; font-size:13px; }.oj-live.is-error { color:#ffd27a; border-color:rgba(255,200,87,.35); background:rgba(255,200,87,.08); }
 .oj-live span { display:inline-block; width:7px; height:7px; background:#00ff88; border-radius:50%; box-shadow:0 0 10px #00ff88; margin-right:5px; }
 .oj-toolbar { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; margin-bottom:16px; border:1px solid #26344b; background:rgba(18,28,47,.8); border-radius:10px; }
 .oj-progress-copy { color:#8596ad; font-size:13px; }.oj-progress-copy strong { color:#fff; font-size:22px; margin-right:4px; }
