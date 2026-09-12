@@ -147,6 +147,33 @@
         }
         return { ok: true, status: 'Accepted', message: `公开测试点 ${publicPassed}/${problem.publicCases.length}，隐藏测试点 ${hiddenPassed}/${problem.hiddenCases.length}。\n代码已在浏览器内通过真实 C11 编译和运行。` };
     }
+    async function runFreeCode() {
+        const source = $('#freeCodeEditor').value;
+        const input = $('#freeCodeInput').value;
+        const button = $('#runFreeCode');
+        const output = $('#freeCodeOutput');
+        button.disabled = true;
+        button.textContent = '⏳ 运行中...';
+        output.className = 'free-output-pending';
+        output.textContent = '正在加载 Wasm 编译器并编译代码...';
+        try {
+            if (location.protocol === 'file:') throw new Error('请通过 HTTP/HTTPS 服务打开页面。');
+            const runtime = await loadCompiler();
+            const compiled = await Promise.race([
+                runtime.compile({ source, fileName: 'playground.c', flags: [] }),
+                new Promise((resolve, reject) => setTimeout(() => reject(new Error('编译超时，请检查代码或稍后重试。')), 120000))
+            ]);
+            if (!compiled.module) throw new Error(compiled.compileOutput || '编译失败，请检查 C 代码。');
+            output.textContent = await runModule(compiled.module, input, runtime) || '（程序没有输出）';
+            output.className = 'free-output-success';
+        } catch (error) {
+            output.textContent = error.message || '运行失败。';
+            output.className = 'free-output-error';
+        } finally {
+            button.disabled = false;
+            button.textContent = '▶ 运行代码';
+        }
+    }
     async function submit() {
         const p = problems.find(item => item.id === state.current);
         const source = $('#codeEditor').value;
@@ -180,6 +207,8 @@
         document.querySelectorAll('.filter-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelector('.filter-tab.active').classList.remove('active'); tab.classList.add('active'); state.filter = tab.dataset.filter; if (!visibleProblems().some(p => p.id === state.current)) state.current = visibleProblems()[0].id; render(); }));
         $('#submitCode').addEventListener('click', submit);
         $('#resetCode').addEventListener('click', renderDetail);
+        $('#runFreeCode').addEventListener('click', runFreeCode);
+        $('#clearFreeCode').addEventListener('click', () => { $('#freeCodeOutput').className = ''; $('#freeCodeOutput').textContent = '点击“运行代码”查看输出。'; });
         render();
     });
 })();

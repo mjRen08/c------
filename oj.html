@@ -45,6 +45,29 @@
                 <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn" id="submitCode">▶ 提交并运行</button></div>
                 <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，浏览器会加载 Wasm 编译器并运行全部测试点。</p></div></div></div>
             </section>
+            <aside class="free-code-panel" aria-labelledby="freeCodeTitle">
+                <div class="free-code-heading">
+                    <div><span class="oj-kicker">PLAYGROUND / FREE CODE</span><h2 id="freeCodeTitle">自由编程区</h2><p>自由编写 C 代码，输入标准数据并查看程序输出。</p></div>
+                    <span class="language-tag">C11 · Wasm</span>
+                </div>
+                <div class="free-code-grid">
+                    <div class="free-editor-wrap">
+                        <div class="editor-head"><span><i></i><i></i><i></i> playground.c</span><span class="language-tag">C11</span></div>
+                        <textarea id="freeCodeEditor" class="code-editor free-code-editor" spellcheck="false" aria-label="自由编程代码编辑器">#include &lt;stdio.h&gt;
+
+int main(void) {
+    printf("Hello, CodeMaster!\n");
+    return 0;
+}</textarea>
+                    </div>
+                    <div class="free-input-wrap">
+                        <label for="freeCodeInput">标准输入</label>
+                        <textarea id="freeCodeInput" class="free-input" spellcheck="false" placeholder="例如：\n1 2" aria-label="自由编程标准输入"></textarea>
+                        <div class="free-actions"><button class="btn btn-ghost" id="clearFreeCode">清空输出</button><button class="run-btn" id="runFreeCode">▶ 运行代码</button></div>
+                        <div class="free-output-wrap"><div class="free-output-label">程序输出</div><pre id="freeCodeOutput">点击“运行代码”查看输出。</pre></div>
+                    </div>
+                </div>
+            </aside>
         </div>
     </main>
     <script src="assets/js/main.js"></script>
