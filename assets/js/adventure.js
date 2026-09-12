@@ -73,6 +73,7 @@
             gunKills: 0, bestAccuracy: 0,
             playerX: null, playerY: null, playerHp: null, playerMaxHp: null,
             checkpoint: null, sceneEntry: {},
+            inventory: { potion: 0, bigPotion: 0, revive: 0 },
             upgradeStats: { maxHpBonus: 0, dashCdMul: 1, invinMul: 1, magnetMul: 1, shieldBonus: 0, reviveCount: 0, slowmoBonus: 0 }
         },
         load() {
@@ -101,6 +102,7 @@
                 gunKills: 0, bestAccuracy: 0,
                 playerX: null, playerY: null, playerHp: null, playerMaxHp: null,
                 checkpoint: null, sceneEntry: {},
+                inventory: { potion: 0, bigPotion: 0, revive: 0 },
                 upgradeStats: { maxHpBonus: 0, dashCdMul: 1, invinMul: 1, magnetMul: 1, shieldBonus: 0, reviveCount: 0, slowmoBonus: 0 }
             };
         },
@@ -607,6 +609,7 @@
         checkpoint: Save.data.checkpoint || null,
         sceneEntry: Save.data.sceneEntry || {},
         runStats: { shots: 0, hits: 0 },
+        inventory: Save.data.inventory || { potion: 0, bigPotion: 0, revive: 0 },
         _bgImageLoaded: null, _sprite: null
     };
 
@@ -665,76 +668,85 @@
         wrapper.className = 'adv-wrapper';
         wrapper.id = 'advWrapper';
         wrapper.innerHTML = `
-            <div class="adv-hud">
-                <div class="adv-hud-left">
-                    <button class="adv-back-btn" id="advBackBtn">← 返回大厅</button>
-                    <div class="adv-hp-bar">
-                        <span class="adv-heart">❤️</span>
-                        <div class="adv-hp-track"><div class="adv-hp-fill" id="advHpFill"></div></div>
-                        <span class="adv-hp-text" id="advHpText">100 / 100</span>
-                    </div>
-                </div>
-                <div class="adv-hud-center">
-                    <div class="adv-scene-badge">
-                        <span class="adv-scene-ico" id="advSceneIco">🏘️</span>
-                        <span id="advSceneName">晨曦村庄</span>
-                    </div>
-                </div>
-                <div class="adv-hud-right">
-                    <div class="adv-resource"><span class="adv-res-ico">🪙</span><span id="advCoins">0</span></div>
-                    <div class="adv-resource keys"><span class="adv-res-ico">🔑</span><span id="advKeys">0</span></div>
-                    <button class="adv-save-btn" id="advAchBtn">🏆 成就</button>
-                    <button class="adv-save-btn" id="advShopBtn">🏪 商店</button>
-                    <button class="adv-save-btn" id="advSaveBtn">💾 存档</button>
-                </div>
-            </div>
             <div class="adv-canvas-wrap" id="advCanvasWrap">
-                <canvas id="advCanvas" width="1400" height="540"></canvas>
-                <div class="adv-boss-hud" id="advBossHud">
-                    <div class="adv-boss-head">
-                        <div class="adv-boss-name" id="advBossName">代码暴君</div>
-                        <div class="adv-boss-phase" id="advBossPhase">阶段 1 / 3</div>
-                    </div>
-                    <div class="adv-boss-hp-track"><div class="adv-boss-hp-fill" id="advBossHpFill"></div></div>
-                </div>
-                <div class="adv-dialog" id="advDialog">
-                    <div class="adv-dialog-speaker" id="advDialogSpeaker"></div>
-                    <div class="adv-dialog-text" id="advDialogText"></div>
-                    <div class="adv-dialog-hint">按 F / 空格 继续</div>
-                </div>
-                <div class="adv-shield-ui" id="advShieldUI">
-                    <div class="adv-shield-title">防御代码光波 — 选择正确的盾牌！</div>
-                    <div class="adv-shield-code" id="advShieldCode"></div>
-                    <div class="adv-shield-options" id="advShieldOptions"></div>
-                    <div class="adv-shield-timer"><div class="adv-shield-timer-fill" id="advShieldTimerFill"></div></div>
-                </div>
+                <div class="adv-stage" id="advStage">
+                    <canvas id="advCanvas" width="1400" height="540"></canvas>
 
-                <!-- ★ 答题石碑：页面内弹窗 -->
-                <div class="adv-quiz-ui" id="advQuizUI">
-                    <div class="adv-quiz-panel">
-                        <div class="adv-quiz-title">📜 答题石碑</div>
-                        <div class="adv-quiz-question" id="advQuizQuestion"></div>
-                        <div class="adv-quiz-options" id="advQuizOptions"></div>
+                    <div class="adv-hud">
+                        <div class="adv-hud-left">
+                            <button class="adv-back-btn" id="advBackBtn">← 返回</button>
+                            <div class="adv-scene-badge">
+                                <span class="adv-scene-ico" id="advSceneIco">🏘️</span>
+                                <span id="advSceneName">晨曦村庄</span>
+                            </div>
+                        </div>
+                        <div class="adv-hud-center">
+                            <div class="adv-hp-bar">
+                                <span class="adv-heart">❤️</span>
+                                <div class="adv-hp-track"><div class="adv-hp-fill" id="advHpFill"></div></div>
+                                <span class="adv-hp-text" id="advHpText">100 / 100</span>
+                            </div>
+                        </div>
+                        <div class="adv-hud-right">
+                            <div class="adv-resource"><span class="adv-res-ico">🪙</span><span id="advCoins">0</span></div>
+                            <div class="adv-resource keys"><span class="adv-res-ico">🔑</span><span id="advKeys">0</span></div>
+                            <button class="adv-save-btn" id="advAchBtn" title="成就">🏆</button>
+                            <button class="adv-save-btn" id="advShopBtn" title="商店">🏪</button>
+                            <button class="adv-save-btn" id="advSaveBtn" title="存档">💾</button>
+                        </div>
+                    </div>
+
+                    <div class="adv-boss-hud" id="advBossHud">
+                        <div class="adv-boss-head">
+                            <div class="adv-boss-name" id="advBossName">代码暴君</div>
+                            <div class="adv-boss-phase" id="advBossPhase">阶段 1 / 3</div>
+                        </div>
+                        <div class="adv-boss-hp-track"><div class="adv-boss-hp-fill" id="advBossHpFill"></div></div>
+                    </div>
+
+                    <div class="adv-dialog" id="advDialog">
+                        <div class="adv-dialog-speaker" id="advDialogSpeaker"></div>
+                        <div class="adv-dialog-text" id="advDialogText"></div>
+                        <div class="adv-dialog-hint">按 F / 空格 继续</div>
+                    </div>
+
+                    <div class="adv-shield-ui" id="advShieldUI">
+                        <div class="adv-shield-title">防御代码光波 — 选择正确的盾牌！</div>
+                        <div class="adv-shield-code" id="advShieldCode"></div>
+                        <div class="adv-shield-options" id="advShieldOptions"></div>
+                        <div class="adv-shield-timer"><div class="adv-shield-timer-fill" id="advShieldTimerFill"></div></div>
+                    </div>
+
+                    <div class="adv-quiz-ui" id="advQuizUI">
+                        <div class="adv-quiz-panel">
+                            <div class="adv-quiz-title">📜 答题石碑</div>
+                            <div class="adv-quiz-question" id="advQuizQuestion"></div>
+                            <div class="adv-quiz-options" id="advQuizOptions"></div>
+                        </div>
+                    </div>
+
+                    <div class="adv-inventory hidden" id="advInventory"></div>
+
+                    <div class="adv-skill-bar" id="advSkillBar"></div>
+
+                    <div class="adv-slowmo" id="advSlowmo"><div class="slowmo-text">SLOW MOTION</div></div>
+                    <div class="adv-banner" id="advBanner"></div>
+                    <div class="adv-tutorial-modal" id="advTutorialModal"></div>
+                    <div class="adv-choice-modal" id="advChoiceModal"></div>
+
+                    <div class="adv-controls">
+                        <div class="adv-ctrl"><kbd>A</kbd><kbd>D</kbd> 移动</div>
+                        <div class="adv-ctrl"><kbd>空格</kbd> 跳跃</div>
+                        <div class="adv-ctrl"><kbd>Shift</kbd> 二段跳</div>
+                        <div class="adv-ctrl"><kbd>Q</kbd> 冲刺</div>
+                        <div class="adv-ctrl"><kbd>E</kbd> 护盾</div>
+                        <div class="adv-ctrl"><kbd>L</kbd> 减速</div>
+                        <div class="adv-ctrl"><kbd>F</kbd> 交互</div>
+                        <div class="adv-ctrl"><kbd>左键</kbd> 射击</div>
+                        <div class="adv-ctrl"><kbd>J</kbd> 取消</div>
+                        <div class="adv-ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 选项</div>
                     </div>
                 </div>
-
-                <div class="adv-slowmo" id="advSlowmo"><div class="slowmo-text">SLOW MOTION</div></div>
-                <div class="adv-banner" id="advBanner"></div>
-                <div class="adv-skill-bar" id="advSkillBar"></div>
-                <div class="adv-tutorial-modal" id="advTutorialModal"></div>
-                <div class="adv-choice-modal" id="advChoiceModal"></div>
-            </div>
-            <div class="adv-controls">
-                <div class="adv-ctrl"><kbd>A</kbd><kbd>D</kbd> 移动</div>
-                <div class="adv-ctrl"><kbd>空格</kbd> 跳跃</div>
-                <div class="adv-ctrl"><kbd>Shift</kbd> 二段跳</div>
-                <div class="adv-ctrl"><kbd>Q</kbd> 冲刺</div>
-                <div class="adv-ctrl"><kbd>E</kbd> 护盾</div>
-                <div class="adv-ctrl"><kbd>L</kbd> 减速</div>
-                <div class="adv-ctrl"><kbd>F</kbd> 交互</div>
-                <div class="adv-ctrl"><kbd>左键</kbd> 射击</div>
-                <div class="adv-ctrl"><kbd>J</kbd> 取消 / 关闭</div>
-                <div class="adv-ctrl"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 盾牌/选项</div>
             </div>`;
         document.body.appendChild(wrapper);
         AD.canvas = document.getElementById('advCanvas');
@@ -931,6 +943,65 @@
     }
 
     /* ============================================================
+       道具栏 UI
+       ============================================================ */
+    function updateInventoryUI() {
+        const inv = document.getElementById('advInventory');
+        if (!inv) return;
+        const invData = AD.inventory || { potion: 0, bigPotion: 0, revive: 0 };
+        const items = [
+            { id: 'potion',    icon: '🧪', name: '药水',    count: invData.potion || 0 },
+            { id: 'bigPotion', icon: '💊', name: '大药水',  count: invData.bigPotion || 0 },
+            { id: 'key',       icon: '🔑', name: '钥匙',    count: AD.keys || 0 },
+            { id: 'revive',    icon: '💎', name: '复活石',  count: invData.revive || 0 }
+        ].filter(it => it.count > 0);
+
+        if (items.length === 0) {
+            inv.classList.add('hidden');
+            inv.innerHTML = '';
+            return;
+        }
+        inv.classList.remove('hidden');
+        inv.innerHTML = `
+            <div class="adv-inventory-title">🎒 背包</div>
+            ${items.map(it => `
+                <div class="adv-inv-item" data-item="${it.id}" title="${it.name} ×${it.count}">
+                    <span class="adv-inv-ico">${it.icon}</span>
+                    <span class="adv-inv-name">${it.name}</span>
+                    <span class="adv-inv-count">×${it.count}</span>
+                </div>`).join('')}
+        `;
+        inv.querySelectorAll('.adv-inv-item').forEach(el => {
+            el.addEventListener('click', () => useInventoryItem(el.dataset.item));
+        });
+    }
+
+    function useInventoryItem(id) {
+        const p = AD.player;
+        if (id === 'potion') {
+            if ((AD.inventory.potion || 0) <= 0) return;
+            if (p.hp >= p.maxHp) { showBanner('生命值已满', '#ffcc00'); return; }
+            AD.inventory.potion--;
+            p.hp = Math.min(p.maxHp, p.hp + 50);
+            updateHpBar();
+            Save.save({ inventory: AD.inventory });
+            showBanner('🧪 恢复 50 HP', '#00ff88');
+            spawnParticles(p.x + p.w / 2, p.y, '#00ff88', 15);
+            updateInventoryUI();
+        } else if (id === 'bigPotion') {
+            if ((AD.inventory.bigPotion || 0) <= 0) return;
+            if (p.hp >= p.maxHp) { showBanner('生命值已满', '#ffcc00'); return; }
+            AD.inventory.bigPotion--;
+            p.hp = p.maxHp;
+            updateHpBar();
+            Save.save({ inventory: AD.inventory });
+            showBanner('💊 满血恢复', '#00ff88');
+            spawnParticles(p.x + p.w / 2, p.y, '#00ff88', 25);
+            updateInventoryUI();
+        }
+    }
+
+    /* ============================================================
        技能
        ============================================================ */
     function updateSkillBar() {
@@ -1088,9 +1159,18 @@
             AD.player.maxHp = Save.data.playerMaxHp || AD.player.maxHp;
             AD.player.hp = Math.min(Save.data.playerHp, AD.player.maxHp);
             updateHpBar();
+            updateInventoryUI();
         }
 
         AD.lastTime = performance.now();
+        /* 恢复背包 */
+        AD.inventory = Object.assign(
+            { potion: 0, bigPotion: 0, revive: 0 },
+            Save.data.inventory || {}
+        );
+        Save.data.inventory = AD.inventory;
+        AD.inventory.revive = Save.data.upgradeStats.reviveCount || AD.inventory.revive || 0;
+        updateInventoryUI();
         requestAnimationFrame(loop);
         showBanner('冒险开始', '#00f0ff');
         checkAchievements();
@@ -1876,9 +1956,11 @@
 
         if ((Save.data.upgradeStats.reviveCount || 0) > 0) {
             Save.data.upgradeStats.reviveCount--;
-            Save.save({});
+            AD.inventory.revive = Save.data.upgradeStats.reviveCount;
+            Save.save({ inventory: AD.inventory });
             AD.player.hp = AD.player.maxHp;
             updateHpBar();
+            updateInventoryUI();
             showBanner('💎 复活石生效！', '#00f0ff');
             spawnParticles(AD.player.x + AD.player.w / 2, AD.player.y + AD.player.h / 2, '#00f0ff', 30);
             AD.player.invincible = 120;
@@ -2118,13 +2200,15 @@
             if (id === 'potion') {
                 Save.addCoins(-cost); AD.coins = Save.data.coins;
                 document.getElementById('advCoins').textContent = AD.coins;
-                AD.player.hp = Math.min(AD.player.maxHp, AD.player.hp + 50);
-                updateHpBar(); showBanner('🧪 已恢复 50 HP', '#00ff88');
+                AD.inventory.potion = (AD.inventory.potion || 0) + 1;
+                Save.save({ inventory: AD.inventory });
+                showBanner('🧪 获得药水 ×1', '#00ff88');
             } else if (id === 'bigPotion') {
                 Save.addCoins(-cost); AD.coins = Save.data.coins;
                 document.getElementById('advCoins').textContent = AD.coins;
-                AD.player.hp = AD.player.maxHp;
-                updateHpBar(); showBanner('💊 已满血恢复', '#00ff88');
+                AD.inventory.bigPotion = (AD.inventory.bigPotion || 0) + 1;
+                Save.save({ inventory: AD.inventory });
+                showBanner('💊 获得大药水 ×1', '#00ff88');
             } else if (id === 'key') {
                 Save.addCoins(-cost); AD.keys++;
                 Save.save({ keys: AD.keys });
@@ -2132,12 +2216,14 @@
                 showBanner('🔑 获得钥匙 +1', '#ffcc00');
             } else if (id === 'revive') {
                 Save.addCoins(-cost);
-                Save.data.upgradeStats.reviveCount = (Save.data.upgradeStats.reviveCount || 0) + 1;
-                Save.save({});
+                AD.inventory.revive = (AD.inventory.revive || 0) + 1;
+                Save.data.upgradeStats.reviveCount = AD.inventory.revive;
+                Save.save({ inventory: AD.inventory });
                 AD.coins = Save.data.coins;
                 document.getElementById('advCoins').textContent = AD.coins;
-                showBanner('💎 复活石 +1', '#00f0ff');
+                showBanner('💎 获得复活石 ×1', '#00f0ff');
             }
+            updateInventoryUI();
         }
     }
 
