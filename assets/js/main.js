@@ -203,6 +203,107 @@ function initNavigation() {
             link.classList.add('active');
         }
     });
+
+    // 初始化移动端抽屉导航
+    initMobileNav();
+}
+
+// 移动端汉堡菜单 & 抽屉导航
+function initMobileNav() {
+    // 防止重复初始化
+    if (document.querySelector('.nav-toggle')) return;
+
+    const navContainer = document.querySelector('.nav-container');
+    const navLinks = document.querySelector('.nav-container .nav-links');
+    if (!navContainer || !navLinks) return;
+
+    // ----- 创建汉堡按钮 -----
+    const toggle = document.createElement('button');
+    toggle.className = 'nav-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-label', '打开导航菜单');
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.innerHTML = '<span></span><span></span><span></span>';
+
+    // ----- 创建遮罩 -----
+    const overlay = document.createElement('div');
+    overlay.className = 'nav-overlay';
+
+    // ----- 创建抽屉，复制导航链接 -----
+    const drawer = document.createElement('nav');
+    drawer.className = 'nav-drawer';
+    drawer.setAttribute('aria-label', '移动端导航');
+    drawer.innerHTML = navLinks.outerHTML;
+
+    // 在抽屉底部添加退出登录按钮（仅在原按钮存在时）
+    const originalLogoutBtn = document.getElementById('logoutBtn');
+    if (originalLogoutBtn) {
+        const drawerLogout = document.createElement('button');
+        drawerLogout.type = 'button';
+        drawerLogout.className = 'nav-drawer-logout';
+        drawerLogout.textContent = '退出登录';
+        drawerLogout.addEventListener('click', function () {
+            closeDrawer();
+            originalLogoutBtn.click();
+        });
+        drawer.appendChild(drawerLogout);
+    }
+
+    // ----- 插入汉堡按钮：放在 nav-actions 最前面（紧贴左侧） -----
+    const navActions = navContainer.querySelector('.nav-actions');
+    if (navActions) {
+        navActions.insertBefore(toggle, navActions.firstChild);
+    } else {
+        navContainer.appendChild(toggle);
+    }
+
+    // ----- 把遮罩和抽屉挂到 body -----
+    document.body.appendChild(overlay);
+    document.body.appendChild(drawer);
+
+    // ----- 打开/关闭控制 -----
+    function openDrawer() {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+        toggle.classList.add('active');
+        toggle.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('nav-open');
+    }
+
+    function closeDrawer() {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+        toggle.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('nav-open');
+    }
+
+    toggle.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (drawer.classList.contains('active')) closeDrawer();
+        else openDrawer();
+    });
+
+    overlay.addEventListener('click', closeDrawer);
+
+    // 点击抽屉里的链接后关闭
+    drawer.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            closeDrawer();
+        });
+    });
+
+    // ESC 关闭
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('active')) closeDrawer();
+    });
+
+    // 窗口变宽时自动关闭（> 968px 隐藏抽屉）
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > 968 && drawer.classList.contains('active')) {
+            closeDrawer();
+        }
+    });
 }
 
 // ========== 认证系统 ==========
@@ -714,6 +815,9 @@ function showToast(message, type = 'info') {
         z-index: 9999;
         animation: fadeInUp 0.3s ease;
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        max-width: calc(100vw - 32px);
+        text-align: center;
+        word-break: break-word;
     `;
 
     const colors = {
@@ -733,6 +837,68 @@ function showToast(message, type = 'info') {
         toast.style.transition = 'all 0.3s ease';
         setTimeout(() => toast.remove(), 300);
     }, 2500);
+}
+
+// ========== 个人中心：课程分支手风琴 ==========
+// 模块级状态：记录当前打开的分支课程 ID，以及关闭/切换的延时器
+let profileBranchCourseId = null;
+let profileBranchTimer = null;
+
+function profileRenderBranchPanel(user, courses, branchList, courseId) {
+    const course = courses.find(function (item) { return item.id === courseId; });
+    if (!course || !course.branches) return;
+    const completedLessons = (user.courseLessons && user.courseLessons[course.id]) || [];
+    branchList.innerHTML = '<div class="course-branch-panel">' +
+        '<h4>' + course.name + ' · 课程分支</h4>' +
+        '<div class="course-branch-items">' +
+        course.branches.map(function (branch, index) {
+            const isCompleted = completedLessons.indexOf(index) !== -1;
+            return '<div class="course-branch-item ' + (isCompleted ? 'completed' : '') + '">' +
+                '<span>' + (isCompleted ? '✅' : '▶️') + ' ' + branch + '</span>' +
+                '<button type="button" data-lesson-index="' + index + '" data-course-id="' + course.id + '">' +
+                (isCompleted ? '已完成' : '完成本节') +
+                '</button>' +
+                '</div>';
+        }).join('') +
+        '</div></div>';
+}
+
+function profileOpenBranches(user, courses, branchList, courseId) {
+    clearTimeout(profileBranchTimer);
+    profileRenderBranchPanel(user, courses, branchList, courseId);
+    // 强制回流，保证从 0fr 开始过渡到 1fr
+    void branchList.offsetHeight;
+    branchList.classList.add('expanded');
+    profileBranchCourseId = courseId;
+}
+
+function profileCloseBranches(branchList) {
+    clearTimeout(profileBranchTimer);
+    branchList.classList.remove('expanded');
+    profileBranchCourseId = null;
+    profileBranchTimer = setTimeout(function () {
+        if (profileBranchCourseId === null) branchList.innerHTML = '';
+    }, 460);
+}
+
+function profileToggleBranches(user, courses, branchList, courseId) {
+    // 点击同一个 -> 关闭
+    if (profileBranchCourseId === courseId) {
+        profileCloseBranches(branchList);
+        return;
+    }
+    // 另一个分支打开 -> 先收起，再展开新的
+    if (profileBranchCourseId !== null) {
+        clearTimeout(profileBranchTimer);
+        branchList.classList.remove('expanded');
+        profileBranchCourseId = null;
+        profileBranchTimer = setTimeout(function () {
+            profileOpenBranches(user, courses, branchList, courseId);
+        }, 380);
+        return;
+    }
+    // 没有任何分支打开 -> 直接展开
+    profileOpenBranches(user, courses, branchList, courseId);
 }
 
 // ========== 个人主页数据加载 ==========
@@ -791,37 +957,18 @@ function loadProfileData() {
 
     const learningList = $('#learningList');
     const branchList = $('#courseBranchList');
-    function showCourseBranches(courseId) {
-        const course = courses.find(function (item) {
-            return item.id === courseId;
-        });
-        if (!course) return;
 
-        if (course.branches) {
-            const completedLessons = user.courseLessons && user.courseLessons[course.id] || [];
-            branchList.innerHTML = `<div class="course-branch-panel">
-                <h4>${course.name} · 课程分支</h4>
-                <div class="course-branch-items">${course.branches.map(function (branch, index) {
-                    const isCompleted = completedLessons.indexOf(index) !== -1;
-                    return `<div class="course-branch-item ${isCompleted ? 'completed' : ''}">
-                        <span>${isCompleted ? '✅' : '▶️'} ${branch}</span>
-                        <button type="button" data-lesson-index="${index}" data-course-id="${course.id}">${isCompleted ? '已完成' : '完成本节'}</button>
-                    </div>`;
-                }).join('')}</div>
-            </div>`;
-        }
-    }
-
+    // ====== 手风琴式分支交互 ======
     learningList.onclick = function (event) {
         const item = event.target.closest('.learning-item');
-        if (item) showCourseBranches(item.getAttribute('data-course-id'));
+        if (item) profileToggleBranches(user, courses, branchList, item.getAttribute('data-course-id'));
     };
     learningList.onkeydown = function (event) {
         if (event.key === 'Enter' || event.key === ' ') {
             const item = event.target.closest('.learning-item');
             if (item) {
                 event.preventDefault();
-                showCourseBranches(item.getAttribute('data-course-id'));
+                profileToggleBranches(user, courses, branchList, item.getAttribute('data-course-id'));
             }
         }
     };
@@ -853,9 +1000,21 @@ function loadProfileData() {
             addExp(50);
         }
         evaluateAchievements();
+
+        // 记住当前打开的分支，重新渲染后恢复
+        profileBranchCourseId = courseId;
         loadProfileData();
-        showCourseBranches(courseId);
     };
+
+    // 重新渲染后，如果之前有分支打开，把它平滑地恢复出来
+    if (profileBranchCourseId) {
+        const idToRestore = profileBranchCourseId;
+        setTimeout(function () {
+            if (profileBranchCourseId === idToRestore) {
+                profileOpenBranches(user, courses, branchList, idToRestore);
+            }
+        }, 0);
+    }
 }
 
 function getProfileCourses() {

@@ -233,6 +233,7 @@ body.quiz-home-page {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+    gap: 12px;
 }
 
 .logo {
@@ -242,6 +243,7 @@ body.quiz-home-page {
     font-size: 22px;
     font-weight: 700;
     color: var(--text-primary);
+    flex-shrink: 0;
 }
 
 .logo-icon {
@@ -289,6 +291,7 @@ body.quiz-home-page {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .user-avatar {
@@ -303,12 +306,170 @@ body.quiz-home-page {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
+    flex-shrink: 0;
 }
 
     .user-avatar:hover {
         transform: scale(1.1);
         box-shadow: var(--shadow-glow);
     }
+
+/* ========== 移动端汉堡菜单 ========== */
+.nav-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 10px;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+    flex-shrink: 0;
+    z-index: 1002;
+}
+.nav-toggle span {
+    position: absolute;
+    left: 50%;
+    width: 18px;
+    height: 2px;
+    background: #64d2ff;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 0 6px rgba(100,210,255,0.6);
+}
+.nav-toggle span:nth-child(1) { top: 12px; }
+.nav-toggle span:nth-child(2) { top: 19px; }
+.nav-toggle span:nth-child(3) { top: 26px; }
+.nav-toggle:hover {
+    background: rgba(0, 212, 255, 0.18);
+    border-color: #00d4ff;
+    box-shadow: 0 0 14px rgba(0,212,255,0.4);
+}
+.nav-toggle.active span:nth-child(1) {
+    top: 19px;
+    transform: translateX(-50%) rotate(45deg);
+}
+.nav-toggle.active span:nth-child(2) {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0);
+}
+.nav-toggle.active span:nth-child(3) {
+    top: 19px;
+    transform: translateX(-50%) rotate(-45deg);
+}
+
+/* 抽屉菜单 */
+.nav-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(320px, 82vw);
+    height: 100vh;
+    padding: 92px 22px 32px;
+    background: linear-gradient(180deg, rgba(10,14,26,0.98), rgba(13,20,48,0.98));
+    border-left: 1px solid rgba(0, 212, 255, 0.25);
+    box-shadow: -20px 0 60px rgba(0,0,0,0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 998;
+    transform: translateX(100%);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow-y: auto;
+    display: none;
+}
+.nav-drawer.active {
+    transform: translateX(0);
+}
+.nav-drawer .nav-links {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+.nav-drawer .nav-links li {
+    width: 100%;
+    list-style: none;
+}
+.nav-drawer .nav-links a {
+    display: block;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #a0aec0;
+    border-radius: 12px;
+    border-left: 3px solid transparent;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+}
+.nav-drawer .nav-links a:hover {
+    background: rgba(0, 212, 255, 0.08);
+    color: #64d2ff;
+    border-left-color: rgba(0,212,255,0.5);
+    transform: translateX(4px);
+}
+.nav-drawer .nav-links a.active {
+    background: rgba(0, 212, 255, 0.12);
+    color: #64d2ff;
+    border-left-color: #64d2ff;
+    box-shadow: inset 0 0 20px rgba(0,212,255,0.08);
+}
+.nav-drawer .nav-links a::after,
+.nav-drawer .nav-links a::before {
+    display: none !important;
+}
+
+/* 抽屉底部退出按钮 */
+.nav-drawer-logout {
+    display: block;
+    width: 100%;
+    margin-top: 24px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid rgba(255, 71, 87, 0.35);
+    color: #ff8b8b;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+}
+.nav-drawer-logout:hover {
+    background: rgba(255, 71, 87, 0.2);
+    border-color: #ff4757;
+    color: #ff4757;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,71,87,0.25);
+}
+
+/* 遮罩 */
+.nav-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.62);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 997;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s;
+    display: none;
+}
+.nav-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+body.nav-open {
+    overflow: hidden;
+}
 
 /* ========== Hero区域 ========== */
 .hero {
@@ -390,11 +551,13 @@ body.quiz-home-page {
     display: flex;
     gap: 16px;
     margin-bottom: 48px;
+    flex-wrap: wrap;
 }
 
 .hero-stats {
     display: flex;
     gap: 48px;
+    flex-wrap: wrap;
 }
 
 .stat-item h3 {
@@ -1403,9 +1566,12 @@ body.quiz-home-page {
         grid-template-columns: 1fr 1fr;
     }
 
-    .nav-links {
-        display: none;
-    }
+    /* 显示汉堡按钮，抽屉启用 */
+    .nav-toggle { display: block; }
+    .nav-drawer { display: block; }
+    .nav-overlay { display: block; }
+    /* 主导航的链接在移动端隐藏，由抽屉提供 */
+    .nav-container > .nav-links { display: none; }
 }
 
 @media (max-width: 640px) {
@@ -1456,6 +1622,21 @@ body.quiz-home-page {
     .question-card {
         padding: 24px;
     }
+
+    /* 移动端导航栏：隐藏退出登录按钮（改到抽屉里） */
+    .nav-actions > .btn-ghost#logoutBtn {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-container { padding: 0 14px; }
+    .logo span { font-size: 18px; }
+    .logo-icon { width: 32px; height: 32px; font-size: 16px; }
+    .user-avatar { width: 34px; height: 34px; }
+    .nav-drawer { width: min(280px, 86vw); padding: 86px 16px 24px; }
+    .hero h1 { font-size: 28px; }
+    .section-title { font-size: 24px; }
 }
 
 /* ========== 动画 ========== */
