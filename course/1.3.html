@@ -71,5 +71,6 @@ printf("%d %d\\n", result, clearResult);</code></pre></div>
         function recordLesson(){if(progressRecorded||window.scrollY+window.innerHeight<document.documentElement.scrollHeight-24)return;progressRecorded=true;if(typeof completeCourseChapter==='function'){completeCourseChapter(course,chapter);updateLessonBadge();}}
         window.addEventListener('scroll',recordLesson,{passive:true});window.addEventListener('resize',recordLesson);updateLessonBadge();recordLesson();
     </script>
+    <script src="../assets/js/ai-assistant.js"></script>
 </body>
 </html>
