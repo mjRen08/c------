@@ -158,9 +158,53 @@ function renderCode(topic, step) {
     select('#nextButton').disabled = state.stepIndex === topic.steps.length - 1;
 }
 
+function renderBars(topic, step) {
+    const visualization = select('#visualization');
+    let chart = visualization.querySelector('.bar-chart');
+    if (!chart) {
+        visualization.innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="bar-chart"></div>`;
+        chart = visualization.querySelector('.bar-chart');
+    }
+
+    const oldItems = new Map([...chart.querySelectorAll('.bar-item')].map(item => [item.dataset.barKey, item]));
+    const firstPositions = new Map([...oldItems].map(([key, item]) => [key, item.getBoundingClientRect()]));
+    const valueCounts = {};
+    const nextKeys = new Set();
+
+    step.bars.forEach((value, index) => {
+        const occurrence = valueCounts[value] || 0;
+        valueCounts[value] = occurrence + 1;
+        const key = `${value}-${occurrence}`;
+        nextKeys.add(key);
+        const item = oldItems.get(key) || document.createElement('div');
+        item.className = `bar-item ${step.active.includes(index) ? 'active' : ''}`;
+        item.dataset.barKey = key;
+        item.innerHTML = `<strong>${value}</strong><i style="--bar-height: ${value * 25}px"></i><span>a[${index}]</span>`;
+        chart.appendChild(item);
+    });
+
+    oldItems.forEach((item, key) => {
+        if (!nextKeys.has(key)) item.remove();
+    });
+
+    [...chart.querySelectorAll('.bar-item')].forEach(item => {
+        const previous = firstPositions.get(item.dataset.barKey);
+        if (!previous) return;
+        const current = item.getBoundingClientRect();
+        const deltaX = previous.left - current.left;
+        const deltaY = previous.top - current.top;
+        if (!deltaX && !deltaY) return;
+        item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        requestAnimationFrame(() => {
+            item.style.transform = '';
+        });
+    });
+}
+
 function renderVisualization(topic, step) {
+    const visualization = select('#visualization');
     if (topic.visualType === 'bars') {
-        select('#visualization').innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="bar-chart">${step.bars.map((value, index) => `<div class="bar-item ${step.active.includes(index) ? 'active' : ''}"><strong>${value}</strong><i style="--bar-height: ${value * 25}px"></i><span>a[${index}]</span></div>`).join('')}</div>`;
+        renderBars(topic, step);
         return;
     }
     if (topic.visualType === 'stack') {
