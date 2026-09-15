@@ -229,11 +229,11 @@ body.quiz-home-page {
 .nav-container {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
-    gap: 12px;
+    padding: 0 16px;
+    gap: 24px;
 }
 
 .logo {
@@ -261,7 +261,8 @@ body.quiz-home-page {
 .nav-links {
     display: flex;
     align-items: center;
-    gap: 32px;
+    gap: 20px;
+    margin-left: auto;
 }
 
     .nav-links a {

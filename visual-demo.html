@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C 语言可视化实验室 - CodeMaster</title>
+    <link rel="stylesheet" href="assets/css/reset.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/visual-demo.css">
+</head>
+<body class="visual-demo-page">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">Cm</div>
+                <span>CodeMaster</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="list.html">课程中心</a></li>
+                <li><a href="visual-demo.html" class="active">可视化演示</a></li>
+                <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="oj.html">OJ 练习场</a></li>
+                <li><a href="game.html">编程游戏</a></li>
+                <li><a href="profile.html">个人中心</a></li>
+                <li><a href="team.html">制作团队</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-ghost" id="logoutBtn">退出登录</button>
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="visual-shell">
+        <header class="visual-hero">
+            <div>
+                <span class="eyebrow">C LANGUAGE · VISUAL LAB</span>
+                <h1>把代码变成看得见的过程</h1>
+                <p>从第一行代码到内存、指针和文件，逐步观察 C 程序如何运行。选择左侧主题，点击播放或单步执行。</p>
+            </div>
+            <div class="hero-meter">
+                <span>探索进度</span>
+                <strong id="topicProgress">1 / 6</strong>
+                <div class="meter-track"><i id="topicMeter"></i></div>
+            </div>
+        </header>
+
+        <section class="lab-layout" aria-label="C语言可视化实验室">
+            <aside class="topic-rail">
+                <div class="rail-heading"><span>实验目录</span><small>12 TOPICS</small></div>
+                <div id="topicList" class="topic-list"></div>
+                <div class="rail-note"><span class="note-mark">i</span><p>每个实验都对应一个 C 语言核心概念。先观察，再动手改变代码。</p></div>
+            </aside>
+
+            <section class="lab-stage">
+                <div class="stage-heading">
+                    <div>
+                        <span class="stage-kicker" id="topicTag">01 · 程序入口</span>
+                        <h2 id="topicTitle">程序是怎样启动的？</h2>
+                    </div>
+                    <div class="stage-actions">
+                        <button class="icon-button" id="resetButton" type="button" title="重置实验">↺</button>
+                        <label class="speed-control" for="speedSelect">速度
+                            <select id="speedSelect">
+                                <option value="0.6">慢速</option>
+                                <option value="1" selected>标准</option>
+                                <option value="1.8">快速</option>
+                                <option value="3">极速</option>
+                            </select>
+                        </label>
+                        <button class="play-button" id="playButton" type="button"><span id="playIcon">▶</span><span id="playText">播放过程</span></button>
+                    </div>
+                </div>
+                <p class="stage-description" id="topicDescription"></p>
+
+                <div class="code-visual-grid">
+                    <div class="code-panel">
+                        <div class="panel-top"><span class="panel-label">SOURCE.C</span><span class="live-dot">LIVE</span></div>
+                        <div id="codeLines" class="code-lines"></div>
+                        <div class="step-controls">
+                            <button id="previousButton" type="button">← 上一步</button>
+                            <span id="stepLabel">步骤 1 / 1</span>
+                            <button id="nextButton" type="button">下一步 →</button>
+                        </div>
+                    </div>
+                    <div class="visual-panel">
+                        <div class="panel-top"><span class="panel-label" id="visualLabel">EXECUTION MAP</span><span class="signal" id="visualSignal">● 等待执行</span></div>
+                        <div id="visualization" class="visualization"></div>
+                    </div>
+                </div>
+
+                <div class="explain-strip">
+                    <span class="explain-icon">◆</span>
+                    <div><strong id="stepTitle">程序从 main 函数开始</strong><p id="stepDescription">操作系统找到入口，准备执行第一条语句。</p></div>
+                </div>
+            </section>
+
+            <aside class="inspector">
+                <div class="inspector-heading"><span>运行时观察器</span><span class="status-dot"></span></div>
+                <div class="inspector-block"><span class="inspector-label">PROGRAM COUNTER</span><strong id="programCounter">main()</strong></div>
+                <div class="inspector-block"><span class="inspector-label">CONSOLE OUTPUT</span><pre id="consoleOutput">等待程序输出...</pre></div>
+                <div class="inspector-block"><span class="inspector-label">MEMORY SNAPSHOT</span><div id="memorySnapshot" class="memory-list"></div></div>
+                <div class="inspector-block glossary"><span class="inspector-label">本节关键词</span><div id="keywords" class="keyword-list"></div></div>
+            </aside>
+        </section>
+
+        <footer class="visual-footer"><span>CodeMaster / Visual Lab</span><span>通过观察建立 C 语言的运行直觉</span></footer>
+    </main>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/visual-demo.js"></script>
+</body>
+</html>
