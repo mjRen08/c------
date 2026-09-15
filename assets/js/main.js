@@ -195,6 +195,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // ========== 导航栏交互 ==========
 function initNavigation() {
+    ensureVisualDemoLink();
+
     // 高亮当前页面导航
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     $$('.nav-links a').forEach(link => {
@@ -206,6 +208,23 @@ function initNavigation() {
 
     // 初始化移动端抽屉导航
     initMobileNav();
+}
+
+function ensureVisualDemoLink() {
+    const navLinks = document.querySelector('.nav-container .nav-links');
+    if (!navLinks || navLinks.querySelector('a[href*="visual-demo.html"]')) return;
+
+    const isSubPage = /\/(course|test)\//.test(window.location.pathname);
+    const link = document.createElement('a');
+    link.href = isSubPage ? '../visual-demo.html' : 'visual-demo.html';
+    link.textContent = '可视化演示';
+
+    const item = document.createElement('li');
+    item.appendChild(link);
+    const quizItem = Array.from(navLinks.querySelectorAll('li')).find(function (li) {
+        return li.querySelector('a[href*="quiz.html"]');
+    });
+    navLinks.insertBefore(item, quizItem || null);
 }
 
 // 移动端汉堡菜单 & 抽屉导航
