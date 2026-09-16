@@ -396,6 +396,14 @@ body.quiz-home-page {
     width: 100%;
     margin: 0;
     padding: 0;
+    /* 关键修复：基础 .nav-links 用的是 position:absolute + left:50% + translateX(-50%)
+       （桌面端让导航水平居中）。抽屉里若沿用这套定位，这个列表就脱离了文档流，
+       后面的"退出登录"按钮会浮到同一个位置和它重叠。
+       抽屉内部必须回到普通流。 */
+    position: static;
+    left: auto;
+    transform: none;
+    white-space: normal;
 }
 .nav-drawer .nav-links li {
     width: 100%;

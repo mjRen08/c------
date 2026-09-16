@@ -168,10 +168,12 @@ button{
 
 .result-modal{
     position:fixed;
-    top:20px;
-    left:0;
-    width:100vw;
+    /* 原来写的是 top:20px + height:100vh：比屏幕高 20px，
+       底部会被顶出可视区（手机上尤其明显）。改为铺满视口。 */
+    inset:0;
     height:100vh;
+    height:100dvh;          /* 支持 dvh 的浏览器按实际可视高度算 */
+    padding:16px;
     background:rgba(0,0,0,0.75);
     display:none;
     align-items:center;
@@ -182,10 +184,13 @@ button{
 .result-content{
     background:linear-gradient(135deg, rgba(15,25,55,0.98), rgba(10,18,45,0.98));
     border:1px solid rgba(100,210,255,0.55);
-    width:640px;
+    /* 原来写死 640px，在手机上直接溢出屏幕。改成"撑满但不超过 640" */
+    width:100%;
+    max-width:640px;
     padding:32px;
     border-radius:24px;
     max-height:85vh;
+    max-height:85dvh;
     overflow-y:auto;
     overflow-x:hidden;
     overscroll-behavior:contain;

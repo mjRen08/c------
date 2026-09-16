@@ -1,0 +1,680 @@
+/* ============================================================
+   CodeMaster · 移动端补丁层（mobile.css）
+   ------------------------------------------------------------
+   【为什么是"补丁层"而不是重写】
+   本站其实已经有一定响应式基础：
+     · style.css  → 968 / 640 / 480 断点，并且已有完整的汉堡抽屉导航
+                    （.nav-toggle / .nav-drawer / .nav-overlay，由 main.js 驱动）
+     · oj.css     → 1000 / 900 / 600 断点，OJ 双栏会塌陷成单栏
+     · course.css → 900 断点
+     · 根目录页面各自的内联 <style> 也带了一些断点
+   所以这里不重复造轮子，只补前面没覆盖到的部分。
+
+   【加载顺序】
+   本文件在 </head> 的最后引入，位于所有页面样式之后，
+   同优先级下可以稳定覆盖前面的规则。
+
+   【覆盖范围】
+     1. 通用手机端基础（可视高度 / 图片 / 代码块 / 触摸反馈）
+     2. test/*.html（24 页，用 quiz.css）——原来完全没有媒体查询
+     3. course/*.html（45 页，用 course.css）——排版偏松、内边距偏大
+     4. oj.html 补充（oj.css 已较完善，这里只补按钮与状态条）
+     5. 根目录页面通用组件补遗
+   ============================================================ */
+
+/* ============================================================
+   1. 通用手机端基础（全部 80 个页面）
+   ============================================================ */
+
+/* 横屏时系统不要自动放大字号 */
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+/* 图片、视频永不超出屏幕 */
+img,
+video {
+    max-width: 100%;
+    height: auto;
+}
+
+/* canvas 带 width/height 属性，只压宽度会压扁变形，必须同时放开高度 */
+canvas {
+    max-width: 100%;
+}
+#gameCanvas,
+.game-stage canvas {
+    height: auto;
+}
+
+/* 代码块：横向滚动条在触摸设备上要能滑，且不要撑破外层卡片 */
+pre,
+.code-block,
+.code-box {
+    max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* 长英文单词 / 内存地址之类的长串不要顶破布局 */
+.lesson-text,
+.problem-detail p,
+.ai-bubble {
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+/* 手机浏览器的地址栏会伸缩：100vh 会算多一截，
+   导致抽屉底部被顶出屏幕、全屏区域出现多余滚动。
+   用 dvh 修正，不支持的旧浏览器自动忽略这两条。 */
+@supports (height: 100dvh) {
+    .hero {
+        min-height: 100dvh;
+    }
+    .auth-page,
+    body.auth-page {
+        min-height: 100dvh;
+    }
+    .nav-drawer {
+        height: 100dvh;
+    }
+}
+
+/* 全面屏底部手势条留白 */
+.nav-drawer {
+    padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+
+/* 抽屉打开时，收起会压在上面的悬浮元素。
+   AI 悬浮球/窗口的 z-index 是 9990 / 9991（写在 ai-assistant.js 里），
+   比抽屉（998）和遮罩（997）都高，会正好压在抽屉右下角的"退出登录"按钮上。
+   这里在抽屉打开期间把它们藏起来；抽屉一关，原有的 .open 状态还在，会自动恢复。 */
+body.nav-open .ai-fab,
+body.nav-open .ai-window {
+    display: none !important;
+}
+
+/* 触摸设备上 :hover 会"粘住"（点完还保持悬停态），
+   去掉那些上浮 / 放大效果，避免点一下卡片就歪着不动 */
+@media (hover: none) {
+    .card:hover,
+    .btn-primary:hover,
+    .btn-outline:hover,
+    .btn-ghost:hover,
+    .achievement-item:hover,
+    .chapter-item:hover,
+    .problem-item:hover,
+    .course-card:hover,
+    .user-avatar:hover,
+    .logo:hover,
+    .filter-tab:hover,
+    .option-item:hover {
+        transform: none;
+    }
+}
+
+/* ============================================================
+   2. test/*.html（24 个小测页，走 quiz.css）
+   quiz.css 原本一条媒体查询都没有，手机上问题最集中
+   ============================================================ */
+
+@media (max-width: 640px) {
+    #quiz-page {
+        /* 原来 margin-top:100px + padding:32px，屏幕上太挤 */
+        margin: 92px auto 28px;
+        padding: 20px 16px;
+        border-radius: 18px;
+    }
+
+    .quiz-title {
+        font-size: 19px;
+        letter-spacing: 0.5px;
+    }
+
+    #q-index {
+        font-size: 13px;
+    }
+
+    .progress-wrap {
+        height: 12px;
+    }
+
+    .question-block {
+        margin: 20px 0;
+    }
+
+    .question-text {
+        font-size: 17px;
+        margin-bottom: 16px;
+        line-height: 1.65;
+    }
+
+    .option-item {
+        padding: 13px 15px;
+        border-radius: 12px;
+        margin-bottom: 11px;
+        font-size: 15px;
+        line-height: 1.6;
+    }
+
+    /* 按钮两列排布、高度够手指点 */
+    .btn-group {
+        gap: 10px;
+        margin-top: 22px;
+    }
+    .btn-group button {
+        flex: 1 1 calc(50% - 5px);
+        min-height: 46px;
+        padding: 12px 8px;
+        font-size: 14px;
+    }
+
+    .tip-readonly {
+        font-size: 13px;
+        margin-bottom: 14px;
+    }
+
+    /* 结果弹窗内容区 */
+    .result-content {
+        padding: 20px 16px;
+        border-radius: 18px;
+    }
+    .result-content h2 {
+        font-size: 20px;
+    }
+    #score-text {
+        font-size: 16px;
+        margin: 12px 0;
+    }
+    .result-item {
+        padding: 12px 0;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+}
+
+/* 小屏手机（360px 一类）：按钮改成一列，避免两列挤到换行 */
+@media (max-width: 400px) {
+    #quiz-page {
+        padding: 16px 12px;
+    }
+    .btn-group button {
+        flex: 1 1 100%;
+    }
+    .question-text {
+        font-size: 16px;
+    }
+}
+
+/* ============================================================
+   3. course/*.html（45 个课程页，走 course.css）
+   主要问题：正文 18px / 行高 2.2、卡片内边距 28px，手机上又长又空
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .page-shell {
+        padding: 100px 20px 64px;
+    }
+}
+
+@media (max-width: 640px) {
+    .page-shell {
+        padding: 92px 14px 56px;
+    }
+
+    .lesson-card {
+        padding: 18px 15px;
+        border-radius: 18px;
+    }
+
+    .breadcrumb {
+        font-size: 12.5px;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .lesson-header {
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    /* course.css 用 clamp(30px,3vw,42px)：手机上 3vw 太小会被夹到 30px，仍偏大 */
+    .lesson-header h1 {
+        font-size: 23px;
+        line-height: 1.3;
+    }
+
+    .lesson-badge {
+        font-size: 11px;
+        padding: 6px 11px;
+    }
+
+    .meta-row {
+        gap: 8px 14px;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .panel {
+        padding: 16px 14px;
+        border-radius: 14px;
+    }
+    .panel h3 {
+        font-size: 17px;
+        margin-bottom: 13px;
+    }
+
+    /* 正文：18px/2.2 → 16px/1.95，行长与行距都更适合竖屏阅读 */
+    .lesson-text {
+        font-size: 16px;
+        line-height: 1.95;
+        letter-spacing: 0;
+    }
+    .lesson-text p {
+        margin-bottom: 17px;
+    }
+
+    .story-card,
+    .focus-box,
+    .tip-box,
+    .mini-quiz,
+    .summary-box {
+        padding: 14px 15px;
+        margin: 16px 0 20px;
+        border-radius: 14px;
+    }
+    .story-card h4,
+    .focus-box h4,
+    .mini-quiz h4,
+    .summary-box h4 {
+        font-size: 16px;
+    }
+    .mini-quiz ul {
+        padding-left: 18px;
+        line-height: 1.8;
+        font-size: 15px;
+    }
+
+    .checklist li {
+        font-size: 15px;
+        line-height: 1.85;
+        gap: 8px;
+    }
+
+    /* 代码块：字号收一档，内边距减小，靠横向滚动看长行 */
+    pre {
+        padding: 14px;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+    .code-box .code-top {
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    /* 上一章 / 下一章：竖排整行，手指好点 */
+    .chapter-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    .chapter-actions .btn {
+        width: 100%;
+        min-height: 46px;
+    }
+}
+
+/* ============================================================
+   4. oj.html 补充（oj.css 已有 1000/900/600 断点，这里只补漏）
+   ============================================================ */
+
+@media (max-width: 600px) {
+    /* 编译器状态条原来是 nowrap，文字一长就把标题挤出去 */
+    .oj-live {
+        white-space: normal;
+        font-size: 12px;
+        line-height: 1.5;
+    }
+
+    .oj-heading h1 {
+        font-size: 27px;
+    }
+
+    .problem-detail h2 {
+        font-size: 19px;
+    }
+
+    /* 测试点示例在小屏上单独占一行，避免挤成两行断字 */
+    .examples .example {
+        width: 100%;
+    }
+
+    .code-editor,
+    .free-code-editor {
+        font-size: 13px;
+        padding: 14px;
+    }
+
+    /* 编辑区按钮竖排整行 */
+    .editor-actions,
+    .free-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .editor-actions .btn,
+    .free-actions .btn {
+        width: 100%;
+        min-height: 46px;
+    }
+}
+
+/* ============================================================
+   5. 根目录页面通用组件补遗
+   （根页面各自的内联 <style> 已带断点，这里只补它们没管的公共部分）
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .container {
+        padding: 0 14px;
+    }
+
+    /* Hero 改成内容自适应高度：手机上 100vh 会留一大片空白 */
+    .hero {
+        min-height: auto;
+        padding: 104px 0 64px;
+    }
+    .hero h1 {
+        /* 跟 style.css / index.html 里作者已调好的 640px 值保持一致 */
+        font-size: 32px;
+        line-height: 1.25;
+    }
+    .hero p {
+        font-size: 15px;
+        line-height: 1.75;
+        margin-bottom: 24px;
+    }
+    .hero-badge {
+        font-size: 12px;
+        padding: 6px 12px;
+        margin-bottom: 16px;
+    }
+    .hero-buttons {
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+    .hero-buttons .btn {
+        flex: 1 1 100%;
+        min-height: 46px;
+    }
+    .hero-stats {
+        gap: 20px 28px;
+    }
+    .stat-item h3 {
+        font-size: 24px;
+    }
+
+    .section-title {
+        font-size: 22px;
+    }
+    .section-subtitle {
+        font-size: 14px;
+        margin-bottom: 26px;
+    }
+
+    /* 大幅收掉整段的上下留白（桌面是 100px） */
+    .features,
+    .courses,
+    .achievements {
+        padding: 64px 0;
+    }
+
+    /* 各页面主体区上边距：不需要在这里改，各页面已经各自处理好了。
+       核对结论（避免以后重复劳动或写错选择器）：
+         · detail.html  → .detail-container（内联 968px 断点已调）
+         · game.html    → .game-container（内联 768px 断点已调）
+         · quiz.html    → .quiz-home-wrap（内联 640px 断点已调）
+         · team.html    → .team-container（内联 640px 断点已调）
+         · list.html    → .course-container（内联 768px 断点已调）
+         · profile.html → .profile-page（内联 640/480 已调）
+       另外 style.css 里的 .detail-page / .game-page / .quiz-page
+       没有任何页面在用（死代码），别照着它们写规则。 */
+
+    .course-detail-header {
+        margin-bottom: 26px;
+    }
+    .course-detail-header h1 {
+        font-size: 24px;
+        line-height: 1.3;
+    }
+    .course-detail-meta {
+        gap: 8px 16px;
+        flex-wrap: wrap;
+        font-size: 13px;
+    }
+
+    .chapter-item {
+        padding: 15px;
+    }
+    .chapter-title {
+        gap: 9px;
+        font-size: 15px;
+    }
+
+    .quiz-header h2 {
+        font-size: 24px;
+    }
+    .quiz-progress {
+        gap: 10px;
+        margin-bottom: 22px;
+    }
+    .question-card {
+        padding: 20px 16px;
+    }
+    .quiz-actions {
+        gap: 10px;
+    }
+    .quiz-actions .btn {
+        flex: 1;
+        min-height: 46px;
+    }
+
+    .profile-avatar {
+        width: 96px;
+        height: 96px;
+        font-size: 40px;
+    }
+    .profile-info h2 {
+        font-size: 22px;
+    }
+    .profile-stats {
+        gap: 22px;
+        justify-content: center;
+    }
+
+    .footer {
+        padding: 44px 0 24px;
+    }
+    .footer-content {
+        gap: 26px;
+        margin-bottom: 26px;
+    }
+    .footer-col h4 {
+        font-size: 15px;
+        margin-bottom: 12px;
+    }
+}
+
+/* ============================================================
+   6. 登录 / 注册页（login.html、register.html）
+   这两页原本一条媒体查询都没有。而且它们的内联样式里写的是
+   `.auth-page .auth-card { padding: 44px 40px }`，优先级 (0,2,0)
+   高于 style.css 移动端的 `.auth-card { padding: 24px }` (0,1,0)，
+   所以那条移动端规则其实一直没生效。
+   下面用同优先级 + 靠后加载来覆盖。
+   ============================================================ */
+
+@media (max-width: 640px) {
+    /* 关键：body.auth-page 原来是 overflow:hidden + 垂直居中。
+       手机上弹出软键盘后表单比屏幕高，超出的部分会被直接裁掉，
+       "登录"按钮点不到。改成可滚动、顶部对齐。 */
+    body.auth-page,
+    .auth-page {
+        overflow: auto;
+        align-items: flex-start;
+        padding: 88px 16px 48px;
+    }
+
+    .auth-page .auth-card {
+        padding: 26px 20px;
+        border-radius: 18px;
+    }
+
+    .auth-page .auth-header {
+        margin-bottom: 22px;
+    }
+
+    .auth-page .auth-header h2 {
+        font-size: 22px;
+    }
+
+    .auth-page .auth-header p {
+        font-size: 13px;
+    }
+
+    .auth-page .form-group {
+        margin-bottom: 16px;
+    }
+
+    .auth-page .form-group input {
+        padding: 12px 14px;
+    }
+
+    .auth-btn {
+        min-height: 48px;
+        margin-bottom: 16px;
+    }
+
+    .form-row {
+        gap: 10px;
+        font-size: 12.5px;
+    }
+}
+
+/* ============================================================
+   7. 游戏页 HUD 与弹层（game.html）
+   手机竖屏时舞台只有约 300px 宽，而血条是固定 150px，
+   左右两栏 HUD 会挤在一起甚至顶出舞台。
+   ============================================================ */
+
+@media (max-width: 640px) {
+    .game-stage-wrap {
+        padding: 10px;
+        border-radius: 16px;
+    }
+
+    .game-hud {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+    }
+
+    .hud-left,
+    .hud-right {
+        gap: 5px;
+    }
+
+    .hud-item {
+        padding: 5px 9px;
+        font-size: 11px;
+        gap: 5px;
+    }
+
+    /* 血条原来固定 150px，缩到能在窄舞台里和右侧 HUD 共存 */
+    .health-bar {
+        width: 76px;
+        height: 6px;
+    }
+
+    .dialog-box {
+        width: calc(100% - 20px);
+        bottom: 10px;
+        padding: 12px 14px;
+        border-radius: 10px;
+    }
+
+    .dialog-speaker {
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .dialog-text {
+        font-size: 13px;
+        min-height: 40px;
+        margin-bottom: 8px;
+    }
+
+    .battle-panel,
+    .shop-panel {
+        padding: 18px 16px;
+        border-radius: 14px;
+    }
+
+    .battle-enemy {
+        font-size: 36px;
+        margin-bottom: 6px;
+    }
+
+    .battle-question {
+        font-size: 15px;
+    }
+
+    .battle-code {
+        padding: 12px;
+        font-size: 12px;
+    }
+
+    .shop-item {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .shop-item-icon {
+        font-size: 26px;
+        width: 40px;
+    }
+
+    .level-select {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .level-btn {
+        padding: 14px 8px;
+    }
+
+    .game-title {
+        /* 原来是 48px，横屏/窄屏会挤出容器 */
+        font-size: 30px;
+    }
+}
+
+/* ============================================================
+   8. 可视化演示页补充（visual-demo.html）
+   visual-demo.css 已有 1100 / 760 两档，这里只补 480 以下
+   ============================================================ */
+
+@media (max-width: 480px) {
+    .visual-shell {
+        width: min(100% - 20px, 620px);
+    }
+
+    /* 760 档把 inspector 排成两列，小屏上太挤，改回单列 */
+    .inspector {
+        grid-template-columns: 1fr;
+    }
+
+    .topic-button {
+        min-width: 124px;
+    }
+}

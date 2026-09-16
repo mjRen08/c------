@@ -20,6 +20,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const zlib = require('zlib');
 const crypto = require('crypto');
 const { Readable, Transform } = require('stream');
@@ -228,8 +229,25 @@ async function handleStatic(req, res, url) {
     return sendText(res, 403, '403 Forbidden');
   }
 
-  const isHtml = /\.html?$/i.test(file);
-  await sendFile(req, res, file, { cache: isHtml ? 'no-cache' : 'public, max-age=3600' });
+  await sendFile(req, res, file, { cache: cacheControlFor(file) });
+}
+
+/* 静态资源的缓存策略。
+   注意：这里刻意不让 CSS/JS 走长时间强缓存。
+   本机开发时文件随时在改，如果给 max-age=3600，
+   改完样式后手机浏览器一小时内都不会来取新文件，
+   看起来就像"改了没生效"。
+   改成 no-cache（仍然带 ETag）后：
+     · 内容没变 → 服务器回 304，几乎不耗流量
+     · 内容变了 → 立刻拿到新文件
+   图片/字体这类基本不变的东西才给一天缓存。 */
+function cacheControlFor(file) {
+  const ext = path.extname(file).toLowerCase();
+  if (['.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif', '.bmp', '.ico', '.svg',
+       '.woff', '.woff2', '.ttf', '.otf', '.eot'].includes(ext)) {
+    return 'public, max-age=86400';
+  }
+  return 'no-cache';
 }
 
 /* ============================================================
@@ -691,10 +709,47 @@ server.on('error', err => {
   throw err;
 });
 
+/* 找出本机在局域网里的 IPv4 地址，方便手机访问。
+   虚拟网卡（VPN / 虚拟机 / WSL）的地址手机连不上，标出来并排到后面。 */
+const VIRTUAL_ADAPTER = /radmin|virtual|vmware|vbox|hyper-?v|vethernet|loopback|tailscale|zerotier|docker|wsl|tap|tun|clash|wireguard/i;
+
+function lanAddresses() {
+  const list = [];
+  const all = os.networkInterfaces();
+  for (const [name, infos] of Object.entries(all)) {
+    for (const info of infos || []) {
+      // 跳过 IPv6、回环、以及 169.254 这类自动分配地址
+      if (info.family !== 'IPv4' || info.internal) continue;
+      if (info.address.startsWith('169.254.')) continue;
+      list.push({ name, address: info.address, virtual: VIRTUAL_ADAPTER.test(name) });
+    }
+  }
+  return list.sort((a, b) => Number(a.virtual) - Number(b.virtual));
+}
+
 server.listen(PORT, HOST, () => {
   console.log(`\n  ✅ CodeMaster 已启动（单端口一体化服务）`);
-  console.log(`  🌐 请统一用这个地址打开：http://localhost:${PORT}`);
-  console.log(`  🤖 AI       : DeepSeek / ${MODEL}    →  POST /api/ai`);
+  console.log(`  🌐 本机打开：http://localhost:${PORT}`);
+
+  const lan = lanAddresses();
+  const real = lan.filter(item => !item.virtual);
+  if (real.length) {
+    console.log(`  📱 手机打开（需与电脑连同一个 Wi-Fi）：`);
+    real.forEach(item => {
+      console.log(`       http://${item.address}:${PORT}      [${item.name}]`);
+    });
+    if (real.length > 1) {
+      console.log(`     （有多张网卡：手机连哪个网络，就用对应那条地址）`);
+    }
+  } else {
+    console.log(`  📱 手机访问：没检测到可用的局域网地址，请先让电脑连上 Wi-Fi`);
+  }
+  const virtual = lan.filter(item => item.virtual);
+  if (virtual.length) {
+    console.log(`  （另有虚拟网卡 ${virtual.map(v => v.address).join('、')}，手机连不上，忽略即可）`);
+  }
+
+  console.log(`\n  🤖 AI       : DeepSeek / ${MODEL}    →  POST /api/ai`);
   console.log(`  🧩 Wasm 编译器: 依赖同源代理 + 本地缓存  →  /vendor/npm/...`);
   console.log(`  🖼  静态资源 : HTML / CSS / JS / 图片（中文文件名已支持）`);
   console.log(`  ⛔ 停止服务 : Ctrl + C\n`);

@@ -1922,15 +1922,20 @@
 
 .adv-stage {
     position: relative;
-    /* 取屏幕能容纳的最大 1400:540 尺寸 */
-    width:  min(100vw, calc(100vh * 1400 / 540));
-    height: min(100vh, calc(100vw * 540 / 1400));
+    /* 宽度跟随容器，不要再用 100vw。
+       100vw 表示"视口宽度"，完全不理会外层
+       .game-container（padding 16px）和 .game-stage-wrap（padding 16px），
+       在手机竖屏下会比实际可用宽度大出约 64px，
+       再被 .game-stage 的 overflow:hidden 裁掉 —— 表现就是游戏框溢出、右侧被切。
+       高度统一交给 aspect-ratio 计算，避免宽高来自不同参照物而变形。 */
+    width: 100%;
+    height: auto;
     aspect-ratio: 1400 / 540;
-    max-width: none;
+    max-width: 100%;
     max-height: none;
     border-radius: 0;
     box-shadow: none;
-    margin: 0;
+    margin: 0 auto;
     overflow: hidden;
 }
 
@@ -1947,14 +1952,14 @@
 /* 屏幕极宽或极高时，让舞台保持比例并居中，不再多余内边距 */
 @media (min-aspect-ratio: 1400/540) {
     .adv-stage {
-        width: calc(100vh * 1400 / 540);
-        height: 100vh;
+        width: min(100%, calc(100vh * 1400 / 540));
+        height: auto;
     }
 }
 @media (max-aspect-ratio: 1400/540) {
     .adv-stage {
-        width: 100vw;
-        height: calc(100vw * 540 / 1400);
+        width: 100%;
+        height: auto;
     }
 }
 
