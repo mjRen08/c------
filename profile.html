@@ -1128,33 +1128,51 @@
             }
         })();
 
-        // ================= 自定义昵称与头像 =================
-        const STORAGE_NICKNAME = 'cm_profileDisplayName';
-        const STORAGE_AVATAR = 'cm_profileAvatar';
+        // ================= 存储 key：按用户名分开 =================
         const STORAGE_STREAK = 'cm_streakData';
 
+        function nicknameKey(user) {
+            return 'cm_profileDisplayName_' + (user && user.username ? user.username : 'guest');
+        }
+        function avatarKey(user) {
+            return 'cm_profileAvatar_' + (user && user.username ? user.username : 'guest');
+        }
+        function getCurrentUser() {
+            return (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
+        }
+
+        // 根据名字取头像首字符：英文大写、中文保留
+        function initialOf(name) {
+            if (!name) return 'U';
+            const first = String(name).trim().charAt(0);
+            if (!first) return 'U';
+            return /[a-zA-Z]/.test(first) ? first.toUpperCase() : first;
+        }
+
+        // ================= 应用自定义资料 =================
         function applyCustomProfile() {
-            const user = (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
+            const user = getCurrentUser();
             const username = user && user.username ? String(user.username).trim() : '';
-            const firstChar = username.charAt(0);
-            const avatarInitial = firstChar
-                ? (/[a-zA-Z]/.test(firstChar) ? firstChar.toUpperCase() : firstChar)
-                : 'U';
             const fallbackName = username || 'U';
 
-            // 昵称（用于标题显示，可以是自定义昵称）
-            const displayName = localStorage.getItem(STORAGE_NICKNAME) || fallbackName;
+            // 显示名：昵称优先，其次用户名
+            let displayName = fallbackName;
+            if (user) {
+                const stored = localStorage.getItem(nicknameKey(user));
+                if (stored && stored.trim()) displayName = stored.trim();
+            }
+
             const usernameEl = document.getElementById('profileUsername');
             if (usernameEl && usernameEl.textContent !== displayName) {
                 usernameEl.textContent = displayName;
             }
 
-            const avatarData = localStorage.getItem(STORAGE_AVATAR);
+            // 头像：有图片显示图片，没有显示"显示名首字符"
+            const avatarData = user ? localStorage.getItem(avatarKey(user)) : null;
             const imgEl = document.getElementById('profileAvatarImg');
             const fallbackEl = document.getElementById('profileAvatarFallback');
 
             if (avatarData && imgEl) {
-                // 有上传过头像：显示图片
                 if (imgEl.getAttribute('data-loaded') !== '1' || imgEl.src !== avatarData) {
                     imgEl.src = avatarData;
                     imgEl.setAttribute('data-loaded', '1');
@@ -1162,12 +1180,14 @@
                 imgEl.style.display = 'block';
                 if (fallbackEl) fallbackEl.style.display = 'none';
             } else {
-                // 没上传过头像：显示用户名首字符
                 if (fallbackEl) {
-                    fallbackEl.textContent = avatarInitial;
+                    fallbackEl.textContent = initialOf(displayName);
                     fallbackEl.style.display = 'inline';
                 }
-                if (imgEl) imgEl.style.display = 'none';
+                if (imgEl) {
+                    imgEl.style.display = 'none';
+                    imgEl.removeAttribute('data-loaded');
+                }
             }
 
             if (user) {
@@ -1175,6 +1195,14 @@
                 const dataExp = document.getElementById('dataExp');
                 if (dataLevel) dataLevel.textContent = 'Lv.' + (user.level || 1);
                 if (dataExp) dataExp.textContent = (user.exp || 0) + ' / ' + ((user.level || 1) * 200);
+            }
+        }
+
+        // 同步导航栏头像（个人中心改昵称后立刻刷新）
+        function syncNavbarAvatar() {
+            const user = getCurrentUser();
+            if (user && typeof window.updateUserUI === 'function') {
+                window.updateUserUI(user);
             }
         }
 
@@ -1202,9 +1230,15 @@
                     return;
                 }
 
+                const user = getCurrentUser();
+                if (!user) {
+                    if (typeof showToast === 'function') showToast('请先登录', 'error');
+                    return;
+                }
+
                 resizeImage(file, 400, function(dataUrl) {
                     try {
-                        localStorage.setItem(STORAGE_AVATAR, dataUrl);
+                        localStorage.setItem(avatarKey(user), dataUrl);
                     } catch (err) {
                         if (typeof showToast === 'function') showToast('存储空间不足，请选择更小的图片', 'error');
                         return;
@@ -1260,14 +1294,21 @@
             if (!modal || !input || !editBtn) return;
 
             function openModal() {
-                const current = localStorage.getItem(STORAGE_NICKNAME);
-                const user = (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
-                input.value = current || (user ? user.username : '');
+                const user = getCurrentUser();
+                if (!user) return;
+                const stored = localStorage.getItem(nicknameKey(user));
+                input.value = stored || user.username || '';
                 modal.classList.add('show');
                 setTimeout(function() { input.focus(); input.select(); }, 100);
             }
             function closeModal() { modal.classList.remove('show'); }
+
             function saveNickname() {
+                const user = getCurrentUser();
+                if (!user) {
+                    if (typeof showToast === 'function') showToast('请先登录', 'error');
+                    return;
+                }
                 const value = input.value.trim();
                 if (!value) {
                     if (typeof showToast === 'function') showToast('昵称不能为空', 'error');
@@ -1277,9 +1318,23 @@
                     if (typeof showToast === 'function') showToast('昵称不能超过20个字符', 'error');
                     return;
                 }
-                localStorage.setItem(STORAGE_NICKNAME, value);
+                localStorage.setItem(nicknameKey(user), value);
+
+                // 1. 更新标题文字
                 const usernameEl = document.getElementById('profileUsername');
                 if (usernameEl) usernameEl.textContent = value;
+
+                // 2. 更新大头像首字符（如果没有上传图片）
+                const avatarData = localStorage.getItem(avatarKey(user));
+                const fallbackEl = document.getElementById('profileAvatarFallback');
+                if (!avatarData && fallbackEl) {
+                    fallbackEl.textContent = initialOf(value);
+                    fallbackEl.style.display = 'inline';
+                }
+
+                // 3. 更新导航栏头像
+                syncNavbarAvatar();
+
                 closeModal();
                 if (typeof showToast === 'function') showToast('昵称已更新！', 'success');
             }
@@ -1296,21 +1351,8 @@
             });
         }
 
-        function observeUsername() {
-            const el = document.getElementById('profileUsername');
-            if (!el) return;
-            const observer = new MutationObserver(function() {
-                const displayName = localStorage.getItem(STORAGE_NICKNAME);
-                if (displayName && el.textContent !== displayName) {
-                    el.textContent = displayName;
-                }
-            });
-            observer.observe(el, { childList: true, characterData: true, subtree: true });
-        }
-
         // ================= 学习仪表盘渲染 =================
         function renderDashboard() {
-            // 1. 问候语（按时间段）
             const hour = new Date().getHours();
             const greetingEl = document.getElementById('greetingText');
             const emojiEl = document.getElementById('greetingEmoji');
@@ -1324,7 +1366,6 @@
             if (greetingEl) greetingEl.textContent = greeting;
             if (emojiEl) emojiEl.textContent = emoji;
 
-            // 2. 连续学习天数（基于本地日期记录）
             let streak = 1;
             try {
                 const today = new Date().toDateString();
@@ -1347,9 +1388,8 @@
             const streakEl = document.getElementById('streakDays');
             if (streakEl) streakEl.textContent = streak;
 
-            // 3. 今日目标进度（用已完成的答题数 + 完成小课数估算，无数据则为 0%）
             let todayProgress = 0;
-            const user = (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
+            const user = getCurrentUser();
             if (user) {
                 const completedCourses = (user.completedCourses || []).length;
                 todayProgress = Math.min(100, Math.round((completedCourses / 9) * 100));
@@ -1375,7 +1415,6 @@
             }
             if (ringPct) ringPct.textContent = todayProgress + '%';
 
-            // 4. 最近解锁成就（取最后3个）
             const badgesBox = document.getElementById('recentBadges');
             if (badgesBox && user && user.achievements && user.achievements.length > 0) {
                 const achievementList = (typeof window.achievementList !== 'undefined') ? window.achievementList : null;
@@ -1393,7 +1432,6 @@
                 badgesBox.innerHTML = html;
             }
 
-            // 5. 当前学习课程标签（取第一个未完成课程）
             const tag = document.getElementById('currentCourseTag');
             const nameEl = document.getElementById('currentCourseName');
             if (tag && nameEl && user && typeof courseCatalog !== 'undefined') {
@@ -1411,13 +1449,14 @@
         document.addEventListener('DOMContentLoaded', function() {
             initAvatarUpload();
             initNicknameEdit();
-            observeUsername();
             renderDashboard();
         });
 
         window.addEventListener('load', function() {
-            setTimeout(applyCustomProfile, 200);
-            setTimeout(applyCustomProfile, 500);
+            // 多次延迟保证 main.js 状态就绪后再刷新
+            setTimeout(applyCustomProfile, 100);
+            setTimeout(applyCustomProfile, 300);
+            setTimeout(syncNavbarAvatar, 350);
             setTimeout(renderDashboard, 600);
         });
     </script>
