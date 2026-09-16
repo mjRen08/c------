@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const item = document.createElement('li');
     item.appendChild(link);
-    const quizItem = Array.from(navLinks.querySelectorAll('li')).find(function (li) {
-        return li.querySelector('a[href*="quiz.html"]');
+    const ojItem = Array.from(navLinks.querySelectorAll('li')).find(function (li) {
+        return li.querySelector('a[href*="oj.html"]');
     });
-    navLinks.insertBefore(item, quizItem || null);
+    navLinks.insertBefore(item, ojItem || null);
 });

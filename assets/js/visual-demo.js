@@ -194,10 +194,25 @@ function renderBars(topic, step) {
         const deltaX = previous.left - current.left;
         const deltaY = previous.top - current.top;
         if (!deltaX && !deltaY) return;
-        item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        item.classList.add('is-moving');
+        item.style.transition = 'none';
+        item.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
         requestAnimationFrame(() => {
-            item.style.transform = '';
+            requestAnimationFrame(() => {
+                item.style.transition = '';
+                item.style.transform = 'translate3d(0, 0, 0)';
+            });
         });
+        item.addEventListener('transitionend', event => {
+            if (event.propertyName !== 'transform') return;
+            item.classList.remove('is-moving');
+            item.style.transform = '';
+        }, { once: true });
+        setTimeout(() => {
+            item.classList.remove('is-moving');
+            item.style.transform = '';
+            item.style.transition = '';
+        }, 920);
     });
 }
 
@@ -280,6 +295,20 @@ function togglePlaying() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const starField = document.querySelector('#starField');
+    if (starField) {
+        for (let index = 0; index < 60; index += 1) {
+            const star = document.createElement('span');
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            starField.appendChild(star);
+        }
+    }
     select('#nextButton').addEventListener('click', nextStep);
     select('#previousButton').addEventListener('click', () => {
         if (state.stepIndex > 0) state.stepIndex -= 1;

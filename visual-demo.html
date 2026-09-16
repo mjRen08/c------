@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/visual-demo.css">
 </head>
-<body class="visual-demo-page">
+<body class="home-page-bg visual-demo-page">
+    <div id="starField"></div>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">
@@ -18,8 +19,8 @@
             <ul class="nav-links">
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
-                <li><a href="visual-demo.html" class="active">可视化演示</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="visual-demo.html" class="active">可视化演示</a></li>
                 <li><a href="oj.html">OJ 练习场</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
@@ -60,7 +61,7 @@
                         <h2 id="topicTitle">程序是怎样启动的？</h2>
                     </div>
                     <div class="stage-actions">
-                        <button class="icon-button" id="resetButton" type="button" title="重置实验">↺</button>
+                        <button class="icon-button btn btn-ghost" id="resetButton" type="button" title="重置实验">↺</button>
                         <label class="speed-control" for="speedSelect">速度
                             <select id="speedSelect">
                                 <option value="0.6">慢速</option>
@@ -69,7 +70,7 @@
                                 <option value="3">极速</option>
                             </select>
                         </label>
-                        <button class="play-button" id="playButton" type="button"><span id="playIcon">▶</span><span id="playText">播放过程</span></button>
+                        <button class="play-button btn btn-primary" id="playButton" type="button"><span id="playIcon">▶</span><span id="playText">播放过程</span></button>
                     </div>
                 </div>
                 <p class="stage-description" id="topicDescription"></p>
@@ -79,9 +80,9 @@
                         <div class="panel-top"><span class="panel-label">SOURCE.C</span><span class="live-dot">LIVE</span></div>
                         <div id="codeLines" class="code-lines"></div>
                         <div class="step-controls">
-                            <button id="previousButton" type="button">← 上一步</button>
+                            <button class="btn btn-outline" id="previousButton" type="button">← 上一步</button>
                             <span id="stepLabel">步骤 1 / 1</span>
-                            <button id="nextButton" type="button">下一步 →</button>
+                            <button class="btn btn-outline" id="nextButton" type="button">下一步 →</button>
                         </div>
                     </div>
                     <div class="visual-panel">

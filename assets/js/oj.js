@@ -204,6 +204,20 @@
         }
     }
     document.addEventListener('DOMContentLoaded', () => {
+        const starField = document.querySelector('#starField');
+        if (starField) {
+            for (let index = 0; index < 60; index += 1) {
+                const star = document.createElement('span');
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                starField.appendChild(star);
+            }
+        }
         document.querySelectorAll('.filter-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelector('.filter-tab.active').classList.remove('active'); tab.classList.add('active'); state.filter = tab.dataset.filter; if (!visibleProblems().some(p => p.id === state.current)) state.current = visibleProblems()[0].id; render(); }));
         $('#submitCode').addEventListener('click', submit);
         $('#resetCode').addEventListener('click', renderDetail);
