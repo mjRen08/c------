@@ -1280,6 +1280,7 @@
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="visual-demo.html">可视化演示</a></li>
                 <li><a href="oj.html">OJ 练习场</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html" class="active">个人中心</a></li>
@@ -1516,8 +1517,14 @@
 
         function applyCustomProfile() {
             const user = (typeof getFromStorage === 'function') ? getFromStorage('currentUser') : null;
-            const fallbackName = user && user.username ? user.username : 'U';
+            const username = user && user.username ? String(user.username).trim() : '';
+            const firstChar = username.charAt(0);
+            const avatarInitial = firstChar
+                ? (/[a-zA-Z]/.test(firstChar) ? firstChar.toUpperCase() : firstChar)
+                : 'U';
+            const fallbackName = username || 'U';
 
+            // 昵称（用于标题显示，可以是自定义昵称）
             const displayName = localStorage.getItem(STORAGE_NICKNAME) || fallbackName;
             const usernameEl = document.getElementById('profileUsername');
             if (usernameEl && usernameEl.textContent !== displayName) {
@@ -1527,16 +1534,21 @@
             const avatarData = localStorage.getItem(STORAGE_AVATAR);
             const imgEl = document.getElementById('profileAvatarImg');
             const fallbackEl = document.getElementById('profileAvatarFallback');
+
             if (avatarData && imgEl) {
+                // 有上传过头像：显示图片
                 if (imgEl.getAttribute('data-loaded') !== '1' || imgEl.src !== avatarData) {
                     imgEl.src = avatarData;
                     imgEl.setAttribute('data-loaded', '1');
                 }
                 imgEl.style.display = 'block';
                 if (fallbackEl) fallbackEl.style.display = 'none';
-            } else if (fallbackEl) {
-                fallbackEl.textContent = fallbackName.charAt(0).toUpperCase();
-                fallbackEl.style.display = 'inline';
+            } else {
+                // 没上传过头像：显示用户名首字符
+                if (fallbackEl) {
+                    fallbackEl.textContent = avatarInitial;
+                    fallbackEl.style.display = 'inline';
+                }
                 if (imgEl) imgEl.style.display = 'none';
             }
 

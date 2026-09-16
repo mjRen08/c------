@@ -105,6 +105,12 @@ function getFromStorage(key) {
     }
 
     if (key === 'currentUser') {
+        // 关键：以 localStorage 为准。
+        // 退出登录时 localStorage 里的 currentUser 被删掉（= null），
+        // 即使 cookie 残留，也直接视为未登录。
+        if (localData === null) {
+            return null;
+        }
         const currentUser = mergeUserRecords(localData, cookieData);
         if (currentUser && currentUser.username) {
             const savedUser = getFromStorage('userProgress_' + currentUser.username);
@@ -155,7 +161,15 @@ function removeFromStorage(key) {
         localStorage.removeItem(key);
     } catch (error) {
     }
-    document.cookie = encodeURIComponent('cm_' + key) + '=; path=/; max-age=0';
+    // 多路径尝试删除 cookie，避免 path/domain 不匹配导致删不掉
+    const name = encodeURIComponent('cm_' + key);
+    const expire = '; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = name + '=; path=/; max-age=0' + expire;
+    document.cookie = name + '=; path=/; max-age=0';
+    document.cookie = name + '=' + expire;
+    // 兼容历史遗留（未编码版本）
+    document.cookie = 'cm_' + key + '=; path=/; max-age=0' + expire;
+    document.cookie = 'cm_' + key + '=; path=/; max-age=0';
 }
 
 function saveUserData(user) {
@@ -173,23 +187,24 @@ function saveUserData(user) {
 
 // ========== 初始化 ==========
 document.addEventListener('DOMContentLoaded', function () {
-    initAuth();
-    initNavigation();
-    initQuiz();
-    checkLoginStatus();
-    evaluateAchievements();
-    initOnlineTimeTracker();
-    loadAchievements();
-    initCourseFeatures();
+    // 逐条 try-catch 保护，单个失败不影响后续初始化
+    try { initAuth(); } catch (e) { console.error('[initAuth]', e); }
+    try { initNavigation(); } catch (e) { console.error('[initNavigation]', e); }
+    try { initLegacyQuiz(); } catch (e) { console.error('[initLegacyQuiz]', e); }
+    try { checkLoginStatus(); } catch (e) { console.error('[checkLoginStatus]', e); }
+    try { evaluateAchievements(); } catch (e) { console.error('[evaluateAchievements]', e); }
+    try { initOnlineTimeTracker(); } catch (e) { console.error('[initOnlineTimeTracker]', e); }
+    try { loadAchievements(); } catch (e) { console.error('[loadAchievements]', e); }
+    try { initCourseFeatures(); } catch (e) { console.error('[initCourseFeatures]', e); }
 
     // 如果是游戏页面，初始化游戏
     if (document.getElementById('gameCanvas')) {
-        initGameEngine();
+        try { initGameEngine(); } catch (e) { console.error('[initGameEngine]', e); }
     }
 
     // 如果是个人主页，加载数据
     if (window.location.pathname.includes('profile.html')) {
-        loadProfileData();
+        try { loadProfileData(); } catch (e) { console.error('[loadProfileData]', e); }
     }
 });
 
@@ -265,6 +280,10 @@ function initMobileNav() {
             closeDrawer();
             originalLogoutBtn.click();
         });
+        // 未登录时初始隐藏（若已登录则由 updateUserUI 恢复显示）
+        if (!getFromStorage('currentUser')) {
+            drawerLogout.style.display = 'none';
+        }
         drawer.appendChild(drawerLogout);
     }
 
@@ -434,25 +453,34 @@ function initAuth() {
         });
     }
 
-    // 退出登录
+    // 退出登录：不跳转，仅清除状态并更新 UI
     const logoutBtn = $('#logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
+            // 先停掉在线时长追踪，避免 pagehide 时把用户存回来
+            if (typeof window.__stopOnlineTracker === 'function') {
+                window.__stopOnlineTracker();
+            }
             removeFromStorage('currentUser');
+            AppState.currentUser = null;
+            updateUserUI(null);
             showToast('已退出登录', 'info');
-            setTimeout(() => {
-                window.location.href = 'login.html';
-            }, 800);
         });
     }
 }
 
+// 计算用户名的首字符：英文转大写，中文取第一个字
+function getUserInitial(name) {
+    if (!name) return 'U';
+    const first = String(name).trim().charAt(0);
+    if (!first) return 'U';
+    return /[a-zA-Z]/.test(first) ? first.toUpperCase() : first;
+}
+
 function checkLoginStatus() {
-    const user = getFromStorage('currentUser');
-    if (user) {
-        AppState.currentUser = user;
-        updateUserUI(user);
-    }
+    const user = getFromStorage('currentUser') || null;
+    AppState.currentUser = user;
+    updateUserUI(user);
 }
 
 function formatOnlineTime(seconds) {
@@ -479,9 +507,18 @@ function initOnlineTimeTracker() {
 
     let totalSeconds = user.onlineSeconds || 0;
     let activeSince = document.hidden ? null : Date.now();
+    let trackerStopped = false;
 
     function saveOnlineTime() {
-        if (activeSince === null) return;
+        if (trackerStopped || activeSince === null) return;
+
+        // ===== 关键修复：每次保存前检查用户是否还在 =====
+        const latest = getFromStorage('currentUser');
+        if (!latest || latest.username !== user.username) {
+            trackerStopped = true;
+            activeSince = null;
+            return;
+        }
 
         const elapsedSeconds = Math.floor((Date.now() - activeSince) / 1000);
         if (elapsedSeconds < 1) return;
@@ -502,19 +539,25 @@ function initOnlineTimeTracker() {
         updateOnlineTimeDisplay(totalSeconds);
     }
 
+    // 暴露停止方法给退出登录用
+    window.__stopOnlineTracker = function () {
+        trackerStopped = true;
+        activeSince = null;
+    };
+
     updateOnlineTimeDisplay(totalSeconds);
     document.addEventListener('visibilitychange', function () {
         if (document.hidden) {
             saveOnlineTime();
             activeSince = null;
-        } else {
+        } else if (!trackerStopped) {
             activeSince = Date.now();
         }
     });
     window.addEventListener('pagehide', saveOnlineTime);
     window.setInterval(function () {
         saveOnlineTime();
-        if (activeSince !== null) {
+        if (!trackerStopped && activeSince !== null) {
             updateOnlineTimeDisplay(totalSeconds + Math.floor((Date.now() - activeSince) / 1000));
         }
     }, 1000);
@@ -522,18 +565,37 @@ function initOnlineTimeTracker() {
 
 function updateUserUI(user) {
     const userAvatar = $('#userAvatar');
-    if (userAvatar) {
-        userAvatar.textContent = user.username.charAt(0).toUpperCase();
-        userAvatar.style.display = 'flex';
+    const logoutBtn = $('#logoutBtn');
+    const drawerLogout = document.querySelector('.nav-drawer-logout');
+
+    if (user) {
+        // ===== 已登录 =====
+        if (userAvatar) {
+            userAvatar.textContent = getUserInitial(user.username);
+            userAvatar.title = user.username;
+            userAvatar.style.display = 'flex';
+            userAvatar.onclick = function () { location.href = 'profile.html'; };
+        }
+        if (logoutBtn) logoutBtn.style.display = '';
+        if (drawerLogout) drawerLogout.style.display = '';
+    } else {
+        // ===== 未登录 =====
+        if (userAvatar) {
+            userAvatar.textContent = '👤';
+            userAvatar.title = '点击登录';
+            userAvatar.style.display = 'flex';
+            userAvatar.onclick = function () { location.href = 'login.html'; };
+        }
+        if (logoutBtn) logoutBtn.style.display = 'none';
+        if (drawerLogout) drawerLogout.style.display = 'none';
     }
 
+    // 兼容旧代码（这两个按钮不在当前 HTML 中，保留以免报错）
     const loginBtn = $('#loginBtn');
     const registerBtn = $('#registerBtn');
     if (loginBtn) loginBtn.style.display = 'none';
     if (registerBtn) registerBtn.style.display = 'none';
-}
-
-// ========== 小测系统 ==========
+}// ========== 小测系统 ==========
 let quizData = [
     {
         question: '以下哪个是C语言的正确主函数入口？',
@@ -582,7 +644,7 @@ int main() {
     }
 ];
 
-function initQuiz() {
+function initLegacyQuiz() {
     const quizContainer = $('#quizContainer');
     if (!quizContainer) return;
 

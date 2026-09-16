@@ -19,6 +19,27 @@
     const WELCOME = '你好，我是 CodeMaster 的 AI 代码助手 👋\n\n我可以帮你解答 C 语言问题、分析报错、生成代码。试试下面的问题，或者直接输入你的疑问。';
 
     /* ============================================================
+       AI 接口地址
+       ------------------------------------------------------------
+       优先用「同源」的 /api/ai —— 也就是 server.js 提供的那个端口。
+       如果本站被放到了别的端口/别的静态服务器（甚至直接双击 HTML），
+       同源请求会失败，此时自动回退到本机 CodeMaster 服务（server.js 已开启 CORS），
+       这样 AI、Wasm、图片三者就不会因为"端口不同"打架。
+       ============================================================ */
+    const API_PORT = 3000;
+    const API_BASES = ['http://localhost:' + API_PORT, 'http://127.0.0.1:' + API_PORT];
+    const AI_ENDPOINTS = (function () {
+        const list = [];
+        if (location.protocol !== 'file:') list.push(location.origin + '/api/ai');
+        API_BASES.forEach(base => {
+            const url = base + '/api/ai';
+            if (!list.includes(url)) list.push(url);
+        });
+        return list;
+    })();
+    let activeEndpoint = null;
+
+    /* ============================================================
        CSS
        ============================================================ */
     const AI_CSS = `
@@ -259,6 +280,24 @@
     white-space: pre;
   }
   .ai-bubble pre.ai-code code { background: none; padding: 0; color: inherit; }
+
+  /* 推理型模型的"思考过程"，正式回答出现后会被替换掉 */
+  .ai-thought {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #8ea3c8;
+    background: rgba(255,255,255,.03);
+    border-left: 2px solid rgba(0,212,255,.35);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 180px;
+    overflow-y: auto;
+  }
+  .ai-thought b { color: #64d2ff; font-weight: 600; }
 
   /* 光标 */
   .ai-cursor {
@@ -560,6 +599,36 @@
     /* ============================================================
        发送 / 流式接收
        ============================================================ */
+    /* 探活：确认某个地址后面确实是我们自己的 CodeMaster 后端 */
+    async function probeEndpoint(url) {
+        try {
+            const res = await fetch(url, { method: 'GET', cache: 'no-store' });
+            if (!res.ok) return false;
+            if (!(res.headers.get('content-type') || '').includes('application/json')) return false;
+            const data = await res.json();
+            return Boolean(data && data.ok);
+        } catch {
+            return false;
+        }
+    }
+
+    async function resolveEndpoint() {
+        if (activeEndpoint && await probeEndpoint(activeEndpoint)) return activeEndpoint;
+        activeEndpoint = null;
+        for (const url of AI_ENDPOINTS) {
+            if (await probeEndpoint(url)) {
+                activeEndpoint = url;
+                return url;
+            }
+        }
+        return null;
+    }
+
+    function endpointHint() {
+        return '没找到 AI 后端。请先运行 start.bat（或 node server.js）启动服务，' +
+            '然后统一用 http://localhost:' + API_PORT + ' 打开网站。';
+    }
+
     async function send() {
         const text = inputEl.value.trim();
         if (!text || state.streaming) return;
@@ -575,26 +644,39 @@
 
         const bubble = addMessage('ai', '<div class="ai-typing"><span></span><span></span><span></span></div>');
         let acc = '';
+        let think = '';
         let firstChunk = true;
 
+        const fail = html => {
+            bubble.innerHTML = `<span class="ai-err">⚠️ ${html}</span>`;
+            state.history.pop();
+        };
+
         try {
-            const res = await fetch('/api/ai', {
+            const endpoint = await resolveEndpoint();
+            if (!endpoint) return fail(escapeHtml(endpointHint()));
+
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ messages: state.history }),
             });
 
+            const ctype = res.headers.get('content-type') || '';
             if (!res.ok) {
                 let msg = `请求失败 (${res.status})`;
                 try { const j = await res.json(); if (j.error) msg = j.error; } catch { }
-                bubble.innerHTML = `<span class="ai-err">⚠️ ${escapeHtml(msg)}</span>`;
-                state.history.pop();
-                return;
+                return fail(escapeHtml(msg));
+            }
+            /* 若返回的不是事件流，说明这个地址并不是我们的后端（比如 404 页面） */
+            if (!ctype.includes('text/event-stream')) {
+                return fail(escapeHtml(endpointHint()));
             }
 
             const reader = res.body.getReader();
             const decoder = new TextDecoder();
             let buf = '';
+            let serverError = '';
 
             while (true) {
                 const { done, value } = await reader.read();
@@ -610,6 +692,16 @@
                     if (data === '[DONE]') continue;
                     try {
                         const json = JSON.parse(data);
+                        /* 思考过程（推理型模型如 deepseek-flash 会先发这个） */
+                        if (json.reasoning) {
+                            think += json.reasoning;
+                            if (firstChunk) {
+                                bubble.innerHTML = `<span class="ai-thought"><b>💭 思考中…</b><br>${escapeHtml(think)}</span>`;
+                                scrollBottom();
+                            }
+                            continue;
+                        }
+                        if (json.error) { serverError = json.error; continue; }
                         if (json.text) {
                             if (firstChunk) { bubble.innerHTML = ''; firstChunk = false; }
                             acc += json.text;
@@ -621,14 +713,17 @@
             }
 
             if (firstChunk) {
-                bubble.innerHTML = '<span class="ai-err">⚠️ 未收到回复内容</span>';
+                bubble.innerHTML = serverError
+                    ? `<span class="ai-err">⚠️ ${escapeHtml(serverError)}</span>`
+                    : (think
+                        ? `<span class="ai-thought"><b>💭 思考过程</b><br>${escapeHtml(think)}</span><span class="ai-err">⚠️ 未收到最终答案，请重试。</span>`
+                        : '<span class="ai-err">⚠️ 未收到回复内容</span>');
             } else {
                 bubble.innerHTML = renderMarkdown(acc);
                 state.history.push({ role: 'assistant', content: acc });
             }
         } catch (e) {
-            bubble.innerHTML = `<span class="ai-err">⚠️ 网络错误：${escapeHtml(e.message)}</span>`;
-            state.history.pop();
+            fail('网络错误：' + escapeHtml(e.message || '未知错误'));
         } finally {
             state.streaming = false;
             sendBtn.disabled = false;

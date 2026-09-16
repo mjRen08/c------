@@ -25,10 +25,10 @@ const visualTopics = [
         ], map: ['初始化', '判断', '分支', 'i++', '结束']
     },
     {
-        tag: '04 · 数组与指针', title: '一组数据如何被访问？', description: '数组把相同类型的数据连续放在内存里，指针则记录“从哪里找到它们”。', visual: 'ADDRESS SPACE', keywords: ['array', 'index', '&', '*'], code: ['int nums[3] = {10, 20, 30};', 'int *p = nums;', '', 'printf("%d", *p);', 'p++;', 'printf("%d", *p);'], steps: [
+        tag: '04 · 数组与指针', title: '一组数据如何被访问？', description: '数组把相同类型的数据连续放在内存里，指针则记录"从哪里找到它们"。', visual: 'ADDRESS SPACE', keywords: ['array', 'index', '&', '*'], code: ['int nums[3] = {10, 20, 30};', 'int *p = nums;', '', 'printf("%d", *p);', 'p++;', 'printf("%d", *p);'], steps: [
             { line: 0, title: '连续分配数组', description: '三个 int 元素紧挨着排列，每个元素都有自己的下标。', counter: 'nums[0..2]', output: 'array ready', memory: [{ name: '[0]', value: '10', type: '0x1000' }, { name: '[1]', value: '20', type: '0x1004' }, { name: '[2]', value: '30', type: '0x1008' }] },
             { line: 1, title: '指针指向首元素', description: '数组名在表达式中会变成首元素地址，p 保存这个地址。', counter: 'p → nums[0]', output: 'pointer ready', memory: [{ name: 'p', value: '0x1000', type: 'address' }, { name: '*p', value: '10', type: 'dereference' }] },
-            { line: 3, title: '解引用读取数据', description: '*p 不是地址，而是“地址里的值”，因此得到 10。', counter: '*p', output: '10', memory: [{ name: 'p', value: '0x1000', type: 'address' }, { name: '*p', value: '10', type: 'value' }] },
+            { line: 3, title: '解引用读取数据', description: '*p 不是地址，而是"地址里的值"，因此得到 10。', counter: '*p', output: '10', memory: [{ name: 'p', value: '0x1000', type: 'address' }, { name: '*p', value: '10', type: 'value' }] },
             { line: 4, title: '指针向后移动', description: 'p++ 按元素大小移动 4 字节，指向下一个 int。', counter: 'p++', output: '10', memory: [{ name: 'p', value: '0x1004', type: 'next int' }, { name: '*p', value: '20', type: 'value' }] },
             { line: 5, title: '读取第二个元素', description: '同一个指针变量，现在访问的是 nums[1]。', counter: '*p', output: '10 20', memory: [{ name: 'p', value: '0x1004', type: 'address' }, { name: '*p', value: '20', type: 'dereference' }] }
         ]
@@ -55,7 +55,7 @@ const visualTopics = [
             { line: 0, title: '准备第 1 轮', description: '外层循环 i = 0，暂时还没有元素确定位置。', counter: 'i = 0', output: '[7, 3, 8, 2, 5, 1, 6, 4]', memory: [{ name: '已排序', value: '0 个', type: 'right side' }], bars: [7, 3, 8, 2, 5, 1, 6, 4], active: [] },
             { line: 2, title: '比较 7 和 3', description: '7 大于 3，条件成立，交换这两个相邻元素。', counter: 'j = 0 · swap', output: '[3, 7, 8, 2, 5, 1, 6, 4]', memory: [{ name: '比较', value: '7 > 3', type: 'true' }], bars: [3, 7, 8, 2, 5, 1, 6, 4], active: [0, 1] },
             { line: 2, title: '比较 7 和 8', description: '7 小于 8，不交换，继续向右检查。', counter: 'j = 1 · keep', output: '[3, 7, 8, 2, 5, 1, 6, 4]', memory: [{ name: '比较', value: '7 < 8', type: 'false' }], bars: [3, 7, 8, 2, 5, 1, 6, 4], active: [1, 2] },
-            { line: 3, title: '8 继续向右移动', description: '8 大于 2，交换后继续向右，较大值正在“冒泡”。', counter: 'j = 2 · swap', output: '[3, 7, 2, 8, 5, 1, 6, 4]', memory: [{ name: '交换次数', value: '2', type: 'pass 1' }], bars: [3, 7, 2, 8, 5, 1, 6, 4], active: [2, 3] },
+            { line: 3, title: '8 继续向右移动', description: '8 大于 2，交换后继续向右，较大值正在"冒泡"。', counter: 'j = 2 · swap', output: '[3, 7, 2, 8, 5, 1, 6, 4]', memory: [{ name: '交换次数', value: '2', type: 'pass 1' }], bars: [3, 7, 2, 8, 5, 1, 6, 4], active: [2, 3] },
             { line: 3, title: '第 1 轮继续交换', description: '8 依次和 5、1、6、4 比较，最终移动到最右端。', counter: 'j = 3..6', output: '[3, 7, 2, 5, 1, 6, 4, 8]', memory: [{ name: '有序尾部', value: '8', type: 'locked' }], bars: [3, 7, 2, 5, 1, 6, 4, 8], active: [6, 7] },
             { line: 0, title: '准备第 2 轮', description: 'i = 1，最右侧的 8 已经有序，比较范围缩小。', counter: 'i = 1', output: 'ignore index 7', memory: [{ name: '有序尾部', value: '[8]', type: 'locked' }], bars: [3, 7, 2, 5, 1, 6, 4, 8], active: [7] },
             { line: 3, title: '小数值向左移动', description: '2、1 等较小值通过多次交换逐渐靠近左侧。', counter: 'swap adjacent', output: '[2, 3, 1, 5, 6, 4, 7, 8]', memory: [{ name: '有序尾部', value: '[7, 8]', type: 'locked' }], bars: [2, 3, 1, 5, 6, 4, 7, 8], active: [1, 2] },
@@ -125,121 +125,226 @@ const visualTopics = [
     }
 ];
 
-const state = { topicIndex: 0, stepIndex: 0, playing: false, timer: null, speed: 1 };
+const progressKey = 'cm_visual_completed_topics_v2';
+let storedTopics = [];
+try {
+    const parsedTopics = JSON.parse(localStorage.getItem(progressKey) || '[]');
+    storedTopics = Array.isArray(parsedTopics)
+        ? parsedTopics.filter(index => Number.isInteger(index) && index >= 0 && index < visualTopics.length)
+        : [];
+} catch (error) {
+    storedTopics = [];
+}
+
+const state = {
+    topicIndex: 0,
+    stepIndex: 0,
+    playing: false,
+    timer: null,
+    speed: 1,
+    completedTopics: [...new Set(storedTopics)]
+};
+
 const select = selector => document.querySelector(selector);
 
+function saveProgress() {
+    localStorage.setItem(progressKey, JSON.stringify(state.completedTopics));
+}
+
+function completeCurrentTopic() {
+    if (state.completedTopics.includes(state.topicIndex)) return;
+    state.completedTopics.push(state.topicIndex);
+    state.completedTopics.sort((first, second) => first - second);
+    saveProgress();
+}
+
 function renderTopics() {
-    select('#topicList').innerHTML = visualTopics.map((topic, index) => `
-        <button class="topic-button ${index === state.topicIndex ? 'active' : ''} ${index < state.topicIndex ? 'done' : ''}" data-topic="${index}" type="button">
-            <span class="topic-number">${String(index + 1).padStart(2, '0')}</span><span class="topic-name">${topic.title}</span>
-            <span class="topic-status">${index < state.topicIndex ? '已探索' : index === state.topicIndex ? '正在观察' : '待探索'}</span>
-        </button>
-    `).join('');
-    document.querySelectorAll('.topic-button').forEach(button => button.addEventListener('click', () => {
-        stopPlaying();
-        state.topicIndex = Number(button.dataset.topic);
-        state.stepIndex = 0;
-        render();
-    }));
+    select('#topicList').innerHTML = visualTopics.map((topic, index) => {
+        const isCompleted = state.completedTopics.includes(index);
+        const isCurrent = index === state.topicIndex;
+        const status = isCompleted ? '已探索' : (isCurrent ? '正在观察' : '待探索');
+
+        const classes = [
+            'topic-button',
+            isCurrent ? 'active' : '',
+            isCompleted ? 'done' : ''
+        ].filter(Boolean).join(' ');
+
+        return `
+            <button class="${classes}" data-topic="${index}" type="button">
+                <span class="topic-glow" aria-hidden="true"></span>
+                <span class="topic-number">${String(index + 1).padStart(2, '0')}</span>
+                <span class="topic-name">${topic.title}</span>
+                <span class="topic-status">${status}</span>
+            </button>
+        `;
+    }).join('');
+
+    document.querySelectorAll('.topic-button').forEach(button => {
+        button.addEventListener('click', () => {
+            if (button.classList.contains('is-clicking')) return;
+            button.classList.add('is-clicking');
+            stopPlaying();
+            setTimeout(() => {
+                state.topicIndex = Number(button.dataset.topic);
+                state.stepIndex = 0;
+                render();
+            }, 260);
+        });
+    });
 }
 
 function highlightCode(code) {
-    return code.replace(/(&lt;.*?&gt;|".*?")/g, '<span class="syntax-string">$1</span>')
+    const escapedCode = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return escapedCode
+        .replace(/(&lt;.*?&gt;|".*?")/g, '<span class="syntax-string">$1</span>')
         .replace(/\b(int|char|return|if|else|for|struct|FILE)\b/g, '<span class="syntax-keyword">$1</span>')
         .replace(/\b(main|printf|fopen|fwrite|fclose|factorial|sizeof)\b/g, '<span class="syntax-function">$1</span>');
 }
 
 function renderCode(topic, step) {
     select('#codeLines').innerHTML = topic.code.map((line, index) => `
-        <div class="code-line ${index === step.line ? 'active' : ''}"><span class="line-number">${String(index + 1).padStart(2, '0')}</span><code>${highlightCode(line) || '&nbsp;'}</code></div>
+        <div class="code-line ${index === step.line ? 'active' : ''}">
+            <span class="line-number">${String(index + 1).padStart(2, '0')}</span>
+            <code>${highlightCode(line) || '&nbsp;'}</code>
+        </div>
     `).join('');
+
     select('#stepLabel').textContent = `步骤 ${state.stepIndex + 1} / ${topic.steps.length}`;
     select('#previousButton').disabled = state.stepIndex === 0;
     select('#nextButton').disabled = state.stepIndex === topic.steps.length - 1;
 }
 
+/* =========================================================
+   柱状图渲染 —— 柱子原地平滑升降
+   柱子不移动，只做高度的自然增长/缩短
+   ========================================================= */
 function renderBars(topic, step) {
     const visualization = select('#visualization');
     let chart = visualization.querySelector('.bar-chart');
+
     if (!chart) {
         visualization.innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="bar-chart"></div>`;
         chart = visualization.querySelector('.bar-chart');
     }
 
-    const oldItems = new Map([...chart.querySelectorAll('.bar-item')].map(item => [item.dataset.barKey, item]));
-    const firstPositions = new Map([...oldItems].map(([key, item]) => [key, item.getBoundingClientRect()]));
-    const valueCounts = {};
-    const nextKeys = new Set();
+    const bars = step.bars;
+    const existingBars = [...chart.querySelectorAll('.bar-item')];
 
-    step.bars.forEach((value, index) => {
-        const occurrence = valueCounts[value] || 0;
-        valueCounts[value] = occurrence + 1;
-        const key = `${value}-${occurrence}`;
-        nextKeys.add(key);
-        const item = oldItems.get(key) || document.createElement('div');
-        item.className = `bar-item ${step.active.includes(index) ? 'active' : ''}`;
-        item.dataset.barKey = key;
-        item.innerHTML = `<strong>${value}</strong><i style="--bar-height: ${value * 25}px"></i><span>a[${index}]</span>`;
+    // 补充柱子（如果现有数量不足）
+    while (existingBars.length < bars.length) {
+        const item = document.createElement('div');
+        item.className = 'bar-item';
+        item.innerHTML = `<strong>0</strong><i style="--bar-height: 0px"></i><span>a[0]</span>`;
         chart.appendChild(item);
-    });
+        existingBars.push(item);
+    }
+    // 移除多余柱子（如果有）
+    while (existingBars.length > bars.length) {
+        existingBars.pop().remove();
+    }
 
-    oldItems.forEach((item, key) => {
-        if (!nextKeys.has(key)) item.remove();
-    });
+    // 按位置更新每根柱子：高度平滑过渡、数值更新、高亮切换
+    bars.forEach((value, index) => {
+        const item = existingBars[index];
+        const bar = item.querySelector('i');
+        const strong = item.querySelector('strong');
+        const label = item.querySelector('span');
 
-    [...chart.querySelectorAll('.bar-item')].forEach(item => {
-        const previous = firstPositions.get(item.dataset.barKey);
-        if (!previous) return;
-        const current = item.getBoundingClientRect();
-        const deltaX = previous.left - current.left;
-        const deltaY = previous.top - current.top;
-        if (!deltaX && !deltaY) return;
-        item.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-        requestAnimationFrame(() => {
-            item.style.transform = '';
-        });
+        // 高度变化：CSS transition 自动补间
+        bar.style.setProperty('--bar-height', `${value * 25}px`);
+
+        // 数值标签
+        if (strong.textContent !== String(value)) {
+            strong.textContent = value;
+        }
+        label.textContent = `a[${index}]`;
+
+        // 高亮状态
+        item.classList.toggle('active', step.active.includes(index));
     });
 }
 
 function renderVisualization(topic, step) {
     const visualization = select('#visualization');
+
     if (topic.visualType === 'bars') {
         renderBars(topic, step);
         return;
     }
+
     if (topic.visualType === 'stack') {
-        const stack = step.stack.map((value, index) => `<div class="stack-item ${index === step.stack.length - 1 ? 'active' : ''}">${value}</div>`).join('');
-        const queue = step.queue.length ? step.queue.map(value => `<div class="stack-item active">${value}</div>`).join('') : '<div class="stack-item">空</div>';
-        select('#visualization').innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="stack-visual"><div><div class="stack-column">${stack || '<div class="stack-item">空</div>'}</div><div class="stack-caption">栈 · LIFO</div></div><div class="flow-arrow">→</div><div><div class="stack-column">${queue}</div><div class="stack-caption">队列 · FIFO</div></div></div>`;
+        const stack = step.stack.map((value, index) =>
+            `<div class="stack-item ${index === step.stack.length - 1 ? 'active' : ''}">${value}</div>`
+        ).join('');
+
+        const queue = step.queue.length
+            ? step.queue.map(value => `<div class="stack-item active">${value}</div>`).join('')
+            : '<div class="stack-item">空</div>';
+
+        visualization.innerHTML = `
+            <div class="visual-stage-title">${topic.visual}</div>
+            <div class="stack-visual">
+                <div>
+                    <div class="stack-column">${stack || '<div class="stack-item">空</div>'}</div>
+                    <div class="stack-caption">栈 · LIFO</div>
+                </div>
+                <div class="flow-arrow">→</div>
+                <div>
+                    <div class="stack-column">${queue}</div>
+                    <div class="stack-caption">队列 · FIFO</div>
+                </div>
+            </div>`;
         return;
     }
+
     if (topic.visualType === 'list') {
-        select('#visualization').innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="flow-map">${step.list.map((item, index) => `<div class="flow-node ${index === 0 ? 'round' : ''} ${index === state.stepIndex % step.list.length ? 'active' : ''}">${item}</div>${index < step.list.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`).join('')}</div>`;
+        visualization.innerHTML = `
+            <div class="visual-stage-title">${topic.visual}</div>
+            <div class="flow-map">${step.list.map((item, index) =>
+                `<div class="flow-node ${index === 0 ? 'round' : ''} ${index === state.stepIndex % step.list.length ? 'active' : ''}">${item}</div>${index < step.list.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+            ).join('')}</div>`;
         return;
     }
+
     const map = topic.map || ['数据', '处理', '结果'];
-    select('#visualization').innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="flow-map">${map.map((item, index) => `<div class="flow-node ${index === state.stepIndex % map.length ? 'active' : ''} ${index === 0 || index === map.length - 1 ? 'round' : ''}">${item}</div>${index < map.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`).join('')}</div>`;
+    visualization.innerHTML = `
+        <div class="visual-stage-title">${topic.visual}</div>
+        <div class="flow-map">${map.map((item, index) =>
+            `<div class="flow-node ${index === state.stepIndex % map.length ? 'active' : ''} ${index === 0 || index === map.length - 1 ? 'round' : ''}">${item}</div>${index < map.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+        ).join('')}</div>`;
+
     if (!topic.map) {
-        select('#visualization').innerHTML = `<div class="visual-stage-title">${topic.visual}</div><div class="memory-visual">${step.memory.map((item, index) => `<div class="memory-cell ${index === state.stepIndex % step.memory.length ? 'active' : ''}"><span>${item.name}</span><strong>${item.value}</strong><em>${item.type}</em></div>`).join('')}</div>`;
+        visualization.innerHTML = `
+            <div class="visual-stage-title">${topic.visual}</div>
+            <div class="memory-visual">${step.memory.map((item, index) =>
+                `<div class="memory-cell ${index === state.stepIndex % step.memory.length ? 'active' : ''}">
+                    <span>${item.name}</span><strong>${item.value}</strong><em>${item.type}</em>
+                </div>`
+            ).join('')}</div>`;
     }
 }
 
 function render() {
     const topic = visualTopics[state.topicIndex];
     const step = topic.steps[state.stepIndex];
+
     select('#topicTag').textContent = topic.tag;
     select('#topicTitle').textContent = topic.title;
     select('#topicDescription').textContent = topic.description;
     select('#visualLabel').textContent = topic.visual;
-    select('#topicProgress').textContent = `${state.topicIndex + 1} / ${visualTopics.length}`;
-    select('#topicMeter').style.width = `${((state.topicIndex + 1) / visualTopics.length) * 100}%`;
+    select('#topicProgress').textContent = `${state.completedTopics.length} / ${visualTopics.length}`;
+    select('#topicMeter').style.width = `${(state.completedTopics.length / visualTopics.length) * 100}%`;
     select('#programCounter').textContent = step.counter;
     select('#consoleOutput').textContent = step.output;
     select('#stepTitle').textContent = step.title;
     select('#stepDescription').textContent = step.description;
     select('#visualSignal').textContent = state.playing ? '● 执行中' : '● 已暂停';
     select('#keywords').innerHTML = topic.keywords.map(keyword => `<span class="keyword">${keyword}</span>`).join('');
-    select('#memorySnapshot').innerHTML = step.memory.map(item => `<div class="memory-row"><span>${item.name}</span><strong>${item.value}</strong></div>`).join('');
+    select('#memorySnapshot').innerHTML = step.memory.map(item =>
+        `<div class="memory-row"><span>${item.name}</span><strong>${item.value}</strong></div>`
+    ).join('');
+
     renderTopics();
     renderCode(topic, step);
     renderVisualization(topic, step);
@@ -250,9 +355,11 @@ function nextStep() {
     if (state.stepIndex < topic.steps.length - 1) {
         state.stepIndex += 1;
     } else if (state.topicIndex < visualTopics.length - 1) {
+        completeCurrentTopic();
         state.topicIndex += 1;
         state.stepIndex = 0;
     } else {
+        completeCurrentTopic();
         stopPlaying();
     }
     render();
@@ -280,12 +387,28 @@ function togglePlaying() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const starField = document.querySelector('#starField');
+    if (starField) {
+        for (let index = 0; index < 60; index += 1) {
+            const star = document.createElement('span');
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            starField.appendChild(star);
+        }
+    }
+
     select('#nextButton').addEventListener('click', nextStep);
     select('#previousButton').addEventListener('click', () => {
         if (state.stepIndex > 0) state.stepIndex -= 1;
         render();
     });
     select('#playButton').addEventListener('click', togglePlaying);
+
     select('#speedSelect').addEventListener('change', event => {
         state.speed = Number(event.target.value);
         if (state.playing) {
@@ -293,11 +416,13 @@ document.addEventListener('DOMContentLoaded', () => {
             state.timer = setInterval(nextStep, 2600 / state.speed);
         }
     });
+
     select('#resetButton').addEventListener('click', () => {
         stopPlaying();
         state.topicIndex = 0;
         state.stepIndex = 0;
         render();
     });
+
     render();
 });

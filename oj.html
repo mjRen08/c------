@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/oj.css">
 </head>
-<body class="oj-page">
+<body class="course-page-bg oj-page">
+    <div id="starField"></div>
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo"><div class="logo-icon">Cm</div><span>CodeMaster</span></a>
@@ -16,6 +17,7 @@
                 <li><a href="index.html">首页</a></li>
                 <li><a href="list.html">课程中心</a></li>
                 <li><a href="quiz.html">在线小测</a></li>
+                <li><a href="visual-demo.html">可视化演示</a></li>
                 <li><a href="oj.html" class="active">OJ 练习场</a></li>
                 <li><a href="game.html">编程游戏</a></li>
                 <li><a href="profile.html">个人中心</a></li>
@@ -42,7 +44,7 @@
                 <div class="problem-detail" id="problemDetail"></div>
                 <div class="editor-head"><span><i></i><i></i><i></i> main.c</span><span class="language-tag">C11</span></div>
                 <textarea id="codeEditor" class="code-editor" spellcheck="false" aria-label="C语言代码编辑器"></textarea>
-                <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn" id="submitCode">▶ 提交并运行</button></div>
+                <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn btn btn-primary" id="submitCode">▶ 提交并运行</button></div>
                 <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，浏览器会加载 Wasm 编译器并运行全部测试点。</p></div></div></div>
             </section>
             <aside class="free-code-panel" aria-labelledby="freeCodeTitle">
@@ -63,7 +65,7 @@ int main(void) {
                     <div class="free-input-wrap">
                         <label for="freeCodeInput">标准输入</label>
                         <textarea id="freeCodeInput" class="free-input" spellcheck="false" placeholder="例如：\n1 2" aria-label="自由编程标准输入"></textarea>
-                        <div class="free-actions"><button class="btn btn-ghost" id="clearFreeCode">清空输出</button><button class="run-btn" id="runFreeCode">▶ 运行代码</button></div>
+                        <div class="free-actions"><button class="btn btn-ghost" id="clearFreeCode">清空输出</button><button class="run-btn btn btn-primary" id="runFreeCode">▶ 运行代码</button></div>
                         <div class="free-output-wrap"><div class="free-output-label">程序输出</div><pre id="freeCodeOutput">点击“运行代码”查看输出。</pre></div>
                     </div>
                 </div>

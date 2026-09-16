@@ -1,0 +1,8 @@
+# 依赖与运行时产物
+node_modules/
+
+# Wasm 编译器依赖的本地缓存（server.js 首次访问 CDN 时自动生成，约 95 MB）
+.cache/
+
+# 下载中的临时文件
+*.part-*

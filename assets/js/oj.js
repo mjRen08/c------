@@ -1,7 +1,34 @@
 (function () {
-    const COMPILER_URL = 'https://cdn.jsdelivr.net/npm/browsercc@0.1.1/dist/index.js';
-    const WASI_URL = 'https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.2/dist/index.js';
+    /* Wasm 编译器依赖走「本站同源代理」/vendor/npm/...
+       —— 由 server.js 首次从 CDN 取回后缓存到 .cache/vendor，之后本地直读。
+       这样编译器与 AI、图片共用同一个端口/源，不再需要额外开一个 HTTP 服务。
+       如果页面被放到别的静态服务器（没有 /vendor 代理），自动回退到 CDN。 */
+    const COMPILER_SOURCES = [
+        '/vendor/npm/browsercc@0.1.1/dist/index.js',
+        'https://cdn.jsdelivr.net/npm/browsercc@0.1.1/dist/index.js'
+    ];
+    const WASI_SOURCES = [
+        '/vendor/npm/@bjorn3/browser_wasi_shim@0.4.2/dist/index.js',
+        'https://cdn.jsdelivr.net/npm/@bjorn3/browser_wasi_shim@0.4.2/dist/index.js'
+    ];
+    /* 首次需要下载并缓存约 95 MB（clang.wasm 42MB + lld.wasm 23MB + sysroot.tar 29MB），
+       同源缓存后再次打开基本是秒开，所以超时给得宽松一些。 */
+    const COMPILE_TIMEOUT_MS = 300000;
+    const SERVER_HINT = '请先运行 start.bat（或 node server.js），再用 http://localhost:3000/oj.html 打开本页。';
     let compilerPromise;
+
+    /* 依次尝试多个来源，返回 { mod, url } */
+    async function importFirst(urls) {
+        let lastError;
+        for (const url of urls) {
+            try {
+                return { mod: await import(url), url };
+            } catch (error) {
+                lastError = error;
+            }
+        }
+        throw lastError || new Error('无法加载模块');
+    }
 
     const problems = [
         { id: 1, title: '你好，C语言！', level: 'easy', label: '入门', description: '输出一行 Hello, CodeMaster!，熟悉 C 语言程序的基本结构。', input: '无', output: 'Hello, CodeMaster!', publicCases: [{ input: '无', output: 'Hello, CodeMaster!' }], hiddenCases: [{ input: '无', output: 'Hello, CodeMaster!' }], starter: '#include <stdio.h>\n\nint main(void) {\n    // 在这里写下你的代码\n    return 0;\n}' },
@@ -24,14 +51,18 @@
     }
     function loadCompiler() {
         if (!compilerPromise) {
-            compilerPromise = Promise.all([import(COMPILER_URL), import(WASI_URL)]).then(([compiler, wasi]) => ({
-                compile: compiler.compile,
-                File: wasi.File,
-                OpenFile: wasi.OpenFile,
-                ConsoleStdout: wasi.ConsoleStdout,
-                WASI: wasi.WASI
+            compilerPromise = Promise.all([
+                importFirst(COMPILER_SOURCES),
+                importFirst(WASI_SOURCES)
+            ]).then(([compiler, wasi]) => ({
+                compile: compiler.mod.compile,
+                File: wasi.mod.File,
+                OpenFile: wasi.mod.OpenFile,
+                ConsoleStdout: wasi.mod.ConsoleStdout,
+                WASI: wasi.mod.WASI,
+                source: compiler.url.startsWith('/') ? '本站同源代理' : 'jsDelivr CDN'
             })).then(runtime => {
-                setCompilerStatus('Wasm 编译器已就绪', true);
+                setCompilerStatus(`Wasm 编译器已就绪（${runtime.source}）`, true);
                 return runtime;
             }).catch(error => {
                 setCompilerStatus('Wasm 加载失败，将使用结构检查', false);
@@ -120,14 +151,14 @@
     }
     async function judgeWithCompiler(source, problem, setStatus) {
         if (location.protocol === 'file:') {
-            throw new Error('当前页面通过 file:// 打开，浏览器无法稳定运行 Wasm 编译器。请将项目部署到 GitHub Pages，或通过本地 HTTP/HTTPS 服务打开。');
+            throw new Error(`当前页面是用 file:// 直接打开的，浏览器不会加载 Wasm 模块。${SERVER_HINT}`);
         }
-        setStatus('正在加载浏览器 C 编译器（首次加载约 95 MB）...');
+        setStatus('正在加载浏览器 C 编译器（首次约 95 MB，会缓存到本机）...');
         const runtime = await loadCompiler();
         setStatus('正在编译 C11 代码...');
         const compiled = await Promise.race([
             runtime.compile({ source, fileName: 'main.c', flags: [] }),
-            new Promise((resolve, reject) => setTimeout(() => reject(new Error('Wasm 编译器响应超时，已准备切换到 JS 严格结构检查。')), 120000))
+            new Promise((resolve, reject) => setTimeout(() => reject(new Error('Wasm 编译器响应超时，已准备切换到 JS 严格结构检查。')), COMPILE_TIMEOUT_MS))
         ]);
         if (!compiled.module) {
             return { ok: false, status: 'Compile Error', message: compiled.compileOutput || '编译失败，请检查 C 代码。' };
@@ -157,11 +188,11 @@
         output.className = 'free-output-pending';
         output.textContent = '正在加载 Wasm 编译器并编译代码...';
         try {
-            if (location.protocol === 'file:') throw new Error('请通过 HTTP/HTTPS 服务打开页面。');
+            if (location.protocol === 'file:') throw new Error(`file:// 下无法加载 Wasm 模块。${SERVER_HINT}`);
             const runtime = await loadCompiler();
             const compiled = await Promise.race([
                 runtime.compile({ source, fileName: 'playground.c', flags: [] }),
-                new Promise((resolve, reject) => setTimeout(() => reject(new Error('编译超时，请检查代码或稍后重试。')), 120000))
+                new Promise((resolve, reject) => setTimeout(() => reject(new Error('编译超时，请检查代码或稍后重试。')), COMPILE_TIMEOUT_MS))
             ]);
             if (!compiled.module) throw new Error(compiled.compileOutput || '编译失败，请检查 C 代码。');
             output.textContent = await runModule(compiled.module, input, runtime) || '（程序没有输出）';
@@ -204,6 +235,20 @@
         }
     }
     document.addEventListener('DOMContentLoaded', () => {
+        const starField = document.querySelector('#starField');
+        if (starField) {
+            for (let index = 0; index < 60; index += 1) {
+                const star = document.createElement('span');
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
+                const size = Math.random() * 2 + 1;
+                star.style.width = `${size}px`;
+                star.style.height = `${size}px`;
+                starField.appendChild(star);
+            }
+        }
         document.querySelectorAll('.filter-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelector('.filter-tab.active').classList.remove('active'); tab.classList.add('active'); state.filter = tab.dataset.filter; if (!visibleProblems().some(p => p.id === state.current)) state.current = visibleProblems()[0].id; render(); }));
         $('#submitCode').addEventListener('click', submit);
         $('#resetCode').addEventListener('click', renderDetail);
