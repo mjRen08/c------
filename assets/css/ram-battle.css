@@ -1,0 +1,910 @@
+/* ============================================================
+   ram-battle.css
+   内存大逃杀 · 完整版
+   包含：P 标签、书签标记、滑入动画
+   ============================================================ */
+:root {
+    --ram-bg: #080b11;
+    --ram-panel: #0f1620;
+    --ram-panel2: #161f2b;
+    --ram-border: #243240;
+    --ram-text: #dce6f2;
+    --ram-dim: #5a6e84;
+    --ram-cyan: #22d3ee;
+    --ram-green: #34d399;
+    --ram-amber: #fbbf24;
+    --ram-red: #fb7185;
+    --ram-purple: #a78bfa
+}
+
+.ram-root {
+    display: none;
+    position: absolute;
+    inset: 0;
+    overflow: auto;
+    padding: 12px;
+    background: radial-gradient(700px 360px at 50% -10%, #10283c 0%, transparent 68%), var(--ram-bg);
+    color: var(--ram-text);
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, 'Cascadia Code', Consolas, monospace;
+    z-index: 15;
+    -webkit-font-smoothing: antialiased
+}
+
+.ram-root.active {
+    display: block
+}
+
+.ram-shell {
+    width: min(100%, 900px);
+    margin: 0 auto;
+    background: linear-gradient(180deg, #121a24, #0d131b);
+    border: 1px solid var(--ram-border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    box-shadow: 0 18px 40px #0009;
+    position: relative
+}
+
+.ram-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--ram-border);
+    margin-bottom: 10px
+}
+
+.ram-header h2 {
+    font-size: 14px;
+    color: #fff;
+    margin: 0
+}
+
+.ram-header h2 small {
+    color: var(--ram-cyan);
+    font-size: 9px;
+    font-weight: 500;
+    margin-left: 6px
+}
+
+.ram-stats {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap
+}
+
+.ram-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1.1
+}
+
+.ram-stat small {
+    font-size: 8px;
+    color: var(--ram-dim)
+}
+
+.ram-stat strong {
+    font-size: 12px;
+    color: var(--ram-cyan)
+}
+
+.ram-stat.hp strong {
+    color: var(--ram-red)
+}
+
+.ram-stat.wave strong {
+    color: var(--ram-purple)
+}
+
+.ram-stat.score strong {
+    color: var(--ram-amber)
+}
+
+/* ============================================================
+   内存棋盘：顶部留 18px 给标签
+   ============================================================ */
+.ram-memory {
+    background: #080d13;
+    border: 1px solid #182430;
+    border-radius: 11px;
+    padding: 18px 10px 10px;
+    margin-bottom: 10px
+}
+
+.ram-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px
+}
+
+.ram-cell {
+    aspect-ratio: 1/.72;
+    background: #131c26;
+    border: 1px solid #1f2c3a;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: visible;
+    transition: border-color .2s, box-shadow .2s, background .2s
+}
+
+.ram-cell .addr {
+    position: absolute;
+    top: 2px;
+    left: 3px;
+    color: #3a4d62;
+    font-size: 6px
+}
+
+.ram-cell .value {
+    font-size: 12px;
+    font-weight: 800;
+    color: #8aa2ba
+}
+
+/* ============ 玩家 ============ */
+.ram-cell.player {
+    border: 2px solid var(--ram-cyan);
+    background: #12222e;
+    box-shadow: 0 0 12px #22d3ee88;
+    z-index: 3;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.player .value {
+    color: var(--ram-cyan)
+}
+
+.ram-cell.aiming {
+    border-color: var(--ram-amber);
+    box-shadow: 0 0 14px #fbbf24aa
+}
+
+/* ============ 目标格 ============ */
+.ram-cell.target {
+    border: 2px solid var(--ram-cyan);
+    background: #0f2b38;
+    box-shadow: 0 0 16px #22d3ee99;
+    animation: ramPulse 1.4s infinite
+}
+
+.ram-cell.target:before {
+    content: '→';
+    position: absolute;
+    right: -3px;
+    top: -4px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: var(--ram-cyan);
+    color: #06121a;
+    text-align: center;
+    line-height: 17px;
+    font-weight: 900;
+    z-index: 5
+}
+
+/* ============ 敌人 ============ */
+.ram-cell.enemy-q {
+    border: 2px solid var(--ram-red);
+    background: #2a1219;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.enemy-r {
+    border: 2px solid var(--ram-amber);
+    background: #2a2110;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.enemy-s {
+    border: 2px solid var(--ram-purple);
+    background: #211a35;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.enemy-t {
+    border: 2px solid #f472b6;
+    background: #2a141a;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.enemy-u {
+    border: 2px solid #38bdf8;
+    background: #0f2230;
+    will-change: transform, opacity, filter
+}
+
+.ram-cell.enemy-v {
+    border: 2px solid #facc15;
+    background: #2a2410;
+    will-change: transform, opacity, filter
+}
+
+/* ============================================================
+   敌人名字标签（位置基准）
+   ============================================================ */
+.ram-cell .enemy-label {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    line-height: 14px;
+    padding: 0 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    color: #071018;
+    background: var(--ram-red);
+    font-weight: 900;
+    z-index: 6
+}
+
+.ram-cell.enemy-r .enemy-label { background: var(--ram-amber) }
+.ram-cell.enemy-s .enemy-label { background: var(--ram-purple) }
+.ram-cell.enemy-t .enemy-label { background: #f472b6 }
+.ram-cell.enemy-u .enemy-label { background: #38bdf8 }
+.ram-cell.enemy-v .enemy-label { background: #facc15 }
+
+/* ============================================================
+   玩家标记 p（位置、尺寸、字体与 enemy-label 完全一致）
+   ============================================================ */
+.ram-cell .player-label {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    line-height: 14px;
+    padding: 0 4px;
+    border-radius: 4px;
+    white-space: nowrap;
+    color: #06121a;
+    background: linear-gradient(180deg, #9cf3ff, #22d3ee);
+    font-weight: 900;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+    z-index: 8;
+    border: 1px solid rgba(255, 255, 255, .9);
+    box-shadow: 0 0 14px rgba(34, 211, 238, .95), 0 2px 5px rgba(0, 0, 0, .55);
+    letter-spacing: .3px;
+    pointer-events: none
+}
+
+/* ============================================================
+   书签标记（醒目版）
+   ============================================================ */
+.ram-cell.bookmark {
+    background: linear-gradient(180deg, #163a28, #0f2418);
+    border: 2px dashed var(--ram-green);
+    box-shadow: 0 0 0 1px rgba(52, 211, 153, .45),
+                0 0 22px rgba(52, 211, 153, .65);
+    animation: ramBookmarkPulse 1.8s ease-in-out infinite;
+    z-index: 2
+}
+
+.ram-cell.bookmark .value {
+    color: #8df5c2;
+    text-shadow: 0 0 8px rgba(52, 211, 153, .8)
+}
+
+.ram-cell .bookmark-badge {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 9px;
+    line-height: 14px;
+    padding: 0 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+    color: #062017;
+    background: linear-gradient(180deg, #b8fcd8, #34d399);
+    font-weight: 900;
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace;
+    box-shadow: 0 0 14px rgba(52, 211, 153, 1), 0 2px 5px rgba(0, 0, 0, .55);
+    border: 1px solid rgba(255, 255, 255, .95);
+    letter-spacing: .5px;
+    pointer-events: none;
+    z-index: 9;
+    animation: ramBookmarkBob 1.4s ease-in-out infinite
+}
+
+@keyframes ramBookmarkPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 1px rgba(52, 211, 153, .45),
+                    0 0 22px rgba(52, 211, 153, .65);
+    }
+    50% {
+        box-shadow: 0 0 0 4px rgba(52, 211, 153, .6),
+                    0 0 38px rgba(52, 211, 153, 1);
+    }
+}
+
+@keyframes ramBookmarkBob {
+    0%, 100% { transform: translateX(-50%) translateY(0) scale(1) }
+    50%      { transform: translateX(-50%) translateY(-3px) scale(1.15) }
+}
+
+/* ============ 道具 ============ */
+.ram-cell .item {
+    position: absolute;
+    bottom: 2px;
+    left: 3px;
+    font-size: 11px;
+    animation: ramBob 1.5s infinite;
+    z-index: 5
+}
+
+/* ============ 护盾 ============ */
+.ram-cell.shield {
+    box-shadow: inset 0 0 0 2px var(--ram-green), 0 0 8px #34d39966
+}
+
+/* ============ 敌人血量 ============ */
+.ram-cell .hp {
+    position: absolute;
+    right: 2px;
+    bottom: 1px;
+    font-size: 8px;
+    background: #fff9;
+    color: #070b10;
+    border-radius: 3px;
+    padding: 0 2px;
+    font-weight: 900;
+    z-index: 5
+}
+
+/* ============================================================
+   玩家滑入动画：青色光环
+   ============================================================ */
+.ram-cell.player[style*="transition"]::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 3px solid var(--ram-cyan);
+    animation: ramPlayerAura 0.75s ease-out forwards;
+    z-index: 4
+}
+
+@keyframes ramPlayerAura {
+    0% {
+        opacity: 1;
+        transform: scale(0.9);
+        border-width: 3px
+    }
+    55% {
+        opacity: 0.65
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2.6);
+        border-width: 1px
+    }
+}
+
+/* ============================================================
+   敌人滑入动画：彩色光环
+   ============================================================ */
+.ram-cell[class*="enemy-"][style*="transition"]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 3px solid currentColor;
+    animation: ramEnemyAura 0.6s ease-out forwards;
+    z-index: 4;
+    opacity: .95
+}
+
+.ram-cell.enemy-q[style*="transition"]::after { color: var(--ram-red) }
+.ram-cell.enemy-r[style*="transition"]::after { color: var(--ram-amber) }
+.ram-cell.enemy-s[style*="transition"]::after { color: var(--ram-purple) }
+.ram-cell.enemy-t[style*="transition"]::after { color: #f472b6 }
+.ram-cell.enemy-u[style*="transition"]::after { color: #38bdf8 }
+.ram-cell.enemy-v[style*="transition"]::after { color: #facc15 }
+
+@keyframes ramEnemyAura {
+    0% {
+        opacity: 1;
+        transform: scale(0.85);
+        border-width: 3px
+    }
+    55% {
+        opacity: 0.55
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2.2);
+        border-width: 1px
+    }
+}
+
+/* ============ 敌人面板 ============ */
+.ram-enemies {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 5px;
+    margin-bottom: 10px
+}
+
+.ram-enemy {
+    background: var(--ram-panel2);
+    border: 1px solid var(--ram-border);
+    border-radius: 7px;
+    padding: 5px 7px;
+    display: flex;
+    gap: 5px;
+    align-items: center
+}
+
+.ram-enemy.dead {
+    opacity: .25;
+    filter: grayscale(1)
+}
+
+.ram-enemy .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none
+}
+
+.ram-enemy .info {
+    min-width: 0;
+    flex: 1;
+    font-size: 9px
+}
+
+.ram-enemy .name {
+    display: flex;
+    justify-content: space-between;
+    gap: 4px;
+    font-weight: 800
+}
+
+.ram-enemy .pos {
+    color: var(--ram-dim);
+    font-weight: 500
+}
+
+.ram-enemy .bar {
+    height: 4px;
+    background: #0c141c;
+    border-radius: 2px;
+    margin-top: 3px;
+    overflow: hidden
+}
+
+.ram-enemy .bar i {
+    display: block;
+    height: 100%;
+    transition: width .2s
+}
+
+/* ============ 日志 ============ */
+.ram-log {
+    height: 54px;
+    overflow: auto;
+    background: #080d13;
+    border: 1px solid #182430;
+    border-radius: 8px;
+    padding: 5px 8px;
+    font-size: 9px;
+    line-height: 1.5;
+    margin-bottom: 9px;
+    color: #7a90a8
+}
+
+.ram-log b {
+    color: var(--ram-cyan)
+}
+
+.ram-log .red {
+    color: var(--ram-red)
+}
+
+.ram-log .green {
+    color: var(--ram-green)
+}
+
+.ram-log .amber {
+    color: var(--ram-amber)
+}
+
+.ram-log .purple {
+    color: var(--ram-purple)
+}
+
+/* ============ 操作按钮 ============ */
+.ram-ops {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px
+}
+
+.ram-op {
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 7px 3px;
+    border-radius: 6px;
+    cursor: pointer;
+    background: linear-gradient(#1b2a3a, #152230);
+    border: 1px solid #2b3f54;
+    color: #c7e3ff
+}
+
+.ram-op:hover:not(:disabled) {
+    border-color: var(--ram-cyan);
+    transform: translateY(-1px)
+}
+
+.ram-op:disabled {
+    opacity: .3;
+    cursor: not-allowed
+}
+
+.ram-op small {
+    display: block;
+    color: #5d7892;
+    font-size: 7px;
+    margin-top: 2px
+}
+
+.ram-op.attack {
+    border-color: #6b2733;
+    color: #ffb0bb
+}
+
+.ram-op.special {
+    border-color: #4b3971;
+    color: #d4c4ff
+}
+
+.ram-op.defend {
+    border-color: #1e5a3a;
+    color: #a7e8c8
+}
+
+.ram-op.bookmark-set {
+    border-color: #2e8a5a;
+    color: #b8fcd8;
+    background: linear-gradient(180deg, #1e3a2a, #0f2418);
+    box-shadow: 0 0 8px rgba(52, 211, 153, .35)
+}
+
+/* ============ 底部提示 ============ */
+.ram-note {
+    border-top: 1px solid var(--ram-border);
+    margin-top: 9px;
+    padding-top: 7px;
+    color: #50677e;
+    font-size: 8px
+}
+
+/* ============ 弹窗 ============ */
+.ram-overlay {
+    position: absolute;
+    inset: 0;
+    background: #080c11ee;
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px
+}
+
+.ram-overlay[hidden] {
+    display: none
+}
+
+.ram-card {
+    max-width: 390px;
+    width: 100%;
+    text-align: center
+}
+
+.ram-card h3 {
+    font-size: 21px;
+    color: var(--ram-red);
+    margin: 0 0 6px
+}
+
+.ram-card p {
+    font-size: 11px;
+    line-height: 1.8;
+    color: #8ba3ba;
+    background: #0c131b;
+    border: 1px solid #1a2531;
+    border-radius: 9px;
+    padding: 12px;
+    margin: 0 0 14px
+}
+
+.ram-card button {
+    width: 100%;
+    font: 700 12px inherit;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    background: linear-gradient(#12556b, #0d3a4b);
+    border: 1px solid #1b7f9e;
+    color: #c9f5ff
+}
+
+/* ============ 关键帧 ============ */
+@keyframes ramPulse {
+    50% {
+        box-shadow: 0 0 0 5px #22d3ee22, 0 0 22px #22d3eecc
+    }
+}
+
+@keyframes ramBob {
+    50% {
+        transform: scale(1.2)
+    }
+}
+
+/* ============ 手机端 ============ */
+@media(max-width:600px) {
+    .ram-root {
+        padding: 6px
+    }
+
+    .ram-shell {
+        padding: 10px
+    }
+
+    .ram-grid {
+        gap: 2px
+    }
+
+    .ram-cell .value {
+        font-size: 9px
+    }
+
+    .ram-cell .addr {
+        font-size: 5px
+    }
+
+    .ram-cell .enemy-label,
+    .ram-cell .player-label,
+    .ram-cell .bookmark-badge {
+        font-size: 8px;
+        line-height: 12px;
+        padding: 0 4px;
+        top: -9px
+    }
+
+    .ram-ops {
+        grid-template-columns: repeat(5, 1fr)
+    }
+
+    .ram-op {
+        font-size: 8px;
+        padding: 6px 1px
+    }
+
+    .ram-header h2 {
+        font-size: 12px
+    }
+
+    .ram-stat strong {
+        font-size: 10px
+    }
+
+    .ram-enemies {
+        grid-template-columns: repeat(2, 1fr)
+    }
+
+    .ram-memory {
+        padding: 16px 5px 5px
+    }
+}
+
+/* ============ 展开舞台 ============ */
+.game-stage:has(.ram-root.active) {
+    aspect-ratio: auto;
+    min-height: 0;
+    overflow: visible;
+    background: transparent
+}
+
+.game-stage:has(.ram-root.active) .ram-root {
+    position: relative;
+    inset: auto;
+    min-height: 0;
+    overflow: visible;
+    padding: 6px
+}
+
+.game-stage:has(.ram-root.active) .ram-shell {
+    width: min(100%, 760px);
+    max-width: 100%;
+    padding: 10px 12px
+}
+
+.game-stage:has(.ram-root.active) .ram-header {
+    padding-bottom: 6px;
+    margin-bottom: 7px
+}
+
+.game-stage:has(.ram-root.active) .ram-memory {
+    padding: 18px 7px 7px;
+    margin-bottom: 7px
+}
+
+.game-stage:has(.ram-root.active) .ram-grid {
+    gap: 3px
+}
+
+.game-stage:has(.ram-root.active) .ram-cell {
+    aspect-ratio: 1/.55
+}
+
+.game-stage:has(.ram-root.active) .ram-cell .value {
+    font-size: 11px
+}
+
+.game-stage:has(.ram-root.active) .ram-enemies {
+    margin-bottom: 7px
+}
+
+.game-stage:has(.ram-root.active) .ram-log {
+    height: 46px;
+    margin-bottom: 7px
+}
+
+/* 中文用无衬线，数值用等宽 */
+.game-stage:has(.ram-root.active) .ram-root {
+    font-family: "Microsoft YaHei", "Noto Sans SC", "PingFang SC", sans-serif;
+    font-size: 13px;
+    letter-spacing: 0
+}
+
+.game-stage:has(.ram-root.active) .ram-header h2,
+.game-stage:has(.ram-root.active) .ram-stat strong,
+.game-stage:has(.ram-root.active) .ram-cell .addr,
+.game-stage:has(.ram-root.active) .ram-cell .value,
+.game-stage:has(.ram-root.active) .ram-op small {
+    font-family: "JetBrains Mono", "Cascadia Code", Consolas, monospace
+}
+
+.game-stage:has(.ram-root.active) .ram-header h2 {
+    font-weight: 800;
+    letter-spacing: .3px
+}
+
+.game-stage:has(.ram-root.active) .ram-stat small,
+.game-stage:has(.ram-root.active) .ram-cell .addr {
+    font-weight: 600
+}
+
+.game-stage:has(.ram-root.active) .ram-enemy .info {
+    font-size: 11px
+}
+
+.game-stage:has(.ram-root.active) .ram-log {
+    font-size: 11px;
+    line-height: 1.55
+}
+
+.game-stage:has(.ram-root.active) .ram-op {
+    font-size: 11px;
+    font-weight: 800
+}
+
+.game-stage:has(.ram-root.active) .ram-op small {
+    font-size: 8px;
+    font-weight: 600
+}
+
+.game-stage:has(.ram-root.active) .ram-note {
+    color: #d0deea;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6
+}
+
+/* ============ 开始界面 ============ */
+#ramStartScreen {
+    justify-content: flex-start;
+    overflow-y: auto;
+    padding: 30px 24px
+}
+
+#ramStartScreen .game-title {
+    margin-top: auto
+}
+
+#ramStartScreen .game-subtitle {
+    margin-bottom: 26px
+}
+
+#ramStartScreen .controls-hint {
+    position: static;
+    margin-top: 22px;
+    margin-bottom: auto;
+    max-width: 100%
+}
+
+.ram-start-brief {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    width: min(100%, 780px);
+    margin-bottom: 30px
+}
+
+.ram-start-brief>div {
+    flex: 1 1 210px;
+    background: linear-gradient(180deg, #121a24, #0d131b);
+    border: 1px solid var(--ram-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: left;
+    box-shadow: 0 10px 24px #0006
+}
+
+.ram-start-brief h4 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ram-cyan);
+    letter-spacing: .3px
+}
+
+.ram-start-brief p {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.8;
+    color: #9fb3c8;
+    font-family: "Microsoft YaHei", "Noto Sans SC", "PingFang SC", sans-serif
+}
+
+.ram-start-brief b {
+    color: var(--ram-amber);
+    font-weight: 700
+}
+
+@media(max-width:768px) {
+    #ramStartScreen {
+        padding: 22px 14px
+    }
+
+    #ramStartScreen .controls-hint {
+        margin-top: 16px;
+        font-size: 12px
+    }
+
+    .ram-start-brief {
+        gap: 10px;
+        margin-bottom: 20px
+    }
+
+    .ram-start-brief>div {
+        flex: 1 1 100%;
+        padding: 10px 12px
+    }
+
+    .ram-start-brief h4 {
+        font-size: 12px;
+        margin-bottom: 5px
+    }
+
+    .ram-start-brief p {
+        font-size: 11px;
+        line-height: 1.7
+    }
+}

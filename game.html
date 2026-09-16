@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/adventure.css">
+    <link rel="stylesheet" href="assets/css/ram-battle.css">
+    <link rel="stylesheet" href="assets/css/bit-puzzle.css">
+    <link rel="stylesheet" href="assets/css/2048.css">
     <style>
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -23,24 +26,26 @@
             animation: fadeUp 0.6s ease both;
         }
 
+        /* 四个游戏入口排成一排 */
         .game-picker {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
             margin-bottom: 32px;
         }
 
         .game-choice {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 24px;
-            padding: 24px;
+            text-align: center;
+            gap: 12px;
+            padding: 16px 12px;
             background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
             border: 2px solid var(--border);
             border-radius: 16px;
             color: var(--text-primary);
             cursor: pointer;
-            text-align: left;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
@@ -49,6 +54,8 @@
 
         .game-choice:nth-child(1) { animation-delay: 0.05s; }
         .game-choice:nth-child(2) { animation-delay: 0.1s; }
+        .game-choice:nth-child(3) { animation-delay: 0.15s; }
+        .game-choice:nth-child(4) { animation-delay: 0.2s; }
 
         .game-choice::before {
             content: '';
@@ -61,12 +68,12 @@
         }
 
         .game-choice img {
-            width: 130px;
-            height: 130px;
+            width: 72px;
+            height: 72px;
             object-fit: contain;
             border-radius: 12px;
             background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
+            padding: 6px;
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             flex-shrink: 0;
@@ -81,17 +88,17 @@
 
         .game-choice strong {
             display: block;
-            font-size: 20px;
-            margin-bottom: 8px;
+            font-size: 15px;
+            margin-bottom: 4px;
             color: #fff;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             transition: color 0.3s;
         }
 
         .game-choice span {
             color: var(--text-secondary);
-            font-size: 14px;
-            line-height: 1.6;
+            font-size: 12px;
+            line-height: 1.4;
             display: block;
         }
 
@@ -129,14 +136,12 @@
             background: #000;
         }
 
-        #gameCanvas, #snakeCanvas {
+        #gameCanvas {
             display: block;
             width: 100%;
             height: 100%;
             image-rendering: pixelated;
         }
-
-        #snakeCanvas { display: none; background: #08131c; }
 
         .game-hud {
             position: absolute;
@@ -356,15 +361,21 @@
         .stat-col .num { font-size: 28px; color: var(--primary); font-weight: 700; }
         .stat-col .label { font-size: 13px; color: var(--text-muted); }
 
+        /* 响应式：中等屏幕两列，小屏幕一列 */
+        @media (max-width: 968px) {
+            .game-picker { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+        }
         @media (max-width: 768px) {
             .game-container { padding: 100px 16px 40px; }
-            .game-picker { grid-template-columns: 1fr; gap: 16px; }
-            .game-choice { padding: 16px; gap: 16px; }
-            .game-choice img { width: 80px; height: 80px; padding: 6px; }
-            .game-choice strong { font-size: 16px; margin-bottom: 4px; }
-            .game-choice span { font-size: 12px; }
+            .game-choice { padding: 16px; gap: 12px; }
+            .game-choice img { width: 64px; height: 64px; padding: 4px; }
+            .game-choice strong { font-size: 14px; margin-bottom: 4px; }
+            .game-choice span { font-size: 11px; }
             .game-title { font-size: 32px; }
             .game-subtitle { font-size: 14px; }
+        }
+        @media (max-width: 480px) {
+            .game-picker { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -411,12 +422,27 @@
                     <span>横板闯关 · 答题战斗 · 探索收集<br>用C语言的力量净化Bug病毒</span>
                 </div>
             </button>
-            <button class="game-choice" id="snakeChoice" onclick="selectGame('snake')">
-                <img src="assets/images/snake-pixel.png" alt="贪吃蛇图标"
-                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwZmY4OCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjEyIiBjeT0iMTIiIHI9IjkiLz48cGF0aCBkPSJNMTIgOHY4Ii8+PHBhdGggZD0iTTggMTJoOCIvPjwvc3ZnPg==';">
+            <button class="game-choice" id="ramChoice" onclick="selectGame('ram')">
+                <img src="assets/images/ram-battle.png" alt="内存大逃杀图标"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzIyZDNlZSIgc3Ryb2tlLXdpZHRoPSIyIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIi8+PHBhdGggZD0iTTcgMTJoMTBNMTIgN3YxMCIvPjwvc3ZnPg==';">
                 <div class="game-choice-info">
-                    <strong>🐍 贪吃蛇</strong>
-                    <span>方向键移动 · 答题吃食 · 挑战高分<br>考验反应与策略的经典游戏</span>
+                    <strong>🧠 内存大逃杀</strong>
+                    <span>指针移动 · 解引用跳转 · 波次生存<br>用 C 语言操作思维击退内存敌人</span>
+                </div>
+            </button>
+            <button class="game-choice" id="bitChoice" onclick="selectGame('bit')">
+                <img src="assets/images/bit-puzzle.svg" alt="位运算推箱子图标">
+                <div class="game-choice-info">
+                    <strong>🔢 位运算推箱子</strong>
+                    <span>移位 · 掩码 · 异或 · 关卡制<br>用位运算把 8 位位图推到目标图案</span>
+                </div>
+            </button>
+            <button class="game-choice" id="g2048Choice" onclick="selectGame('g2048')">
+                <img src="assets/images/2048.svg" alt="2048图标"
+                    onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmY2MwMCIgc3Ryb2tlLXdpZHRoPSIyIj48cmVjdCB4PSIzIiB5PSIzIiB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHJ4PSIyIi8+PHRleHQgeD0iMTIiIHk9IjE2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjkiIGZpbGw9IiNmZmNjMDAiIHN0cm9rZT0ibm9uZSI+MjA0ODwvdGV4dD48L3N2Zz4=';">
+                <div class="game-choice-info">
+                    <strong>🔢 C 2048</strong>
+                    <span>类型合并 · 无限模式 · 色相彩虹<br>从 char 一路合并到 __int128 甚至更远</span>
                 </div>
             </button>
         </div>
@@ -424,7 +450,9 @@
         <div class="game-stage-wrap">
             <div class="game-stage">
                 <canvas id="gameCanvas" width="960" height="540"></canvas>
-                <canvas id="snakeCanvas" width="960" height="540"></canvas>
+                <div id="ramBattleRoot" class="ram-root"></div>
+                <div id="bitPuzzleRoot" class="bit-puzzle-root"></div>
+                <div id="g2048Root" class="g2048-root"></div>
 
                 <div class="game-hud">
                     <div class="hud-left">
@@ -439,12 +467,12 @@
                         </div>
                     </div>
                     <div class="hud-right">
-                        <div class="hud-item" id="levelName">贪吃蛇 · 等待开始</div>
+                        <div class="hud-item" id="levelName">箱庭冒险 · 等待开始</div>
                         <div class="hud-item">按 ESC 暂停</div>
                     </div>
                 </div>
 
-                <!-- 开始界面（★ 移除“经典横版”按钮，保留箱庭冒险模式入口） -->
+                <!-- 代码勇者开始界面 -->
                 <div class="start-screen" id="startScreen">
                     <div class="game-title">代码勇者</div>
                     <div class="game-subtitle">C语言传说 · 用代码净化Bug病毒</div>
@@ -459,15 +487,42 @@
                     </div>
                 </div>
 
-                <div class="start-screen" id="snakeStartScreen" style="display: none;">
-                    <div class="game-title">贪吃蛇</div>
-                    <div class="game-subtitle">收集代码块，答对题目获得高分</div>
+                <!-- 内存大逃杀开始界面（精简） -->
+                <div class="start-screen" id="ramStartScreen" style="display: none;">
+                    <div class="game-title">内存大逃杀</div>
+                    <div class="game-subtitle">指针操作 · 解引用跳转 · 波次生存</div>
                     <div class="start-menu">
-                        <button class="btn btn-primary" onclick="startSnakeGame()">开始游戏</button>
+                        <button class="btn btn-primary" onclick="startRamGame()">开始游戏</button>
                         <button class="btn btn-ghost" onclick="scrollToInstructions()">操作说明</button>
                     </div>
                     <div class="controls-hint">
-                        方向键 / WASD 移动 · ESC 暂停
+                        方向键 移动 · D 解引用 · R 读取 · M malloc · F free · A 攻击 · B 书签
+                    </div>
+                </div>
+
+                <!-- 位运算推箱子开始界面（精简） -->
+                <div class="start-screen" id="bitStartScreen" style="display: none;">
+                    <div class="game-title">位运算推箱子</div>
+                    <div class="game-subtitle">移位 · 掩码 · 异或 · 把 8 位位图推到目标图案</div>
+                    <div class="start-menu">
+                        <button class="btn btn-primary" onclick="startBitGame()">开始游戏</button>
+                        <button class="btn btn-ghost" onclick="scrollToInstructions()">操作说明</button>
+                    </div>
+                    <div class="controls-hint">
+                        1~8 执行操作 · ←/→ 选择 · Enter 执行 · U 撤销 · R 重开本关 · M 换掩码
+                    </div>
+                </div>
+
+                <!-- C 2048 开始界面（精简） -->
+                <div class="start-screen" id="g2048StartScreen" style="display: none;">
+                    <div class="game-title">C 2048</div>
+                    <div class="game-subtitle">类型合并 · 无限模式 · 从 char 滑到 __int128</div>
+                    <div class="start-menu">
+                        <button class="btn btn-primary" onclick="startG2048Game()">开始游戏</button>
+                        <button class="btn btn-ghost" onclick="scrollToInstructions()">操作说明</button>
+                    </div>
+                    <div class="controls-hint">
+                        ↑↓←→ 或 WASD 滑动 · R 重开
                     </div>
                 </div>
 
@@ -562,6 +617,9 @@
 
     <script src="assets/js/main.js"></script>
     <script src="assets/js/adventure.js"></script>
+    <script src="assets/js/ram-battle.js"></script>
+    <script src="assets/js/bit-puzzle.js"></script>
+    <script src="assets/js/2048.js"></script>
     <script>
         // ========== 星空背景初始化 ==========
         (function () {
@@ -580,21 +638,9 @@
             }
         })();
 
-        // ========== 贪吃蛇游戏（“经典横版”按钮已移除，保留贪吃蛇） ==========
+        // ========== 游戏选择 ==========
         {
-            const snakeCanvas = document.getElementById('snakeCanvas');
-            const snakeCtx = snakeCanvas.getContext('2d');
-
-            const snakeBoard = {columns: 32, rows: 18, cellSize: 30};
             let selectedGame = 'hero';
-            let snake = [];
-            let snakeFood = {x: 0, y: 0, type: 'normal'};
-            let snakeDirection = {x: 1, y: 0};
-            let nextSnakeDirection = {x: 1, y: 0};
-            let snakeScore = 0;
-            let snakeSpeed = 130;
-            let snakeTimer = null;
-            let isSnakePaused = false;
 
             const GameState = {
                 MENU: 'menu',
@@ -609,38 +655,28 @@
             let gameState = GameState.MENU;
             const keys = {};
 
-            const questionBank = {
-                variable: [{q: '以下哪个是合法的C语言变量名？', options: ['123abc', 'int', 'my_var', 'a-b'], answer: 2}, {q: '定义整型变量使用的关键字是？', options: ['float', 'int', 'char', 'double'], answer: 1}, {q: '变量命名不能以什么开头？', options: ['字母', '下划线', '数字', '都可以'], answer: 2}],
-                datatype: [{q: 'char类型占用多少字节？', options: ['1', '2', '4', '8'], answer: 0}, {q: '用于存储小数的数据类型是？', options: ['int', 'char', 'float', 'string'], answer: 2}, {q: '32位系统中int占多少字节？', options: ['1', '2', '4', '8'], answer: 2}],
-                loop: [{q: '哪个不是C语言的循环语句？', options: ['for', 'while', 'do-while', 'loop'], answer: 3}, {q: 'for循环中三个表达式用什么分隔？', options: [',', ';', ':', '.'], answer: 1}],
-                if: [{q: 'if语句中表示否则的关键字是？', options: ['else', 'then', 'elif', 'otherwise'], answer: 0}, {q: '判断相等使用什么运算符？', options: ['=', '==', '===', '!='], answer: 1}],
-                switch: [{q: 'switch语句中每个分支用什么开头？', options: ['case', 'when', 'then', 'branch'], answer: 0}, {q: '跳出switch使用什么？', options: ['continue', 'break', 'return', 'exit'], answer: 1}]
-            };
-
-            const shopItems = [
-                {id: 'potion', name: '生命药水', desc: '恢复30点生命值', price: 20, icon: '🧪'},
-                {id: 'shield', name: '护盾符文', desc: '下次答错不扣血', price: 35, icon: '🛡️'},
-                {id: 'magnet', name: '金币磁铁', desc: '自动吸引附近金币', price: 50, icon: '🧲'}
-            ];
-
             document.addEventListener('keydown', (e) => {
                 keys[e.code] = true;
-                if (selectedGame === 'snake' && gameState === GameState.PLAYING) {
-                    const directions = {ArrowUp: [0, -1], KeyW: [0, -1], ArrowDown: [0, 1], KeyS: [0, 1], ArrowLeft: [-1, 0], KeyA: [-1, 0], ArrowRight: [1, 0], KeyD: [1, 0]};
-                    if (directions[e.code]) {e.preventDefault(); setSnakeDirection(...directions[e.code]);}
+                if (e.code === 'Escape') {
+                    if (gameState === GameState.PLAYING) pauseGame();
+                    else if (gameState === GameState.PAUSED) resumeGame();
                 }
-                if (e.code === 'Escape') {if (gameState === GameState.PLAYING) pauseGame(); else if (gameState === GameState.PAUSED) resumeGame();}
-                if ((e.code === 'Space' || e.code === 'KeyF') && gameState === GameState.DIALOG) {e.preventDefault(); advanceDialog();}
+                if ((e.code === 'Space' || e.code === 'KeyF') && gameState === GameState.DIALOG) {
+                    e.preventDefault();
+                    advanceDialog();
+                }
             });
 
-            document.addEventListener('keyup', (e) => {keys[e.code] = false;});
+            document.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
             function selectGame(game) {
                 selectedGame = game;
                 gameState = GameState.MENU;
-                clearInterval(snakeTimer);
+                if (window.RamBattle) RamBattle.stop();
+                if (window.BitPuzzle) BitPuzzle.stop();
+                if (window.Game2048) Game2048.stop();
 
-                const overlaysToHide = ['battleOverlay', 'shopOverlay', 'pauseMenu', 'levelComplete', 'snakeStartScreen', 'startScreen'];
+                const overlaysToHide = ['battleOverlay', 'shopOverlay', 'pauseMenu', 'levelComplete', 'ramStartScreen', 'bitStartScreen', 'g2048StartScreen', 'startScreen'];
                 overlaysToHide.forEach(id => {
                     const el = document.getElementById(id);
                     if (el) el.style.display = 'none';
@@ -651,176 +687,148 @@
                 if (bHeader) bHeader.textContent = '⚔️ 遭遇战！';
                 const bSub = document.querySelector('.battle-header p');
                 if (bSub) bSub.textContent = '答对C语言题目击败敌人';
-                isSnakePaused = false;
                 const bo = document.getElementById('battleOptions');
                 if (bo) bo.innerHTML = '';
 
-                const isSnake = game === 'snake';
-                document.getElementById('gameCanvas').style.display = isSnake ? 'none' : 'block';
-                document.getElementById('snakeCanvas').style.display = isSnake ? 'block' : 'none';
-                document.getElementById('startScreen').style.display = isSnake ? 'none' : 'flex';
-                document.getElementById('snakeStartScreen').style.display = isSnake ? 'flex' : 'none';
-                document.getElementById('healthHud').style.display = isSnake ? 'none' : 'flex';
-                document.getElementById('heroChoice').classList.toggle('active', !isSnake);
-                document.getElementById('snakeChoice').classList.toggle('active', isSnake);
-                document.getElementById('gamePageTitle').textContent = isSnake ? '🐍 贪吃蛇' : '⚔️ 代码勇者：C语言传说';
-                document.getElementById('gamePageSubtitle').textContent = isSnake ? '收集代码块，答题获得高分' : '横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界';
-                document.getElementById('levelName').textContent = isSnake ? '贪吃蛇 · 等待开始' : '箱庭冒险 · 等待开始';
-                document.getElementById('scoreIcon').textContent = isSnake ? '🏆' : '🪙';
+                const isRam = game === 'ram';
+                const isBit = game === 'bit';
+                const isG2048 = game === 'g2048';
+
+                document.getElementById('gameCanvas').style.display = (isRam || isBit || isG2048) ? 'none' : 'block';
+
+                document.getElementById('ramBattleRoot').classList.remove('active');
+                document.getElementById('bitPuzzleRoot').classList.remove('active');
+                document.getElementById('g2048Root').classList.remove('active');
+
+                document.getElementById('startScreen').style.display = (isRam || isBit || isG2048) ? 'none' : 'flex';
+                document.getElementById('ramStartScreen').style.display = isRam ? 'flex' : 'none';
+                document.getElementById('bitStartScreen').style.display = isBit ? 'flex' : 'none';
+                document.getElementById('g2048StartScreen').style.display = isG2048 ? 'flex' : 'none';
+                document.getElementById('healthHud').style.display = (isRam || isBit || isG2048) ? 'none' : 'flex';
+
+                document.getElementById('heroChoice').classList.toggle('active', !isRam && !isBit && !isG2048);
+                document.getElementById('ramChoice').classList.toggle('active', isRam);
+                document.getElementById('bitChoice').classList.toggle('active', isBit);
+                document.getElementById('g2048Choice').classList.toggle('active', isG2048);
+
+                document.getElementById('gamePageTitle').textContent =
+                    isRam ? '🧠 内存大逃杀' :
+                    isBit ? '🔢 位运算推箱子' :
+                    isG2048 ? '🔢 C 2048' :
+                    '⚔️ 代码勇者：C语言传说';
+                document.getElementById('gamePageSubtitle').textContent =
+                    isRam ? '指针操作 · 内存漂移 · 波次生存' :
+                    isBit ? '移位掩码 · 关卡推位 · 位运算思维' :
+                    isG2048 ? '类型合并 · 无限模式 · 从 char 到 __int128' :
+                    '横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界';
+                document.getElementById('levelName').textContent =
+                    isRam ? '内存大逃杀 · 等待开始' :
+                    isBit ? '位运算推箱子 · 等待开始' :
+                    isG2048 ? 'C 2048 · 等待开始' :
+                    '箱庭冒险 · 等待开始';
+                document.getElementById('scoreIcon').textContent = '🪙';
                 document.getElementById('coinCount').textContent = '0';
                 document.getElementById('comboDisplay').style.display = 'none';
-                updateInstructions(isSnake);
-                if (!isSnake) {
+
+                updateInstructions();
+
+                if (!isRam && !isBit && !isG2048) {
                     document.querySelector('#startScreen .start-menu').style.display = 'flex';
                     document.querySelector('#startScreen .controls-hint').style.display = 'block';
                 }
             }
 
-            function updateInstructions(isSnake) {
+            function updateInstructions() {
                 const title = document.getElementById('instructionsTitle');
                 const grid = document.getElementById('instructionsGrid');
-                title.textContent = isSnake ? '📖 贪吃蛇说明' : '📖 代码勇者说明';
-                grid.innerHTML = isSnake ? `
-                <div><h4 style="color: var(--primary); margin-bottom: 8px;">🎮 操作方式</h4><p>使用键盘方向键或WASD控制移动<br>ESC键暂停游戏</p></div>
-                <div><h4 style="color: var(--primary); margin-bottom: 8px;">🎯 答题机制</h4><p>吃到普通代码块加分<br>吃到特殊代码块触发答题<br>答对得3倍分数，答错缩短长度</p></div>
-                <div><h4 style="color: var(--primary); margin-bottom: 8px;">🏆 得分目标</h4><p>尽可能获得更高分数<br>每得50分，蛇的移动速度加快</p></div>
-            ` : `
+
+                if (selectedGame === 'g2048') {
+                    title.textContent = '📖 C 2048 说明';
+                    grid.innerHTML = '<div><h4 style="color: var(--primary); margin-bottom: 8px;">⌨️ 操作 · Keys</h4><p><b>↑↓←→</b> 或 <b>WASD</b>：滑动<br><b>R</b>：重开本局<br>手机可直接滑动屏幕<br>相同类型的方块合并后会升级为"更大的类型"</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">🧬 类型阶梯 · Types</h4><p><b style="color:#fbbf24">char</b> (1 字节) + char = <b style="color:#22d3ee">short</b> (2B)<br>short + short = <b style="color:#22d3ee">int</b> (4B)<br>int + int = <b style="color:#22d3ee">long</b> (8B)<br>long + long = <b style="color:#22d3ee">long long</b> (16B)<br>long long + long long = <b style="color:#a78bfa">__int128</b> (32B)<br>之后还有 __int256 / __int512 / ... 无限延伸</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">🎯 规则 · Rules</h4><p>无限模式，没有上限<br>每次合并的方块值 × 10 就是得分<br>达到 __int128 会弹金色提示<br>底部类型阶梯条会跟随你当前最大值滚动<br>颜色随等级循环变化（HSL 色相每级 +38°）<br>历史最高分保存在 localStorage</p></div>';
+                    return;
+                }
+                if (selectedGame === 'bit') {
+                    title.textContent = '📖 位运算推箱子说明';
+                    grid.innerHTML = '<div><h4 style="color: var(--primary); margin-bottom: 8px;">⌨️ 操作 · Keys</h4><p><b>1</b>~<b>8</b>：执行对应操作<br><b>← / →</b>：切换选中的操作<br><b>Enter</b>：执行选中的操作<br><b>U</b>：撤销一步（同样消耗 1 步）<br><b>R</b>：重开本关<br><b>M</b>：在预设掩码间循环切换（不耗步数）</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">🧮 操作含义 · Ops</h4><p><b>x &lt;&lt; 1</b>：左移一位，等价 ×2，最高位溢出丢弃<br><b>x &gt;&gt; 1</b>：右移一位，等价 ÷2，低位补 0<br><b>x &amp; 掩码</b>：只保留掩码为 1 的位<br><b>x | 掩码</b>：把掩码为 1 的位点亮<br><b>x ^ 掩码</b>：掩码为 1 的位翻转<br><b>~x</b>：全部取反，等价 x ^ 0xFF<br><b>x &amp; 0</b>：清零</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">🎯 规则 · Rules</h4><p>目标行（虚线）是目标图案<br>用不超过上限的步数把 x 推成 target<br>步数越少星级越高，最高 ★★★<br>步数用尽仍未达标即失败，可重试本关<br>掩码只能从本关给定的预设值中选<br>共 12 关，覆盖移位 / 掩码 / 取反等考点<br>历史最佳成绩会存在本地</p></div>';
+                    return;
+                }
+                if (selectedGame === 'ram') {
+                    title.textContent = '📖 内存大逃杀说明';
+                    grid.innerHTML = '<div><h4 style="color: var(--primary); margin-bottom: 8px;">⌨️ 按键 · Keys</h4><p>↑↓←→：移动指针 p<br>D：解引用，跳到 <b>*p</b> 指向的格子<br>R：读取并获得瞄准，攻击一次后消耗<br>M：malloc，当前位置获得护盾<br>F：free，消耗护盾，范围 2 造成 1 伤<br>A：攻击 2 格内最近敌人，基础 1 伤<br>B：第一次设置书签，再次按下瞬移返回，冷却 6 回合</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">👾 敌人 · Enemies</h4><p><b style="color:#fb7185">q 野指针</b>：♥2 · 速1 · 伤1 · 标准追击<br><b style="color:#fbbf24">r 悬垂指针</b>：♥4 · 速1 · 厚血，血量随波次增加<br><b style="color:#a78bfa">s 空指针</b>：♥2 · 速2 · 高速追击，血量固定<br><b style="color:#f472b6">t 越界指针</b>：♥2 · 速1 · 攻击穿透护盾<br><b style="color:#38bdf8">u 未初始化</b>：♥2 · 速1 · 50% 概率随机移动<br><b style="color:#facc15">v 双重释放</b>：♥3 · 速1 · 伤2，一次扣 2 HP</p></div><div><h4 style="color: var(--primary); margin-bottom: 8px;">🎒 道具 · Items</h4><p><b style="color:#34d399">♥ 回血</b>：+1 HP，满血时转为 +5 分<br><b style="color:#fbbf24">⚔ 力量</b>：接下来 3 次攻击各 +1 伤，可与瞄准叠加为 3 伤<br><b style="color:#22d3ee">🛡 护盾</b>：拾取后立即在当前位置获得护盾<br>道具会随机出现在空闲格子，移动到道具格会自动拾取</p></div>';
+                    return;
+                }
+                title.textContent = '📖 代码勇者说明';
+                grid.innerHTML = `
                 <div><h4 style="color: var(--primary); margin-bottom: 8px;">🎮 基础操作</h4><p>← → 方向键移动<br>空格键跳跃 · Shift 二段跳<br>Q 冲刺 · E 护盾 · L 减速<br>F 键与 NPC/机关交互<br>鼠标左键射击 · J 取消/关闭弹窗<br>ESC 暂停游戏</p></div>
                 <div><h4 style="color: var(--primary); margin-bottom: 8px;">⚔️ 战斗系统</h4><p>Boss 会用激光/地刺/弹幕攻击<br>慢动作中选择正确盾牌可格挡<br>防御失败仅扣 25 血<br>用枪命中 Boss 弱点造成额外伤害</p></div>
                 <div><h4 style="color: var(--primary); margin-bottom: 8px;">🛒 收集与商店</h4><p>地图中散落金币可收集<br>找到神秘商人兑换道具<br>道具有各种特殊效果<br>每关对应不同C语言知识点</p></div>
             `;
             }
 
-            function scrollToInstructions() {document.getElementById('instructionsTitle').scrollIntoView({behavior: 'smooth', block: 'start'});}
+            function scrollToInstructions() { document.getElementById('instructionsTitle').scrollIntoView({behavior: 'smooth', block: 'start'}); }
 
-            function pauseGame() {gameState = GameState.PAUSED; document.getElementById('pauseMenu').style.display = 'flex';}
-            function resumeGame() {gameState = GameState.PLAYING; document.getElementById('pauseMenu').style.display = 'none'; if (selectedGame === 'snake') startSnakeLoop();}
-            function restartLevel() {document.getElementById('pauseMenu').style.display = 'none'; if (selectedGame === 'snake') startSnakeGame();}
-            function backToMenu() {gameState = GameState.MENU; clearInterval(snakeTimer); document.getElementById('pauseMenu').style.display = 'none'; document.getElementById('levelComplete').style.display = 'none'; selectGame(selectedGame);}
-            function nextLevel() {if (selectedGame === 'snake') {startSnakeGame(); return;} backToMenu();}
+            function pauseGame() { gameState = GameState.PAUSED; document.getElementById('pauseMenu').style.display = 'flex'; }
+            function resumeGame() { gameState = GameState.PLAYING; document.getElementById('pauseMenu').style.display = 'none'; }
+            function restartLevel() { document.getElementById('pauseMenu').style.display = 'none'; }
+            function backToMenu() { gameState = GameState.MENU; document.getElementById('pauseMenu').style.display = 'none'; document.getElementById('levelComplete').style.display = 'none'; selectGame(selectedGame); }
+            function nextLevel() { backToMenu(); }
 
-            // ========== 贪吃蛇逻辑 ==========
-            function startSnakeGame() {
-                clearInterval(snakeTimer);
-                snake = [{x: 7, y: 9}, {x: 6, y: 9}, {x: 5, y: 9}];
-                snakeDirection = {x: 1, y: 0}; nextSnakeDirection = {x: 1, y: 0};
-                snakeScore = 0; snakeSpeed = 130; isSnakePaused = false;
-                placeSnakeFood();
-                selectedGame = 'snake'; gameState = GameState.PLAYING;
-                document.getElementById('snakeStartScreen').style.display = 'none';
-                document.getElementById('levelComplete').style.display = 'none';
+            // ========== 内存大逃杀入口 ==========
+            function startRamGame() {
+                if (!window.RamBattle) return;
+                selectedGame = 'ram';
+                document.getElementById('ramStartScreen').style.display = 'none';
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('battleOverlay').style.display = 'none';
                 document.getElementById('pauseMenu').style.display = 'none';
-                document.getElementById('levelName').textContent = '贪吃蛇 · 进行中';
-                document.getElementById('coinCount').textContent = snakeScore;
-                startSnakeLoop();
+                document.getElementById('levelComplete').style.display = 'none';
+                document.getElementById('levelName').textContent = '内存大逃杀 · 进行中';
+                document.getElementById('coinCount').textContent = '0';
+                RamBattle.start();
             }
 
-            function startSnakeLoop() {
-                clearInterval(snakeTimer);
-                renderSnake();
-                snakeTimer = setInterval(updateSnake, snakeSpeed);
+            // ========== 位运算推箱子入口 ==========
+            function startBitGame() {
+                if (!window.BitPuzzle) return;
+                selectedGame = 'bit';
+                document.getElementById('bitStartScreen').style.display = 'none';
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('ramStartScreen').style.display = 'none';
+                document.getElementById('battleOverlay').style.display = 'none';
+                document.getElementById('pauseMenu').style.display = 'none';
+                document.getElementById('levelComplete').style.display = 'none';
+                document.getElementById('levelName').textContent = '位运算推箱子 · 进行中';
+                document.getElementById('coinCount').textContent = '0';
+                BitPuzzle.start();
             }
 
-            function setSnakeDirection(x, y) {
-                if (x === -snakeDirection.x && y === -snakeDirection.y) return;
-                nextSnakeDirection = {x, y};
-            }
-
-            function placeSnakeFood() {
-                do {
-                    snakeFood = {x: Math.floor(Math.random() * snakeBoard.columns), y: Math.floor(Math.random() * snakeBoard.rows)};
-                    snakeFood.type = Math.random() < 0.3 ? 'special' : 'normal';
-                } while (snake.some(segment => segment.x === snakeFood.x && segment.y === snakeFood.y));
-            }
-
-            function updateSnake() {
-                if (gameState !== GameState.PLAYING || selectedGame !== 'snake' || isSnakePaused) return;
-                snakeDirection = nextSnakeDirection;
-                const head = {x: snake[0].x + snakeDirection.x, y: snake[0].y + snakeDirection.y};
-                const hitWall = head.x < 0 || head.x >= snakeBoard.columns || head.y < 0 || head.y >= snakeBoard.rows;
-                const hitSelf = snake.some(segment => segment.x === head.x && segment.y === head.y);
-                if (hitWall || hitSelf) {endSnakeGame(); return;}
-
-                snake.unshift(head);
-                if (head.x === snakeFood.x && head.y === snakeFood.y) {
-                    if (snakeFood.type === 'special') {
-                        isSnakePaused = true;
-                        const q = questionBank.loop[Math.floor(Math.random() * questionBank.loop.length)];
-                        document.getElementById('battleEnemy').textContent = '💎';
-                        document.querySelector('.battle-panel').style.borderColor = 'var(--primary)';
-                        document.querySelector('.battle-header h3').textContent = '💎 特殊代码块！';
-                        document.getElementById('battleQuestion').textContent = q.q;
-                        document.getElementById('battleOptions').innerHTML = q.options.map((opt, idx) => `<div class="battle-option" onclick="answerSnakeQuestion(${idx}, ${q.answer})">${String.fromCharCode(65 + idx)}. ${opt}</div>`).join('');
-                        document.getElementById('battleOverlay').style.display = 'flex';
-                    } else {
-                        snakeScore += 10; document.getElementById('coinCount').textContent = snakeScore;
-                        if (snakeScore % 50 === 0) {snakeSpeed = Math.max(50, snakeSpeed - 10); startSnakeLoop();}
-                        placeSnakeFood();
-                    }
-                } else {snake.pop();}
-                renderSnake();
-            }
-
-            function answerSnakeQuestion(selected, correct) {
-                const options = document.querySelectorAll('.battle-option');
-                if (selected === correct) {
-                    options[selected].classList.add('correct');
-                    snakeScore += 30; document.getElementById('coinCount').textContent = snakeScore;
-                    if (snakeScore % 50 === 0) {snakeSpeed = Math.max(50, snakeSpeed - 10);}
-                } else {
-                    options[selected].classList.add('wrong'); options[correct].classList.add('correct');
-                    if (snake.length > 2) {snake.pop(); snake.pop();}
-                }
-                setTimeout(() => {
-                    document.getElementById('battleOverlay').style.display = 'none';
-                    document.querySelector('.battle-panel').style.borderColor = 'var(--danger)';
-                    document.querySelector('.battle-header h3').textContent = '⚔️ 遭遇战！';
-                    isSnakePaused = false;
-                    placeSnakeFood();
-                    startSnakeLoop();
-                }, 1000);
-            }
-
-            function renderSnake() {
-                snakeCtx.fillStyle = '#08131c'; snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
-                snakeCtx.strokeStyle = 'rgba(0, 212, 255, 0.08)';
-                for (let x = 0; x <= snakeBoard.columns; x++) {snakeCtx.beginPath(); snakeCtx.moveTo(x * snakeBoard.cellSize, 0); snakeCtx.lineTo(x * snakeBoard.cellSize, snakeCanvas.height); snakeCtx.stroke();}
-                for (let y = 0; y <= snakeBoard.rows; y++) {snakeCtx.beginPath(); snakeCtx.moveTo(0, y * snakeBoard.cellSize); snakeCtx.lineTo(snakeCanvas.width, y * snakeBoard.cellSize); snakeCtx.stroke();}
-
-                if (snakeFood.type === 'special') {
-                    snakeCtx.fillStyle = '#00d4ff'; snakeCtx.beginPath(); snakeCtx.arc(snakeFood.x * snakeBoard.cellSize + 15, snakeFood.y * snakeBoard.cellSize + 15, 12, 0, Math.PI * 2); snakeCtx.fill();
-                    snakeCtx.fillStyle = '#fff'; snakeCtx.font = '12px Arial'; snakeCtx.fillText('?', snakeFood.x * snakeBoard.cellSize + 10, snakeFood.y * snakeBoard.cellSize + 20);
-                } else {
-                    snakeCtx.fillStyle = '#ffcc00'; snakeCtx.fillRect(snakeFood.x * snakeBoard.cellSize + 7, snakeFood.y * snakeBoard.cellSize + 7, 16, 16);
-                }
-                snake.forEach((segment, index) => {
-                    snakeCtx.fillStyle = index === 0 ? '#00d4ff' : '#00ff88';
-                    snakeCtx.fillRect(segment.x * snakeBoard.cellSize + 3, segment.y * snakeBoard.cellSize + 3, 24, 24);
-                });
-            }
-
-            function endSnakeGame() {
-                clearInterval(snakeTimer); gameState = GameState.COMPLETE;
-                document.getElementById('completeMessage').textContent = '代码块收集完成，继续挑战更高分吧！';
-                document.getElementById('statCoins').textContent = snakeScore;
-                document.getElementById('statEnemies').textContent = snake.length;
-                document.getElementById('statChests').textContent = '0';
-                document.querySelector('#levelComplete h2').textContent = '🎉 游戏结束！';
-                document.querySelector('#levelComplete .btn-primary').textContent = '再玩一次';
-                document.querySelector('#levelComplete .stat-col:nth-child(1) .label').textContent = '本局得分';
-                document.querySelector('#levelComplete .stat-col:nth-child(2) .label').textContent = '蛇身长度';
-                document.getElementById('levelComplete').style.display = 'flex';
+            // ========== C 2048 入口 ==========
+            function startG2048Game() {
+                if (!window.Game2048) return;
+                selectedGame = 'g2048';
+                document.getElementById('g2048StartScreen').style.display = 'none';
+                document.getElementById('startScreen').style.display = 'none';
+                document.getElementById('ramStartScreen').style.display = 'none';
+                document.getElementById('bitStartScreen').style.display = 'none';
+                document.getElementById('battleOverlay').style.display = 'none';
+                document.getElementById('pauseMenu').style.display = 'none';
+                document.getElementById('levelComplete').style.display = 'none';
+                document.getElementById('levelName').textContent = 'C 2048 · 进行中';
+                document.getElementById('coinCount').textContent = '0';
+                Game2048.start();
             }
 
             Object.assign(window, {
                 selectGame, scrollToInstructions, pauseGame, resumeGame, restartLevel, backToMenu, nextLevel,
-                startSnakeGame, setSnakeDirection, advanceDialog, answerSnakeQuestion
+                advanceDialog,
+                startRamGame, startBitGame, startG2048Game
             });
 
-            // 初始化默认选中贪吃蛇面板的 UI 文案
+            // 初始化默认选中代码勇者面板的 UI 文案
             selectGame('hero');
         }
     </script>
     <script src="assets/js/ai-assistant.js"></script>
 </body>
+
 </html>
