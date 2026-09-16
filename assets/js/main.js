@@ -516,6 +516,17 @@ function getUserInitial(name) {
     return /[a-zA-Z]/.test(first) ? first.toUpperCase() : first;
 }
 
+// 读取用户显示名（昵称优先，其次用户名）
+function getDisplayName(user) {
+    if (!user || !user.username) return '';
+    try {
+        const stored = localStorage.getItem('cm_profileDisplayName_' + user.username);
+        if (stored && stored.trim()) return stored.trim();
+    } catch (e) {
+    }
+    return user.username;
+}
+
 function checkLoginStatus() {
     const user = getFromStorage('currentUser') || null;
     AppState.currentUser = user;
@@ -609,9 +620,10 @@ function updateUserUI(user) {
 
     if (user) {
         // ===== 已登录 =====
+        const displayName = getDisplayName(user);
         if (userAvatar) {
-            userAvatar.textContent = getUserInitial(user.username);
-            userAvatar.title = user.username;
+            userAvatar.textContent = getUserInitial(displayName);
+            userAvatar.title = displayName;
             userAvatar.style.display = 'flex';
             userAvatar.onclick = function () { location.href = 'profile.html'; };
         }
@@ -634,7 +646,8 @@ function updateUserUI(user) {
     const registerBtn = $('#registerBtn');
     if (loginBtn) loginBtn.style.display = 'none';
     if (registerBtn) registerBtn.style.display = 'none';
-}// ========== 小测系统 ==========
+}
+// ========== 小测系统 ==========
 let quizData = [
     {
         question: '以下哪个是C语言的正确主函数入口？',
@@ -1031,7 +1044,7 @@ function loadProfileData() {
     normalizeUserCourseProgress(user);
     syncCompletedCourses(user);
 
-    $('#profileUsername').textContent = user.username;
+    $('#profileUsername').textContent = getDisplayName(user);
     $('#profileLevel').textContent = `Lv.${user.level}`;
     $('#profileExp').textContent = `经验: ${user.exp || 0} / ${user.level * 200}`;
     const unlockedAchievements = (user.achievements || []).map(function (id) {
@@ -2380,7 +2393,7 @@ function renderHomeCourseProgress() {
 }
 
 // ========== 全局页面切换进度条 ==========
-(function() {
+(function () {
     const bar = document.createElement('div');
     bar.id = 'pageProgressBar';
     document.body.appendChild(bar);
@@ -2393,7 +2406,7 @@ function renderHomeCourseProgress() {
         v = 10;
         bar.style.width = v + '%';
         clearInterval(timer);
-        timer = setInterval(function() {
+        timer = setInterval(function () {
             if (v < 85) {
                 v += Math.random() * 8 + 2;
                 bar.style.width = v + '%';
@@ -2403,12 +2416,12 @@ function renderHomeCourseProgress() {
     function finish() {
         clearInterval(timer);
         bar.style.width = '100%';
-        setTimeout(function() {
+        setTimeout(function () {
             bar.classList.remove('active');
-            setTimeout(function() { bar.style.width = '0%'; v = 0; }, 250);
+            setTimeout(function () { bar.style.width = '0%'; v = 0; }, 250);
         }, 300);
     }
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const a = e.target.closest('a');
         if (!a) return;
         const href = a.getAttribute('href');
@@ -2417,5 +2430,5 @@ function renderHomeCourseProgress() {
         if (href.startsWith('http') && !href.includes(location.host)) return;
         start();
     });
-    window.addEventListener('load', function() { start(); setTimeout(finish, 400); });
+    window.addEventListener('load', function () { start(); setTimeout(finish, 400); });
 })();
