@@ -185,6 +185,45 @@ function saveUserData(user) {
     }
 }
 
+// ========== 小测/错题数据存储（按账号隔离，未登录仅存内存） ==========
+// 未登录时的临时内存（刷新/关闭即消失，不写 localStorage）
+const __guestQuizMemory = {};
+
+// 已登录：返回带用户名后缀的 key；未登录：返回 null
+function getQuizStorageKey(baseKey) {
+    const user = getFromStorage('currentUser');
+    const suffix = user && user.username ? user.username : null;
+    return suffix ? (baseKey + '_' + suffix) : null;
+}
+
+// 统一读：未登录读内存，已登录读 localStorage
+function getQuizData(baseKey) {
+    const key = getQuizStorageKey(baseKey);
+    if (key === null) {
+        return __guestQuizMemory[baseKey] || null;
+    }
+    return getFromStorage(key);
+}
+
+// 统一写：未登录写内存，已登录写 localStorage
+function setQuizData(baseKey, data) {
+    const key = getQuizStorageKey(baseKey);
+    if (key === null) {
+        __guestQuizMemory[baseKey] = data;
+        return;
+    }
+    saveToStorage(key, data);
+}
+
+// 统一删：未登录删内存，已登录删 localStorage
+function removeQuizData(baseKey) {
+    const key = getQuizStorageKey(baseKey);
+    if (key === null) {
+        delete __guestQuizMemory[baseKey];
+        return;
+    }
+    removeFromStorage(key);
+}
 // ========== 初始化 ==========
 document.addEventListener('DOMContentLoaded', function () {
     // 逐条 try-catch 保护，单个失败不影响后续初始化
@@ -2256,12 +2295,7 @@ function renderWrongBook() {
         '数组与字符串', '结构体与共同体', '数据结构与算法', '文件操作与IO'
     ];
     const difficultyNames = ['简单', '中等', '困难'];
-    let wrongBook = [];
-    try {
-        wrongBook = JSON.parse(localStorage.getItem('quizWrongBook') || '[]');
-    } catch (error) {
-        wrongBook = [];
-    }
+       let wrongBook = getQuizData('quizWrongBook') || [];
 
     if (count) count.textContent = `${wrongBook.length} 题`;
     if (!wrongBook.length) {
@@ -2294,21 +2328,16 @@ function renderWrongBook() {
 }
 
 function removeWrongBookItem(id) {
-    let wrongBook = [];
-    try {
-        wrongBook = JSON.parse(localStorage.getItem('quizWrongBook') || '[]');
-    } catch (error) {
-        wrongBook = [];
-    }
-    localStorage.setItem('quizWrongBook', JSON.stringify(wrongBook.filter(function (item) {
+    let wrongBook = getQuizData('quizWrongBook') || [];
+    setQuizData('quizWrongBook', wrongBook.filter(function (item) {
         return item.id !== id;
-    })));
+    }));
     renderWrongBook();
     showToast('已从错题本移除', 'success');
 }
 
 function clearWrongBook() {
-    localStorage.removeItem('quizWrongBook');
+    removeQuizData('quizWrongBook');
     renderWrongBook();
     showToast('错题本已清空', 'info');
 }

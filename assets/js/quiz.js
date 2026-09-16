@@ -1,31 +1,10 @@
-// 读取本地存储记录
-function getRecord(){
-    const str = localStorage.getItem("quizRecord");
-    return str ? JSON.parse(str) : {};
-}
-// 保存记录到本地
-function saveRecord(obj){
-    localStorage.setItem("quizRecord", JSON.stringify(obj));
-}
 
-function getWrongBook(){
-    try {
-        return JSON.parse(localStorage.getItem("quizWrongBook") || "[]");
-    } catch (error) {
-        return [];
-    }
-}
-
-function saveWrongBook(items){
-    localStorage.setItem("quizWrongBook", JSON.stringify(items));
-}
-
-function updateWrongBook(key, wrongIndexes){
-    const wrongBook = getWrongBook().filter(function(item){
+function updateWrongBook(key, wrongIndexes) {
+    const wrongBook = (getQuizData('quizWrongBook') || []).filter(function (item) {
         return item.quizKey !== key;
     });
 
-    wrongIndexes.forEach(function(index){
+    wrongIndexes.forEach(function (index) {
         const question = quizList[index];
         if (!question) return;
         wrongBook.push({
@@ -39,9 +18,8 @@ function updateWrongBook(key, wrongIndexes){
             updatedAt: new Date().toLocaleString()
         });
     });
-    saveWrongBook(wrongBook);
+    setQuizData('quizWrongBook', wrongBook);
 }
-
 // 全局答题变量
 let currentTopic;
 let currentDiff;
@@ -51,35 +29,35 @@ let userSelect = [];
 let isReadOnly = false;
 
 //渲染题目
-function renderQuestion(){
+function renderQuestion() {
     const q = quizList[currentQ];
     document.getElementById("q-text").innerText = q.q;
-    document.getElementById("q-index").innerText = `第${currentQ+1}题 / 共${quizList.length}题`
-    let doneCount = userSelect.filter(x=>x!==null).length;
-    document.getElementById("progress").style.width = `${doneCount/quizList.length*100}%`
+    document.getElementById("q-index").innerText = `第${currentQ + 1}题 / 共${quizList.length}题`
+    let doneCount = userSelect.filter(x => x !== null).length;
+    document.getElementById("progress").style.width = `${doneCount / quizList.length * 100}%`
 
     const optWrap = document.getElementById("option-container");
     optWrap.innerHTML = "";
     const userAns = userSelect[currentQ];
     const rightAns = q.ans;
 
-    q.opts.forEach((opt,idx)=>{
+    q.opts.forEach((opt, idx) => {
         const div = document.createElement("div");
         div.className = "option-item";
 
-        if(isReadOnly){
+        if (isReadOnly) {
             div.classList.add("readonly");
             // 正确答案标绿
-            if(idx === rightAns){
+            if (idx === rightAns) {
                 div.classList.add("correct-ans");
             }
             // 用户选的答案，并且选错了，标红
-            if(idx === userAns && userAns !== rightAns){
+            if (idx === userAns && userAns !== rightAns) {
                 div.classList.add("wrong-choose");
             }
-        }else{
-            if(userSelect[currentQ] === idx) div.classList.add("selected");
-            div.onclick = ()=>{
+        } else {
+            if (userSelect[currentQ] === idx) div.classList.add("selected");
+            div.onclick = () => {
                 userSelect[currentQ] = idx;
                 renderQuestion();
             }
@@ -90,43 +68,43 @@ function renderQuestion(){
 
     // 控制上一题按钮，第一题禁用
     const prevBtn = document.getElementById("prev-btn");
-    if(currentQ === 0){
+    if (currentQ === 0) {
         prevBtn.disabled = true;
         prevBtn.style.opacity = 0.5;
-    }else{
+    } else {
         prevBtn.disabled = false;
         prevBtn.style.opacity = 1;
     }
 }
 
 //上一题
-document.getElementById("prev-btn").onclick = function(){
-    if(currentQ > 0){
+document.getElementById("prev-btn").onclick = function () {
+    if (currentQ > 0) {
         currentQ--;
         renderQuestion();
     }
 }
 //下一题
-document.getElementById("next-btn").onclick = function(){
-    if(currentQ < quizList.length - 1){
+document.getElementById("next-btn").onclick = function () {
+    if (currentQ < quizList.length - 1) {
         currentQ++;
         renderQuestion();
     }
 }
 
 // 组装成绩弹窗内容并打开弹窗
-function showResultPopup(){
+function showResultPopup() {
     let score = 0;
     let html = "";
-    for(let i=0;i<quizList.length;i++){
+    for (let i = 0; i < quizList.length; i++) {
         const q = quizList[i];
         const uAns = userSelect[i];
         const rightAns = q.ans;
         const isRight = (uAns === rightAns);
-        if(isRight) score += 20;
+        if (isRight) score += 20;
         html += `<div class="result-item">
-            <div class="q-title">第${i+1}题：${q.q}</div>
-            <div>${isRight?'✅正确':'❌错误'}</div>
+            <div class="q-title">第${i + 1}题：${q.q}</div>
+            <div>${isRight ? '✅正确' : '❌错误'}</div>
             <div>你的选择：${q.opts[uAns]}</div>
             <div class="correct">正确答案：${q.opts[rightAns]}</div>
         </div>`
@@ -159,11 +137,11 @@ function showResultPopup(){
 document.getElementById("showResultBtn").onclick = showResultPopup;
 
 // 清除当前试卷记录，恢复可编辑状态
-function resetQuiz(){
-    const record = getRecord();
+function resetQuiz() {
+    const record = getQuizData('quizRecord') || {};
     const key = `${currentTopic}-${currentDiff}`;
     delete record[key];
-    saveRecord(record);
+    setQuizData('quizRecord', record);
     refreshHomeMark();
 
     currentQ = 0;
@@ -180,10 +158,10 @@ function resetQuiz(){
 document.getElementById("resetQuizBtn").onclick = resetQuiz;
 
 //提交试卷：保存本次答题记录
-document.getElementById("submit-btn").onclick = function(){
+document.getElementById("submit-btn").onclick = function () {
     //检查有没有漏答
     const emptyIndexes = [];
-    userSelect.forEach(function(item, idx){
+    userSelect.forEach(function (item, idx) {
         if (item === null) emptyIndexes.push(idx);
     });
     if (emptyIndexes.length > 0) {
@@ -193,22 +171,22 @@ document.getElementById("submit-btn").onclick = function(){
     let score = 0;
     let html = "";
     let wrongList = [];
-    for(let i=0;i<quizList.length;i++){
+    for (let i = 0; i < quizList.length; i++) {
         const q = quizList[i];
         const uAns = userSelect[i];
         const rightAns = q.ans;
         const isRight = (uAns === rightAns);
-        if(isRight) score += 20;
+        if (isRight) score += 20;
         else wrongList.push(i);
         html += `<div class="result-item">
-            <div class="q-title">第${i+1}题：${q.q}</div>
-            <div>${isRight?'✅正确':'❌错误'}</div>
+            <div class="q-title">第${i + 1}题：${q.q}</div>
+            <div>${isRight ? '✅正确' : '❌错误'}</div>
             <div>你的选择：${q.opts[uAns]}</div>
             <div class="correct">正确答案：${q.opts[rightAns]}</div>
         </div>`
     }
     //写入本地存储
-    const record = getRecord();
+    const record = getQuizData('quizRecord') || {};
     const key = `${currentTopic}-${currentDiff}`;
     record[key] = {
         answers: userSelect,
@@ -216,10 +194,8 @@ document.getElementById("submit-btn").onclick = function(){
         wrongIndex: wrongList,
         finishTime: new Date().toLocaleString()
     };
-    saveRecord(record);
+    setQuizData('quizRecord', record);
     updateWrongBook(key, wrongList);
-    refreshHomeMark();
-
     document.getElementById("score-text").innerText = `总分：${score}/100`
     document.getElementById("result-detail").innerHTML = html;
     document.getElementById("resultModal").style.display = "flex";
@@ -232,13 +208,13 @@ document.getElementById("submit-btn").onclick = function(){
 }
 
 //关闭弹窗
-function closeModal(){
+function closeModal() {
     document.getElementById("resultModal").style.display = "none";
     document.body.style.overflow = '';
 }
 
 // ========== 未答题提醒弹窗 ==========
-function showUnansweredPopup(emptyIndexes){
+function showUnansweredPopup(emptyIndexes) {
     const existing = document.getElementById('unansweredModal');
     if (existing) existing.remove();
 
@@ -246,8 +222,8 @@ function showUnansweredPopup(emptyIndexes){
     modal.id = 'unansweredModal';
     modal.className = 'result-modal';
 
-    const listHtml = emptyIndexes.map(function(i){
-        return `<span class="unanswered-chip" data-index="${i}">第 ${i+1} 题</span>`;
+    const listHtml = emptyIndexes.map(function (i) {
+        return `<span class="unanswered-chip" data-index="${i}">第 ${i + 1} 题</span>`;
     }).join('');
 
     modal.innerHTML = `
@@ -267,14 +243,14 @@ function showUnansweredPopup(emptyIndexes){
     document.body.style.overflow = 'hidden';
 
     // 点击遮罩关闭
-    modal.addEventListener('click', function(e){
+    modal.addEventListener('click', function (e) {
         if (e.target === modal) closeUnansweredPopup();
     });
 
     document.getElementById('unansweredCloseBtn').onclick = closeUnansweredPopup;
 
-    modal.querySelectorAll('.unanswered-chip').forEach(function(chip){
-        chip.onclick = function(){
+    modal.querySelectorAll('.unanswered-chip').forEach(function (chip) {
+        chip.onclick = function () {
             currentQ = Number(chip.dataset.index);
             renderQuestion();
             closeUnansweredPopup();
@@ -282,39 +258,39 @@ function showUnansweredPopup(emptyIndexes){
     });
 }
 
-function closeUnansweredPopup(){
+function closeUnansweredPopup() {
     const modal = document.getElementById('unansweredModal');
     if (modal) modal.remove();
     document.body.style.overflow = '';
 }
 //返回在线小测专题页
-document.getElementById("back-home").onclick = function(){
+document.getElementById("back-home").onclick = function () {
     window.location.href = window.location.pathname.includes('/test/') ? "../quiz.html" : "quiz.html";
 }
 
 // 更新首页：已经做完的试卷小圆标绿色（首页调用）
-function refreshHomeMark(){
-    const record = getRecord();
-    document.querySelectorAll(".dot-box a").forEach(link=>{
+function refreshHomeMark() {
+    const record = getQuizData('quizRecord') || {};
+    document.querySelectorAll(".dot-box a").forEach(link => {
         link.classList.remove("done");
     })
-    for(const key in record){
-        const [t,d] = key.split("-");
-        const itemDom = document.querySelector(`.item[data-topic="${t}"] .dot-box a:nth-child(${Number(d)+1})`);
-        if(itemDom) itemDom.classList.add("done");
+    for (const key in record) {
+        const [t, d] = key.split("-");
+        const itemDom = document.querySelector(`.item[data-topic="${t}"] .dot-box a:nth-child(${Number(d) + 1})`);
+        if (itemDom) itemDom.classList.add("done");
     }
 }
 
 // 试卷页面初始化函数，每个试卷html页面底部调用initQuiz
-function initQuiz(topicId,diffId,questionData){
+function initQuiz(topicId, diffId, questionData) {
     currentTopic = topicId;
     currentDiff = diffId;
     quizList = questionData;
     currentQ = 0;
-    const record = getRecord();
+    const record = getQuizData('quizRecord') || {};
     const key = `${topicId}-${diffId}`;
 
-    if(record[key]){
+    if (record[key]) {
         // 已有作答记录：展示成绩，并提供重新答题入口
         userSelect = [...record[key].answers];
         isReadOnly = true;
@@ -323,7 +299,7 @@ function initQuiz(topicId,diffId,questionData){
         document.getElementById("showResultBtn").style.display = "inline-block";
         document.getElementById("resetQuizBtn").style.display = "inline-block";
         renderQuestion();
-    }else{
+    } else {
         //无记录：正常答题模式
         userSelect = Array(quizList.length).fill(null);
         isReadOnly = false;

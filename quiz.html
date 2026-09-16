@@ -830,10 +830,13 @@ const topicData = [
 ];
 
 // ========== 读取答题记录 ==========
+// ========== 读取答题记录 ==========
 function getQuizRecord(){
     try {
-        const str = localStorage.getItem("quizRecord");
-        return str ? JSON.parse(str) : {};
+        if (typeof getQuizData === 'function') {
+            return getQuizData('quizRecord') || {};
+        }
+        return {};
     } catch(e){ return {}; }
 }
 
