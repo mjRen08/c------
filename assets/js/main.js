@@ -2166,24 +2166,27 @@ function updateHealthBar() {
     document.getElementById('healthBar').style.width = pct + '%';
 }
 
+// 收藏夹：按账号隔离（与 quizRecord / quizWrongBook 使用同一套机制）
 function getCourseFavorites() {
-    let favorites = getFromStorage('courseFavorites') || [];
-    let legacyFavorites = [];
+    let favorites = getQuizData('courseFavorites') || [];
+
+    // 一次性迁移：把早期全局 key 的旧收藏归到当前用户（只迁一次）
     try {
-        legacyFavorites = JSON.parse(localStorage.getItem('cm_course_favorites') || '[]');
-    } catch (error) {
-        legacyFavorites = [];
+        const legacy = JSON.parse(localStorage.getItem('cm_course_favorites') || '[]');
+        if (legacy.length) {
+            favorites = Array.from(new Set(favorites.concat(legacy)));
+            setQuizData('courseFavorites', favorites);
+            localStorage.removeItem('cm_course_favorites');
+        }
+    } catch (e) {
+        // 忽略解析错误
     }
-    if (legacyFavorites.length) {
-        favorites = Array.from(new Set(favorites.concat(legacyFavorites)));
-        saveToStorage('courseFavorites', favorites);
-        localStorage.removeItem('cm_course_favorites');
-    }
+
     return favorites;
 }
 
 function saveCourseFavorites(favorites) {
-    saveToStorage('courseFavorites', favorites);
+    setQuizData('courseFavorites', favorites);
 }
 
 function toggleCourseFavorite(courseId) {
@@ -2308,7 +2311,7 @@ function renderWrongBook() {
         '数组与字符串', '结构体与共同体', '数据结构与算法', '文件操作与IO'
     ];
     const difficultyNames = ['简单', '中等', '困难'];
-       let wrongBook = getQuizData('quizWrongBook') || [];
+    let wrongBook = getQuizData('quizWrongBook') || [];
 
     if (count) count.textContent = `${wrongBook.length} 题`;
     if (!wrongBook.length) {
