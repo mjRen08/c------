@@ -348,7 +348,18 @@
             background: var(--card-color);
             box-shadow: 0 0 24px var(--card-color);
         }
+        /* 头像文字兜底：图片加载失败时显示姓氏，不再出现裂图 */
+        .team-avatar-initial {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0b1020;
+        }
         .team-avatar img {
+            position: relative;
+            z-index: 1;
             width: 100%;
             height: 100%;
             border-radius: 50%;
@@ -763,7 +774,7 @@
                     <div class="team-card-name">张天艺</div>
                     <div class="team-card-stripe"></div>
                     <div class="team-card-detail">
-                        <div class="team-avatar"><img src="assets/images/张.jpg" alt="张天艺头像"></div>
+                        <div class="team-avatar"><span class="team-avatar-initial">张</span><img src="assets/images/张.jpg" alt="张天艺头像" loading="lazy" decoding="async" onerror="this.remove()"></div>
                         <h4>张天艺</h4>
                         <p class="role">队长 / 项目经理 / 技术总监 / 程序员</p>
                         <div class="divider"></div>
@@ -783,7 +794,7 @@
                     <div class="team-card-name">任明捷</div>
                     <div class="team-card-stripe"></div>
                     <div class="team-card-detail">
-                        <div class="team-avatar"><img src="assets/images/任.jpg" alt="任明捷头像"></div>
+                        <div class="team-avatar"><span class="team-avatar-initial">任</span><img src="assets/images/任.jpg" alt="任明捷头像" loading="lazy" decoding="async" onerror="this.remove()"></div>
                         <h4>任明捷</h4>
                         <p class="role">程序员 / 测试员</p>
                         <div class="divider"></div>
@@ -803,7 +814,7 @@
                     <div class="team-card-name">郑铭超</div>
                     <div class="team-card-stripe"></div>
                     <div class="team-card-detail">
-                        <div class="team-avatar"><img src="assets/images/郑.jpg" alt="郑铭超头像"></div>
+                        <div class="team-avatar"><span class="team-avatar-initial">郑</span><img src="assets/images/郑.jpg" alt="郑铭超头像" loading="lazy" decoding="async" onerror="this.remove()"></div>
                         <h4>郑铭超</h4>
                         <p class="role">程序员 / 测试员</p>
                         <div class="divider"></div>
@@ -822,7 +833,7 @@
                     <div class="team-card-name">李宜忱</div>
                     <div class="team-card-stripe"></div>
                     <div class="team-card-detail">
-                        <div class="team-avatar"><img src="assets/images/李.jpg" alt="李宜忱头像"></div>
+                        <div class="team-avatar"><span class="team-avatar-initial">李</span><img src="assets/images/李.jpg" alt="李宜忱头像" loading="lazy" decoding="async" onerror="this.remove()"></div>
                         <h4>李宜忱</h4>
                         <p class="role">UI 设计 / CIO</p>
                         <div class="divider"></div>
@@ -841,7 +852,7 @@
                     <div class="team-card-name">严浩然</div>
                     <div class="team-card-stripe"></div>
                     <div class="team-card-detail">
-                        <div class="team-avatar"><img src="assets/images/严.jpg" alt="严浩然头像"></div>
+                        <div class="team-avatar"><span class="team-avatar-initial">严</span><img src="assets/images/严.jpg" alt="严浩然头像" loading="lazy" decoding="async" onerror="this.remove()"></div>
                         <h4>严浩然</h4>
                         <p class="role">文档编辑 / 网页编辑</p>
                         <div class="divider"></div>
