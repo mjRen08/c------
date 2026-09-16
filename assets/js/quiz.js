@@ -182,12 +182,14 @@ document.getElementById("resetQuizBtn").onclick = resetQuiz;
 //提交试卷：保存本次答题记录
 document.getElementById("submit-btn").onclick = function(){
     //检查有没有漏答
-    const emptyIndex = userSelect.findIndex(item => item === null);
-    if(emptyIndex !== -1){
-        alert(`还有未作答题目：第${emptyIndex+1}题，请完成所有题目再提交！`);
+    const emptyIndexes = [];
+    userSelect.forEach(function(item, idx){
+        if (item === null) emptyIndexes.push(idx);
+    });
+    if (emptyIndexes.length > 0) {
+        showUnansweredPopup(emptyIndexes);
         return;
     }
-
     let score = 0;
     let html = "";
     let wrongList = [];
@@ -235,6 +237,56 @@ function closeModal(){
     document.body.style.overflow = '';
 }
 
+// ========== 未答题提醒弹窗 ==========
+function showUnansweredPopup(emptyIndexes){
+    const existing = document.getElementById('unansweredModal');
+    if (existing) existing.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'unansweredModal';
+    modal.className = 'result-modal';
+
+    const listHtml = emptyIndexes.map(function(i){
+        return `<span class="unanswered-chip" data-index="${i}">第 ${i+1} 题</span>`;
+    }).join('');
+
+    modal.innerHTML = `
+        <div class="result-content unanswered-content">
+            <div class="unanswered-icon">⚠️</div>
+            <h2 class="unanswered-title">还有 ${emptyIndexes.length} 题未作答</h2>
+            <p class="unanswered-desc">完成全部题目才能提交试卷，点击下方题号可直接跳转到对应题目。</p>
+            <div class="unanswered-list">${listHtml}</div>
+            <div class="unanswered-actions">
+                <button class="unanswered-btn secondary" id="unansweredCloseBtn">继续检查</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+
+    // 点击遮罩关闭
+    modal.addEventListener('click', function(e){
+        if (e.target === modal) closeUnansweredPopup();
+    });
+
+    document.getElementById('unansweredCloseBtn').onclick = closeUnansweredPopup;
+
+    modal.querySelectorAll('.unanswered-chip').forEach(function(chip){
+        chip.onclick = function(){
+            currentQ = Number(chip.dataset.index);
+            renderQuestion();
+            closeUnansweredPopup();
+        };
+    });
+}
+
+function closeUnansweredPopup(){
+    const modal = document.getElementById('unansweredModal');
+    if (modal) modal.remove();
+    document.body.style.overflow = '';
+}
 //返回在线小测专题页
 document.getElementById("back-home").onclick = function(){
     window.location.href = window.location.pathname.includes('/test/') ? "../quiz.html" : "quiz.html";

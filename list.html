@@ -570,41 +570,41 @@
     })();
 
     // ================= 课程数据 =================
-    const COURSES = [
+        const COURSES = [
         { id: 'basics', title: 'C语言基础入门', icon: '📘', level: '入门', size: 'lg',
-          accent: '#00d4ff',
+          accent: '#00d4ff', topic: 0,
           desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块地基。',
           chapters: 5, hours: 3, rating: 4.9 },
         { id: 'control-flow', title: '循环与分支结构', icon: '🔄', level: '入门', size: 'sm',
-          accent: '#ff8a00',
+          accent: '#ff8a00', topic: 1,
           desc: 'if-else、switch、for、while，掌握程序逻辑控制。',
           chapters: 5, hours: 2, rating: 4.8 },
         { id: 'io-array', title: '输入输出与数组', icon: '📥', level: '入门', size: 'sm',
-          accent: '#00ff88',
+          accent: '#00ff88', topic: 4,
           desc: 'printf/scanf 与数组，学会处理一组相关数据。',
           chapters: 5, hours: 2.5, rating: 4.8 },
         { id: 'functions', title: '函数与模块化编程', icon: '📦', level: '进阶', size: 'md',
-          accent: '#a855f7',
+          accent: '#a855f7', topic: 2,
           desc: '函数定义、参数传递、递归调用，掌握模块化编程思想。',
           chapters: 5, hours: 2.5, rating: 4.9 },
         { id: 'strings', title: '数组与字符串', icon: '📋', level: '进阶', size: 'md',
-          accent: '#22d3ee',
+          accent: '#22d3ee', topic: 4,
           desc: '一维/二维数组、字符数组与字符串处理，掌握批量数据处理。',
           chapters: 5, hours: 2.5, rating: 4.7 },
         { id: 'pointers', title: '指针与内存管理', icon: '🔧', level: '进阶', size: 'sm',
-          accent: '#ff4757',
+          accent: '#ff4757', topic: 3,
           desc: '地址、指针运算、动态内存，深入理解C语言核心。',
           chapters: 5, hours: 3, rating: 4.9 },
         { id: 'algorithms', title: '数据结构与算法', icon: '🌲', level: '高级', size: 'md',
-          accent: '#7b2cbf',
+          accent: '#7b2cbf', topic: 6,
           desc: '链表、栈、队列、树、排序查找，夯实算法基础。',
           chapters: 5, hours: 5, rating: 5.0 },
         { id: 'file-io', title: '文件操作与IO', icon: '📁', level: '高级', size: 'sm',
-          accent: '#f472b6',
+          accent: '#f472b6', topic: 7,
           desc: '文件读写、缓冲IO，掌握数据持久化存储技术。',
           chapters: 5, hours: 1.5, rating: 4.6 },
         { id: 'project', title: '项目实战：学生管理系统', icon: '💻', level: '实战', size: 'lg',
-          accent: '#fbbf24',
+          accent: '#fbbf24', topic: 5,
           desc: '综合运用函数、结构体、文件、菜单交互，分阶段完成一个可运行的学生管理系统项目，从需求分析到代码重构全流程。',
           chapters: 5, hours: 4, rating: 5.0 }
     ];
@@ -684,7 +684,7 @@
                         <button class="bento-action-btn" title="学习" 
                                 onclick="event.stopPropagation(); goDetail('${c.id}')">学</button>
                         <button class="bento-action-btn" title="测试" 
-                                onclick="event.stopPropagation(); goQuiz()">测</button>
+                                onclick="event.stopPropagation(); goQuiz(${c.topic})">测</button>
                     </div>
                 </article>
             `;
@@ -713,10 +713,13 @@
     function goDetail(id) {
         location.href = 'detail.html?course=' + id;
     }
-    function goQuiz() {
-        location.href = 'quiz.html';
+    function goQuiz(topicIndex) {
+        if (topicIndex === undefined || topicIndex === null) {
+            location.href = 'quiz.html';
+        } else {
+            location.href = 'quiz.html?topic=' + topicIndex;
+        }
     }
-
     // ================= 收藏 =================
     function getFavs() {
         if (typeof getCourseFavorites === 'function') {

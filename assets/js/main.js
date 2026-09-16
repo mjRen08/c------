@@ -873,9 +873,9 @@ function profileRenderBranchPanel(user, courses, branchList, courseId) {
         course.branches.map(function (branch, index) {
             const isCompleted = completedLessons.indexOf(index) !== -1;
             return '<div class="course-branch-item ' + (isCompleted ? 'completed' : '') + '">' +
-                '<span>' + (isCompleted ? '✅' : '▶️') + ' ' + branch + '</span>' +
-                '<button type="button" data-lesson-index="' + index + '" data-course-id="' + course.id + '">' +
-                (isCompleted ? '已完成' : '完成本节') +
+                '<span>' + (isCompleted ? '✅' : '🔒') + ' ' + branch + '</span>' +
+                '<button type="button" disabled>' +
+                (isCompleted ? '已完成' : '未完成') +
                 '</button>' +
                 '</div>';
         }).join('') +
@@ -2158,7 +2158,7 @@ function renderCourseDetail() {
         `;
     }).join('');
     $('#learningGoals').innerHTML = course.learn.map(function (item) {
-        return `<li>✓ ${item}</li>`;
+        return `<li> ${item}</li>`;
     }).join('');
     updateDetailFavoriteButton();
 }

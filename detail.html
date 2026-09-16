@@ -266,6 +266,23 @@
             font-size: 12px;
         }
 
+                /* B站推荐链接 */
+        .bilibili-item {
+            border-color: rgba(251, 114, 153, 0.4);
+            background: rgba(251, 114, 153, 0.06);
+        }
+        .bilibili-item:hover {
+            border-color: #fb7299;
+            background: rgba(251, 114, 153, 0.12);
+            box-shadow: 0 0 16px rgba(251, 114, 153, 0.25);
+        }
+        .bilibili-icon {
+            background: rgba(251, 114, 153, 0.12);
+        }
+        .bilibili-item:hover .bilibili-icon {
+            background: rgba(251, 114, 153, 0.2);
+        }
+        
         /* 响应式 */
         @media (max-width: 968px) {
             .detail-layout {
@@ -274,6 +291,8 @@
             .detail-container { padding: 100px 16px 40px; }
             .course-detail-header h1 { font-size: 26px; }
         }
+        
+
     </style>
 </head>
 <body class="detail-page-bg">
@@ -377,117 +396,146 @@
 
     <script src="assets/js/main.js"></script>
     <script>
-        // ================= 星空背景 =================
-        (function(){
-            const field = document.getElementById('starField');
-            if (!field) return;
-            for (let i = 0; i < 60; i++) {
-                const s = document.createElement('span');
-                s.style.left = Math.random() * 100 + '%';
-                s.style.top = Math.random() * 100 + '%';
-                s.style.animationDelay = (Math.random() * 3) + 's';
-                s.style.opacity = Math.random() * 0.5 + 0.1;
-                const size = Math.random() * 2 + 1;
-                s.style.width = size + 'px';
-                s.style.height = size + 'px';
-                field.appendChild(s);
-            }
-        })();
+    // ================= 星空背景 =================
+    (function(){
+        const field = document.getElementById('starField');
+        if (!field) return;
+        for (let i = 0; i < 60; i++) {
+            const s = document.createElement('span');
+            s.style.left = Math.random() * 100 + '%';
+            s.style.top = Math.random() * 100 + '%';
+            s.style.animationDelay = (Math.random() * 3) + 's';
+            s.style.opacity = Math.random() * 0.5 + 0.1;
+            const size = Math.random() * 2 + 1;
+            s.style.width = size + 'px';
+            s.style.height = size + 'px';
+            field.appendChild(s);
+        }
+    })();
 
-        // ================= 课程扩展数据 =================
-        const courseExtras = {
-            basics: {
-                highlights: ['零基础友好', '大量示例', '即时练习', '视频讲解'],
-                audience: ['编程初学者', '在校大学生', '转行人员', 'C语言爱好者'],
-                related: ['control-flow', 'io-array']
-            },
-            'control-flow': {
-                highlights: ['逻辑思维训练', '流程图辅助', '实战案例', '即时反馈'],
-                audience: ['已学完基础语法', '想提升逻辑能力', '准备算法学习'],
-                related: ['basics', 'functions']
-            },
-            'io-array': {
-                highlights: ['格式化输入输出', '数组可视化', '数据统计案例', '内存模型'],
-                audience: ['已掌握基础语法', '需要处理批量数据', '准备学习字符串'],
-                related: ['basics', 'strings']
-            },
-            functions: {
-                highlights: ['模块化思维', '递归可视化', '参数传递详解', '代码复用'],
-                audience: ['已学完流程控制', '想写出更整洁的代码', '准备学习算法'],
-                related: ['control-flow', 'pointers']
-            },
-            strings: {
-                highlights: ['字符串处理', '常用库函数', '文本分析案例', '安全输入'],
-                audience: ['已学完数组', '需要处理文本数据', '准备项目实战'],
-                related: ['io-array', 'file-io']
-            },
-            pointers: {
-                highlights: ['内存模型图解', '指针运算', '动态内存', '调试技巧'],
-                audience: ['已学完函数和数组', '想深入理解内存', '准备数据结构'],
-                related: ['functions', 'algorithms']
-            },
-            algorithms: {
-                highlights: ['复杂度分析', '经典算法', '代码实现', '面试必备'],
-                audience: ['已掌握指针和结构体', '准备算法竞赛', '想进大厂'],
-                related: ['pointers', 'project']
-            },
-            'file-io': {
-                highlights: ['文件读写', '数据持久化', '错误处理', '项目实战'],
-                audience: ['已学完指针', '需要保存数据', '准备做完整项目'],
-                related: ['strings', 'project']
-            },
-            project: {
-                highlights: ['完整项目', '需求分析', '代码重构', '团队协作'],
-                audience: ['已学完大部分课程', '想检验学习成果', '准备课程设计'],
-                related: ['algorithms', 'file-io']
-            }
-        };
+    // ================= 相关课程元信息（本地数据，不依赖外部文件） =================
+    const courseMeta = {
+        basics:         { title: 'C语言基础入门',         icon: '📘', level: '入门', chapters: 5 },
+        'control-flow': { title: '循环与分支结构',         icon: '🔄', level: '入门', chapters: 5 },
+        'io-array':     { title: '输入输出与数组',         icon: '📥', level: '入门', chapters: 5 },
+        functions:      { title: '函数与模块化编程',       icon: '📦', level: '进阶', chapters: 5 },
+        strings:        { title: '数组与字符串',           icon: '📋', level: '进阶', chapters: 5 },
+        pointers:       { title: '指针与内存管理',         icon: '🔧', level: '进阶', chapters: 5 },
+        algorithms:     { title: '数据结构与算法',         icon: '🌲', level: '高级', chapters: 5 },
+        'file-io':      { title: '文件操作与IO',           icon: '📁', level: '高级', chapters: 5 },
+        project:        { title: '项目实战：学生管理系统', icon: '💻', level: '高级', chapters: 5 }
+    };
 
-        // ================= 渲染右半部分扩展内容 =================
-        function renderCourseExtras() {
-            const params = new URLSearchParams(window.location.search);
-            const courseId = params.get('course') || 'basics';
-            const extras = courseExtras[courseId] || courseExtras.basics;
-            const catalog = window.courseCatalog || {};
+    // ================= 课程扩展数据（每个专题对应不同的B站链接） =================
+    const courseExtras = {
+        basics: {
+            highlights: ['零基础友好', '大量示例', '即时练习', '视频讲解'],
+            audience: ['编程初学者', '在校大学生', '转行人员', 'C语言爱好者'],
+            related: ['control-flow', 'io-array'],
+            bilibili: 'https://www.bilibili.com/video/BV1M6Yk6DEeR/',
+            bilibiliLabel: 'C语言入门100集（免费）'
+        },
+        'control-flow': {
+            highlights: ['逻辑思维训练', '流程图辅助', '实战案例', '即时反馈'],
+            audience: ['已学完基础语法', '想提升逻辑能力', '准备算法学习'],
+            related: ['basics', 'functions'],
+            bilibili: 'https://www.bilibili.com/video/BV1FfCwYWEYm/',
+            bilibiliLabel: 'C语言循环与分支'
+        },
+        'io-array': {
+            highlights: ['格式化输入输出', '数组可视化', '数据统计案例', '内存模型'],
+            audience: ['已掌握基础语法', '需要处理批量数据', '准备学习字符串'],
+            related: ['basics', 'strings'],
+            bilibili: 'https://www.bilibili.com/video/BV1RD4y1279n/',
+            bilibiliLabel: 'C语言数组专题'
+        },
+        functions: {
+            highlights: ['模块化思维', '递归可视化', '参数传递详解', '代码复用'],
+            audience: ['已学完流程控制', '想写出更整洁的代码', '准备学习算法'],
+            related: ['control-flow', 'pointers'],
+            bilibili: 'https://www.bilibili.com/video/BV1WR4y157RP/',
+            bilibiliLabel: 'C语言函数'
+        },
+        strings: {
+            highlights: ['字符串处理', '常用库函数', '文本分析案例', '安全输入'],
+            audience: ['已学完数组', '需要处理文本数据', '准备项目实战'],
+            related: ['io-array', 'file-io'],
+            bilibili: 'https://www.bilibili.com/video/BV1Fe4y117Cs/',
+            bilibiliLabel: 'C语言字符串'
+        },
+        pointers: {
+            highlights: ['内存模型图解', '指针运算', '动态内存', '调试技巧'],
+            audience: ['已学完函数和数组', '想深入理解内存', '准备数据结构'],
+            related: ['functions', 'algorithms'],
+            bilibili: 'https://www.bilibili.com/video/BV1Mb4y1X7dz/',
+            bilibiliLabel: '江科大 · C语言指针详解'
+        },
+        algorithms: {
+            highlights: ['复杂度分析', '经典算法', '代码实现', '面试必备'],
+            audience: ['已掌握指针和结构体', '准备算法竞赛', '想进大厂'],
+            related: ['pointers', 'project'],
+            bilibili: 'https://www.bilibili.com/video/BV1fPd5BGEEJ/',
+            bilibiliLabel: '数据结构与算法（C语言描述）'
+        },
+        'file-io': {
+            highlights: ['文件读写', '数据持久化', '错误处理', '项目实战'],
+            audience: ['已学完指针', '需要保存数据', '准备做完整项目'],
+            related: ['strings', 'project'],
+            bilibili: 'https://www.bilibili.com/video/BV1nF411B7mF/',
+            bilibiliLabel: 'C语言文件操作'
+        },
+        project: {
+            highlights: ['完整项目', '需求分析', '代码重构', '团队协作'],
+            audience: ['已学完大部分课程', '想检验学习成果', '准备课程设计'],
+            related: ['algorithms', 'file-io'],
+            bilibili: 'https://www.bilibili.com/video/BV1Dv4y1X7qV/',
+            bilibiliLabel: 'C语言项目实战 · 从入门到进阶'
+        }
+    };
 
-            // 1. 课程亮点
-            const highlightTags = document.getElementById('highlightTags');
-            if (highlightTags) {
-                highlightTags.innerHTML = extras.highlights.map(tag => 
-                    `<span class="highlight-tag">${tag}</span>`
-                ).join('');
-            }
+    // ================= 渲染函数 =================
+    function renderCourseExtras() {
+        const params = new URLSearchParams(window.location.search);
+        const courseId = params.get('course') || 'basics';
+        const extras = courseExtras[courseId] || courseExtras.basics;
 
-            // 2. 适合人群
-            const audienceList = document.getElementById('audienceList');
-            if (audienceList) {
-                audienceList.innerHTML = extras.audience.map((item, idx) => 
-                    `<div class="audience-item"><span>${idx + 1}</span>${item}</div>`
-                ).join('');
-            }
-
-            // 3. 相关课程推荐
-            const relatedCourses = document.getElementById('relatedCourses');
-            if (relatedCourses && extras.related) {
-                relatedCourses.innerHTML = extras.related.map(id => {
-                    const course = catalog[id];
-                    if (!course) return '';
-                    return `<a class="related-item" href="detail.html?course=${id}">
-                        <div class="related-icon">${course.icon}</div>
-                        <div class="related-info">
-                            <strong>${course.title}</strong>
-                            <span>${course.level} · ${course.chapters.length}章</span>
-                        </div>
-                    </a>`;
-                }).join('');
-            }
+        // 1. 课程亮点
+        const highlightTags = document.getElementById('highlightTags');
+        if (highlightTags) {
+            highlightTags.innerHTML = extras.highlights.map(tag =>
+                `<span class="highlight-tag">${tag}</span>`
+            ).join('');
         }
 
-        // 等待 main.js 完成动态渲染后再填充扩展内容
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(renderCourseExtras, 100);
-        });
-    </script>
+        // 2. 适合人群
+        const audienceList = document.getElementById('audienceList');
+        if (audienceList) {
+            audienceList.innerHTML = extras.audience.map((item, idx) =>
+                `<div class="audience-item"><span>${idx + 1}</span>${item}</div>`
+            ).join('');
+        }
+
+        // 3. 相关课程推荐（只保留B站链接）
+        const relatedCourses = document.getElementById('relatedCourses');
+        if (relatedCourses) {
+            let html = '';
+            if (extras.bilibili) {
+                html += `<a class="related-item bilibili-item" href="${extras.bilibili}" target="_blank" rel="noopener">
+                    <div class="related-icon bilibili-icon">📺</div>
+                    <div class="related-info">
+                        <strong>${extras.bilibiliLabel || 'B站配套视频'}</strong>
+                        <span>B站 · 免费视频教程</span>
+                    </div>
+                </a>`;
+            }
+            relatedCourses.innerHTML = html;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(renderCourseExtras, 100);
+    });
+</script>
     <script src="assets/js/ai-assistant.js"></script>
 </body>
 </html>

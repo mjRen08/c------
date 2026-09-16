@@ -247,7 +247,7 @@
 
     let progressRecorded = isCompleted;
     function recordLesson() {
-        if (progressRecorded || window.scrollY + window.innerHeight < document.documentElement.scrollHeight - 24) return;
+        if (progressRecorded || window.scrollY + window.innerHeight < document.documentElement.scrollHeight - 450) return;
         progressRecorded = true;
         if (typeof completeCourseChapter === 'function') completeCourseChapter(courseId, chapter);
         const badge = document.querySelector('.lesson-badge');
