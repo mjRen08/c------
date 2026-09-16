@@ -292,11 +292,25 @@ body.quiz-home-page {
                 border-radius: 2px;
             }
 
+/* ========== 导航右侧动作区（宽高都锁定） ========== */
 .nav-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 12px;
     flex-shrink: 0;
+    /* 固定最小宽度：退出按钮消失后导航栏不会变窄 */
+    min-width: 220px;
+    /* 关键修复：固定最小高度（比按钮和头像都高）。
+       无论退出按钮是否显示，导航栏高度都不会变化。 */
+    min-height: 48px;
+}
+
+/* 让"退出登录"按钮与右侧区域等高，防止它撑高导航栏 */
+.nav-actions .btn-ghost {
+    height: 44px;
+    padding: 0 22px;
+    line-height: 1;
 }
 
 .user-avatar {
@@ -396,10 +410,6 @@ body.quiz-home-page {
     width: 100%;
     margin: 0;
     padding: 0;
-    /* 关键修复：基础 .nav-links 用的是 position:absolute + left:50% + translateX(-50%)
-       （桌面端让导航水平居中）。抽屉里若沿用这套定位，这个列表就脱离了文档流，
-       后面的"退出登录"按钮会浮到同一个位置和它重叠。
-       抽屉内部必须回到普通流。 */
     position: static;
     left: auto;
     transform: none;
@@ -1636,9 +1646,20 @@ body.nav-open {
         padding: 24px;
     }
 
-    /* 移动端导航栏：隐藏退出登录按钮（改到抽屉里） */
+    /* 移动端导航栏：退出按钮改为占位隐藏 */
     .nav-actions > .btn-ghost#logoutBtn {
         display: none;
+    }
+
+    /* 移动端取消最小宽度/高度（因为按钮已隐藏，导航栏本就窄） */
+    .nav-actions {
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .nav-actions .btn-ghost {
+        height: auto;
+        padding: 12px 28px;
     }
 }
 
