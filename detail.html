@@ -326,9 +326,9 @@
     <section class="detail-container">
         <div class="course-detail-header">
             <div class="breadcrumb">
-                <a href="list.html">课程中心</a> / <span id="detailBreadcrumb">C语言基础入门</span>
+                <a href="list.html">课程中心</a> / <span id="detailBreadcrumb">C语言基础编程</span>
             </div>
-            <h1 id="detailTitle">C语言基础入门</h1>
+            <h1 id="detailTitle">C语言基础编程</h1>
             <div class="course-detail-meta">
                 <span id="detailMeta">📚 课程章节</span>
                 <span id="detailDuration">⏱️ 约 3 小时</span>
@@ -417,12 +417,12 @@
 
     // ================= 相关课程元信息（本地数据，不依赖外部文件） =================
     const courseMeta = {
-        basics:         { title: 'C语言基础入门',         icon: '📘', level: '入门', chapters: 5 },
+        basics:         { title: 'C语言基础编程',         icon: '📘', level: '入门', chapters: 5 },
         'control-flow': { title: '循环与分支结构',         icon: '🔄', level: '入门', chapters: 5 },
-        'io-array':     { title: '输入输出与数组',         icon: '📥', level: '入门', chapters: 5 },
-        functions:      { title: '函数与模块化编程',       icon: '📦', level: '进阶', chapters: 5 },
-        strings:        { title: '数组与字符串',           icon: '📋', level: '进阶', chapters: 5 },
+        functions:      { title: '函数与模块化',           icon: '📦', level: '进阶', chapters: 5 },
         pointers:       { title: '指针与内存管理',         icon: '🔧', level: '进阶', chapters: 5 },
+        strings:        { title: '数组与字符串',           icon: '📋', level: '进阶', chapters: 5 },
+        structs:        { title: '结构体与共同体',         icon: '🧱', level: '进阶', chapters: 5 },
         algorithms:     { title: '数据结构与算法',         icon: '🌲', level: '高级', chapters: 5 },
         'file-io':      { title: '文件操作与IO',           icon: '📁', level: '高级', chapters: 5 },
         project:        { title: '项目实战：学生管理系统', icon: '💻', level: '高级', chapters: 5 }
@@ -433,23 +433,23 @@
         basics: {
             highlights: ['零基础友好', '大量示例', '即时练习', '视频讲解'],
             audience: ['编程初学者', '在校大学生', '转行人员', 'C语言爱好者'],
-            related: ['control-flow', 'io-array'],
-            bilibili: 'https://www.bilibili.com/video/BV1M6Yk6DEeR/',
-            bilibiliLabel: 'C语言入门100集（免费）'
+            related: ['control-flow', 'functions'],
+            bilibili: 'https://www.bilibili.com/video/BV1dr4y1n7vA/',
+            bilibiliLabel: 'C语言入门'
         },
         'control-flow': {
             highlights: ['逻辑思维训练', '流程图辅助', '实战案例', '即时反馈'],
             audience: ['已学完基础语法', '想提升逻辑能力', '准备算法学习'],
             related: ['basics', 'functions'],
-            bilibili: 'https://www.bilibili.com/video/BV1FfCwYWEYm/',
+            bilibili: 'https://www.bilibili.com/video/BV1Fw411u7oy/',
             bilibiliLabel: 'C语言循环与分支'
         },
-        'io-array': {
-            highlights: ['格式化输入输出', '数组可视化', '数据统计案例', '内存模型'],
-            audience: ['已掌握基础语法', '需要处理批量数据', '准备学习字符串'],
-            related: ['basics', 'strings'],
-            bilibili: 'https://www.bilibili.com/video/BV1RD4y1279n/',
-            bilibiliLabel: 'C语言数组专题'
+        structs: {
+            highlights: ['结构体建模', '成员访问图解', '共用体与枚举', '内存布局案例'],
+            audience: ['已学完数组和指针', '需要组织复杂数据', '准备项目实战'],
+            related: ['pointers', 'file-io'],
+            bilibili: 'https://www.bilibili.com/video/BV1GC4y1t7e4/',
+            bilibiliLabel: 'C语言结构体与共用体'
         },
         functions: {
             highlights: ['模块化思维', '递归可视化', '参数传递详解', '代码复用'],
@@ -461,7 +461,7 @@
         strings: {
             highlights: ['字符串处理', '常用库函数', '文本分析案例', '安全输入'],
             audience: ['已学完数组', '需要处理文本数据', '准备项目实战'],
-            related: ['io-array', 'file-io'],
+            related: ['functions', 'pointers'],
             bilibili: 'https://www.bilibili.com/video/BV1Fe4y117Cs/',
             bilibiliLabel: 'C语言字符串'
         },
@@ -476,13 +476,13 @@
             highlights: ['复杂度分析', '经典算法', '代码实现', '面试必备'],
             audience: ['已掌握指针和结构体', '准备算法竞赛', '想进大厂'],
             related: ['pointers', 'project'],
-            bilibili: 'https://www.bilibili.com/video/BV1fPd5BGEEJ/',
+            bilibili: 'https://www.bilibili.com/video/BV1tNpbekEht/',
             bilibiliLabel: '数据结构与算法（C语言描述）'
         },
         'file-io': {
             highlights: ['文件读写', '数据持久化', '错误处理', '项目实战'],
             audience: ['已学完指针', '需要保存数据', '准备做完整项目'],
-            related: ['strings', 'project'],
+            related: ['structs', 'project'],
             bilibili: 'https://www.bilibili.com/video/BV1nF411B7mF/',
             bilibiliLabel: 'C语言文件操作'
         },

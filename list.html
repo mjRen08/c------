@@ -627,7 +627,7 @@
                 <span>系统化课程 · 从入门到精通</span>
             </div>
             <h2>选择你的 C 语言冒险路径</h2>
-            <p>9 门精心设计的课程，覆盖基础语法、数据结构、算法与项目实战。每门课配有交互式代码演示与实机练习。</p>
+            <p>9 个学习专题：前 8 个与「在线小测」一一对应，覆盖基础语法、指针、结构体、数据结构与文件 IO，最后以项目实战收尾。每个专题都配有交互式代码演示与实机练习。</p>
         </div>
 
         <!-- 工具栏 -->
@@ -682,53 +682,55 @@
         })();
 
         // ================= 课程数据 =================
+        // 前 8 个专题与「在线小测」的 8 个专题一一对应（名称、顺序、简介保持一致），
+        // 第 9 个专题为项目实践，不在小测范围内。
         const COURSES = [
             {
-                id: 'basics', title: 'C语言基础入门', icon: '📘', level: '入门', size: 'lg',
+                id: 'basics', title: 'C语言基础编程', icon: '📘', level: '入门', size: 'lg',
                 accent: '#00d4ff', topic: 0,
-                desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块地基。',
+                desc: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块基石。',
                 chapters: 5, hours: 3, rating: 4.9
             },
             {
                 id: 'control-flow', title: '循环与分支结构', icon: '🔄', level: '入门', size: 'sm',
                 accent: '#ff8a00', topic: 1,
-                desc: 'if-else、switch、for、while，掌握程序逻辑控制。',
+                desc: 'if-else、switch、for、while、do-while 的控制逻辑，让程序学会"做决定"和"重复执行"。',
                 chapters: 5, hours: 2, rating: 4.8
             },
             {
-                id: 'io-array', title: '输入输出与数组', icon: '📥', level: '入门', size: 'sm',
-                accent: '#00ff88', topic: 4,
-                desc: 'printf/scanf 与数组，学会处理一组相关数据。',
-                chapters: 5, hours: 2.5, rating: 4.8
-            },
-            {
-                id: 'functions', title: '函数与模块化编程', icon: '📦', level: '进阶', size: 'md',
+                id: 'functions', title: '函数与模块化', icon: '📦', level: '进阶', size: 'md',
                 accent: '#a855f7', topic: 2,
-                desc: '函数定义、参数传递、递归调用，掌握模块化编程思想。',
+                desc: '函数定义、参数传递、递归调用与作用域，掌握拆分复杂问题的思维方式。',
                 chapters: 5, hours: 2.5, rating: 4.9
-            },
-            {
-                id: 'strings', title: '数组与字符串', icon: '📋', level: '进阶', size: 'md',
-                accent: '#22d3ee', topic: 4,
-                desc: '一维/二维数组、字符数组与字符串处理，掌握批量数据处理。',
-                chapters: 5, hours: 2.5, rating: 4.7
             },
             {
                 id: 'pointers', title: '指针与内存管理', icon: '🔧', level: '进阶', size: 'sm',
                 accent: '#ff4757', topic: 3,
-                desc: '地址、指针运算、动态内存，深入理解C语言核心。',
+                desc: '从地址、指针运算到动态内存分配，理解C语言最核心也最具挑战的机制。',
                 chapters: 5, hours: 3, rating: 4.9
+            },
+            {
+                id: 'strings', title: '数组与字符串', icon: '📋', level: '进阶', size: 'md',
+                accent: '#22d3ee', topic: 4,
+                desc: '一维/二维数组、字符数组与字符串处理函数，批量数据的组织与操作。',
+                chapters: 5, hours: 2.5, rating: 4.7
+            },
+            {
+                id: 'structs', title: '结构体与共同体', icon: '🧱', level: '进阶', size: 'sm',
+                accent: '#00ff88', topic: 5,
+                desc: 'struct、union、enum 与位域，把复杂数据打包成一个整体。',
+                chapters: 5, hours: 2.5, rating: 4.8
             },
             {
                 id: 'algorithms', title: '数据结构与算法', icon: '🌲', level: '高级', size: 'md',
                 accent: '#7b2cbf', topic: 6,
-                desc: '链表、栈、队列、树、排序查找，夯实算法基础。',
+                desc: '链表、栈、队列、树与排序算法，夯实计算机科学的核心基础。',
                 chapters: 5, hours: 5, rating: 5.0
             },
             {
                 id: 'file-io', title: '文件操作与IO', icon: '📁', level: '高级', size: 'sm',
                 accent: '#f472b6', topic: 7,
-                desc: '文件读写、缓冲IO，掌握数据持久化存储技术。',
+                desc: '文件的打开、读写、定位与关闭，让数据持久化保存到磁盘。',
                 chapters: 5, hours: 1.5, rating: 4.6
             },
             {

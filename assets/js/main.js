@@ -7,52 +7,54 @@ const AppState = {
     learningProgress: {}
 };
 
+// 课程目录：前 8 个专题与「在线小测」的 8 个专题严格对应（顺序、名称一致），
+// 第 9 个专题 project 为项目实践，不参与小测。
 const courseCatalog = {
     basics: {
-        title: 'C语言基础入门', icon: '📘', duration: '约 3 小时', level: '入门',
-        description: '从程序结构和基本语法开始，逐步掌握变量、数据类型与简单表达式，建立完整的C语言编程基础。',
+        title: 'C语言基础编程', icon: '📘', duration: '约 3 小时', level: '入门',
+        description: '从程序结构、变量、数据类型到基本输入输出，打好C语言的第一块基石。',
         chapters: ['认识C语言与程序结构', '变量、常量与数据类型', '运算符与表达式', '基本输入与输出', '编写第一个完整程序'],
         learn: ['C语言程序的基本组成', '变量声明与数据类型选择', '算术、关系和逻辑运算', 'printf/scanf基本用法', '独立完成简单控制台程序']
     },
     'control-flow': {
         title: '循环与分支结构', icon: '🔄', duration: '约 2 小时', level: '入门',
-        description: '从条件判断到重复执行，循序学习程序流程控制，让代码能够根据不同情况做出决定并完成重复任务。',
+        description: 'if-else、switch、for、while、do-while 的控制逻辑，让程序学会做决定和重复执行。',
         chapters: ['条件表达式与if语句', '多分支与switch语句', 'for循环基础', 'while与do-while循环', '流程控制综合练习'],
         learn: ['设计清晰的条件判断', '使用switch处理多分支逻辑', '掌握for循环的执行过程', '选择合适的循环结构', '解决基础流程控制问题']
     },
-    'io-array': {
-        title: '输入输出与数组', icon: '📥', duration: '约 2.5 小时', level: '入门',
-        description: '学习更规范的数据输入输出方式，并从一维数组开始组织批量数据，为后续的字符串和算法学习做好准备。',
-        chapters: ['格式化输入输出', '一维数组的定义与访问', '数组遍历与统计', '二维数组与表格数据', '数组综合应用'],
-        learn: ['格式化输出和输入校验', '声明并初始化数组', '遍历数组完成数据统计', '处理二维表格数据', '使用数组解决实际问题']
-    },
     functions: {
-        title: '函数与模块化编程', icon: '📦', duration: '约 2.5 小时', level: '进阶',
-        description: '通过函数拆分复杂任务，理解参数传递和返回值，逐步建立可复用、易维护的模块化编程习惯。',
+        title: '函数与模块化', icon: '📦', duration: '约 2.5 小时', level: '进阶',
+        description: '函数定义、参数传递、递归调用与作用域，掌握拆分复杂问题的思维方式。',
         chapters: ['函数声明与定义', '参数传递与返回值', '变量作用域与生命周期', '递归函数入门', '模块化程序设计'],
         learn: ['设计函数接口', '理解值传递过程', '区分局部变量和全局变量', '分析简单递归问题', '拆分并组织多函数程序']
     },
-    strings: {
-        title: '数组与字符串', icon: '📋', duration: '约 2.5 小时', level: '进阶',
-        description: '在数组基础上深入学习字符数组和字符串处理，掌握常见文本操作方法，提升批量数据处理能力。',
-        chapters: ['字符数组与字符串概念', '字符串输入与输出', '常用字符串处理函数', '多维数组与数据表', '字符串综合练习'],
-        learn: ['理解字符串结束标记', '安全读取字符串内容', '使用strlen和strcpy等函数', '组织二维数据', '完成文本处理小任务']
-    },
     pointers: {
         title: '指针与内存管理', icon: '🔧', duration: '约 3 小时', level: '进阶',
-        description: '从地址和指针的基本概念出发，逐步掌握指针运算、数组关系和动态内存分配，建立底层编程思维。',
+        description: '从地址、指针运算到动态内存分配，理解C语言最核心也最具挑战的机制。',
         chapters: ['地址与指针基础', '指针运算与数组', '指针作为函数参数', '动态内存分配', '指针综合应用与调试'],
         learn: ['理解变量地址和解引用', '使用指针遍历数组', '通过指针修改函数外部数据', '正确申请和释放内存', '排查常见指针错误']
     },
+    strings: {
+        title: '数组与字符串', icon: '📋', duration: '约 2.5 小时', level: '进阶',
+        description: '一维/二维数组、字符数组与字符串处理函数，批量数据的组织与操作。',
+        chapters: ['字符数组与字符串概念', '字符串输入与输出', '常用字符串处理函数', '多维数组与数据表', '字符串综合练习'],
+        learn: ['理解字符串结束标记', '安全读取字符串内容', '使用strlen和strcpy等函数', '组织二维数据', '完成文本处理小任务']
+    },
+    structs: {
+        title: '结构体与共同体', icon: '🧱', duration: '约 2.5 小时', level: '进阶',
+        description: 'struct、union、enum 与位域，把复杂数据打包成一个整体。',
+        chapters: ['结构体的定义与声明', '成员访问与结构体指针', '结构体数组与类型别名', '共用体与枚举类型', '位域与内存对齐'],
+        learn: ['定义结构体类型并声明变量', '使用点与箭头运算符访问成员', '用结构体数组组织批量记录', '理解 union 与 enum 的取值特点', '认识位域与内存对齐规则']
+    },
     algorithms: {
         title: '数据结构与算法', icon: '🌲', duration: '约 5 小时', level: '高级',
-        description: '从线性结构到树和排序算法，逐步训练数据组织、复杂度分析与问题拆解能力，夯实算法基础。',
+        description: '链表、栈、队列、树与排序算法，夯实计算机科学的核心基础。',
         chapters: ['复杂度与线性表', '栈、队列与应用', '链表的创建与操作', '树结构与遍历', '排序与查找算法'],
         learn: ['分析算法时间复杂度', '实现栈和队列', '使用链表管理动态数据', '理解树的遍历方式', '比较常见排序和查找算法']
     },
     'file-io': {
         title: '文件操作与IO', icon: '📁', duration: '约 1.5 小时', level: '高级',
-        description: '学习文件打开、读写、定位和关闭等操作，把程序中的数据保存到磁盘，完成可靠的数据持久化。',
+        description: '文件的打开、读写、定位与关闭，让数据持久化保存到磁盘。',
         chapters: ['文件指针与打开关闭', '文本文件读写', '二进制文件处理', '文件定位与错误处理', '持久化数据综合练习'],
         learn: ['正确管理文件指针', '读写文本文件内容', '处理二进制数据', '判断文件操作错误', '设计简单数据存储格式']
     },
@@ -883,7 +885,8 @@ function evaluateAchievements() {
     if ((user.level || 1) >= 10) {
         unlockAchievement('level_10');
     }
-    if (['basics', 'control-flow', 'io-array'].every(function (id) {
+    // 基础课程：入门级别的两个专题
+    if (['basics', 'control-flow'].every(function (id) {
         return completedCourses.indexOf(id) !== -1;
     })) {
         unlockAchievement('all_basic');
@@ -1152,8 +1155,8 @@ function loadProfileData() {
 
 function getProfileCourses() {
     return [
-        ['basics', '基础'], ['control-flow', '流程'], ['io-array', '输入输出'],
-        ['functions', '函数'], ['strings', '字符串'], ['pointers', '指针'],
+        ['basics', '基础编程'], ['control-flow', '流程'], ['functions', '函数'],
+        ['pointers', '指针'], ['strings', '字符串'], ['structs', '结构体'],
         ['algorithms', '算法'], ['file-io', '文件'], ['project', '项目']
     ].map(function (entry) {
         const id = entry[0];
@@ -2250,10 +2253,10 @@ function renderCourseDetail() {
         const coursePagePrefix = {
             basics: 1,
             'control-flow': 2,
-            'io-array': 3,
-            functions: 4,
+            functions: 3,
+            pointers: 4,
             strings: 5,
-            pointers: 6,
+            structs: 6,
             algorithms: 7,
             'file-io': 8,
             project: 9

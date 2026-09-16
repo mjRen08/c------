@@ -1324,7 +1324,7 @@
                     <p class="bio" id="profileExp">经验: 0 / 200</p>
                     <span class="current-course-tag" id="currentCourseTag" style="display:none;">
                         <span class="dot"></span>
-                        <span>正在学习：<strong id="currentCourseName">C语言基础入门</strong></span>
+                        <span>正在学习：<strong id="currentCourseName">C语言基础编程</strong></span>
                     </span>
                     <div class="profile-stats">
                         <div class="profile-stat">
@@ -1831,7 +1831,7 @@
             const nameEl = document.getElementById('currentCourseName');
             if (tag && nameEl && user && typeof courseCatalog !== 'undefined') {
                 const completed = user.completedCourses || [];
-                const allIds = ['basics', 'control-flow', 'io-array', 'functions', 'strings', 'pointers', 'algorithms', 'file-io', 'project'];
+                const allIds = ['basics', 'control-flow', 'functions', 'pointers', 'strings', 'structs', 'algorithms', 'file-io', 'project'];
                 const currentId = allIds.find(function (id) { return completed.indexOf(id) === -1; });
                 if (currentId && courseCatalog[currentId]) {
                     nameEl.textContent = courseCatalog[currentId].title;
