@@ -49,9 +49,14 @@ const BASE_URL = (process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com').r
 const MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat';
 const MAX_TOKENS = Number(process.env.DEEPSEEK_MAX_TOKENS) || 2048;
 
-if (!API_KEY) {
-  console.error('❌ 缺少 DEEPSEEK_API_KEY，请检查 .env');
-  process.exit(1);
+/* 没有 API Key 时不要直接退出。
+   以前这里写的是 process.exit(1)，结果是：别人拿到项目、
+   还没来得及填 .env，整个网站（包括静态页面和 Wasm 判题）都打不开。
+   现在改成"降级"：网站照常提供，只有 AI 助手返回一条清楚的提示。 */
+const AI_ENABLED = Boolean(API_KEY);
+if (!AI_ENABLED) {
+  console.warn('⚠  未检测到 DEEPSEEK_API_KEY：AI 助手将不可用，其它功能正常。');
+  console.warn('   需要 AI 的话，把 .env.example 复制成 .env 并填入你的 Key 后重启。');
 }
 
 const ROOT = __dirname;
@@ -566,12 +571,22 @@ async function handleAI(req, res) {
     return res.end();
   }
 
-  /* GET /api/ai 作为探活接口：前端据此判断"这台服务器是不是 CodeMaster 后端" */
+  /* GET /api/ai 作为探活接口：前端据此判断"这台服务器是不是 CodeMaster 后端"。
+     即使没配 Key 也返回 ok，前端才会把错误信息显示在对话气泡里。 */
   if (req.method === 'GET') {
-    return sendJson(res, 200, { ok: true, service: 'codemaster-ai', model: MODEL, stream: true });
+    return sendJson(res, 200, { ok: true, service: 'codemaster-ai', model: MODEL, stream: true, aiEnabled: AI_ENABLED });
   }
 
   if (req.method !== 'POST') return sendJson(res, 405, { error: 'Method Not Allowed' });
+
+  /* 没配置 Key 时给一条能照着做的提示，而不是让整个网站打不开 */
+  if (!AI_ENABLED) {
+    return sendJson(res, 503, {
+      error: 'AI 功能还没配置：.env 里缺少 DEEPSEEK_API_KEY。'
+           + '把项目里的 .env.example 复制成 .env，填入你自己的 DeepSeek Key 后重启服务即可。'
+           + '（网站的课程、小测、可视化、OJ 判题都不受影响）',
+    });
+  }
 
   let raw = '';
   for await (const chunk of req) raw += chunk;
@@ -749,8 +764,8 @@ server.listen(PORT, HOST, () => {
     console.log(`  （另有虚拟网卡 ${virtual.map(v => v.address).join('、')}，手机连不上，忽略即可）`);
   }
 
-  console.log(`\n  🤖 AI       : DeepSeek / ${MODEL}    →  POST /api/ai`);
+  console.log(`\n  🤖 AI       : ${AI_ENABLED ? `DeepSeek / ${MODEL}    →  POST /api/ai` : '未配置（缺少 DEEPSEEK_API_KEY，网站其它功能正常）'}`);
   console.log(`  🧩 Wasm 编译器: 依赖同源代理 + 本地缓存  →  /vendor/npm/...`);
-  console.log(`  🖼  静态资源 : HTML / CSS / JS / 图片（中文文件名已支持）`);
+  console.log(`  🖼  静态资源 : HTML / CSS / JS / 图片（文件名均为 ASCII，中文名也兼容）`);
   console.log(`  ⛔ 停止服务 : Ctrl + C\n`);
 });
