@@ -818,6 +818,8 @@
                         ${c.topic !== undefined && c.topic !== null ? `
                         <button class="bento-action-btn" title="测试" 
                                 onclick="event.stopPropagation(); goQuiz(${c.topic})">测</button>` : ''}
+                        <button class="bento-action-btn" title="练习"
+                                onclick="event.stopPropagation(); goOj('${c.id}')">练</button>
                     </div>
                 </article>
             `;
@@ -851,6 +853,14 @@
                 location.href = 'quiz.html';
             } else {
                 location.href = 'quiz.html?topic=' + topicIndex;
+            }
+        }
+        // 「练」：跳到 OJ 练习场并定位到本课程的题目分组
+        function goOj(courseId) {
+            if (!courseId) {
+                location.href = 'oj.html';
+            } else {
+                location.href = 'oj.html?course=' + courseId;
             }
         }
         // ================= 收藏 =================

@@ -30,20 +30,32 @@
 
     <main class="oj-shell">
         <header class="oj-heading">
-            <div><span class="oj-kicker">CODEMASTER / ONLINE JUDGE</span><h1>C 语言 OJ 练习场</h1><p>在浏览器内使用 Wasm 编译并运行 C11 代码，逐个挑战公开与隐藏测试点。</p></div>
+            <div><span class="oj-kicker">CODEMASTER / ONLINE JUDGE</span><h1>C 语言 OJ 练习场</h1><p>9 个课程专题 · 45 节课 · 每节课 3 道题由浅入深，在浏览器内用 Wasm 编译运行 C11 代码。</p></div>
             <div class="oj-live" id="compilerStatus"><span></span> Wasm 编译器待加载</div>
         </header>
 
         <section class="oj-toolbar" aria-label="题目筛选">
-            <div class="oj-progress-copy"><strong id="solvedCount">0</strong><span>/ 6 题已通过</span></div>
-            <div class="filter-tabs" role="tablist"><button class="filter-tab active" data-filter="all">全部</button><button class="filter-tab" data-filter="easy">入门</button><button class="filter-tab" data-filter="medium">进阶</button><button class="filter-tab" data-filter="hard">挑战</button></div>
+            <div class="oj-progress">
+                <div class="oj-progress-copy"><strong><span id="solvedCount">0</span> / <span id="solvedTotal">135</span></strong>题已通过</div>
+                <div class="oj-progress-bar" aria-hidden="true"><i id="solvedBar"></i></div>
+            </div>
+            <div class="oj-filter">
+                <span class="oj-filter-label">按课程筛选题目</span>
+                <div class="filter-tabs" id="courseFilter" role="tablist"></div>
+            </div>
         </section>
 
         <div class="oj-layout">
-            <aside class="problem-panel"><div class="panel-title"><span>题目列表</span><span class="panel-count">6 problems</span></div><div id="problemList"></div></aside>
+            <aside class="problem-panel">
+                <div class="panel-title"><span>题目列表</span><span class="panel-count" id="panelCount">135 problems</span></div>
+                <div class="course-summary" id="courseSummary" hidden></div>
+                <div class="panel-note">每节课 3 道题，点击课节标题展开 / 收起</div>
+                <div id="problemList"></div>
+                <div class="panel-foot"><button class="btn btn-ghost" id="toggleAll" type="button">▾ 展开全部</button></div>
+            </aside>
             <section class="workspace-panel">
                 <div class="problem-detail" id="problemDetail"></div>
-                <div class="editor-head"><span><i></i><i></i><i></i> main.c</span><span class="language-tag">C11</span></div>
+                <div class="editor-head"><span><i></i><i></i><i></i> <b id="editorFileName">main.c</b></span><span class="language-tag">C11</span></div>
                 <textarea id="codeEditor" class="code-editor" spellcheck="false" aria-label="C语言代码编辑器"></textarea>
                 <div class="editor-actions"><button class="btn btn-ghost" id="resetCode">↺ 重置代码</button><button class="run-btn btn btn-primary" id="submitCode">▶ 提交并运行</button></div>
                 <div class="result-box" id="resultBox"><div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，浏览器会加载 Wasm 编译器并运行全部测试点。</p></div></div></div>
@@ -74,6 +86,7 @@ int main(void) {
         </div>
     </main>
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/oj-data.js"></script>
     <script src="assets/js/oj.js"></script>
     <script src="assets/js/ai-assistant.js"></script>
 </body>

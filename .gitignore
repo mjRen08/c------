@@ -6,3 +6,9 @@ node_modules/
 
 # 下载中的临时文件
 *.part-*
+
+# 题库验证工具的临时产物（develop/browser-check.mjs、layout-check.mjs 生成）
+develop/.chrome-profile*/
+develop/shots/
+develop/browser-check-log.txt
+develop/README.txt.utf8.tmp

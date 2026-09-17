@@ -224,8 +224,9 @@ async function handleStatic(req, res, url) {
 
   const segments = pathname.split('/').filter(Boolean);
 
-  /* 禁止访问隐藏文件/目录：.env（内含 API Key）、.git、.cache、node_modules */
-  if (segments.some(s => s.startsWith('.') || s === 'node_modules')) {
+  /* 禁止访问隐藏文件/目录：.env（内含 API Key）、.git、.cache、node_modules；
+     develop 是题库维护工具，不属于网站内容，也不对外提供 */
+  if (segments.some(s => s.startsWith('.') || s === 'node_modules' || s === 'develop')) {
     return sendText(res, 403, '403 Forbidden');
   }
 

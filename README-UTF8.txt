@@ -85,11 +85,13 @@
 
 --------------------------------------------------
 【打包发给别人（ZIP 分发）】
-  有两样东西不要打包进去：
+  有三样东西不要打包进去：
 
     .cache     约 128 MB，是 Wasm 编译器的依赖缓存。别人首次用 OJ 时
                会自动重新下载，不需要传。
     .git       版本库（含全部提交历史），交作业用不上。
+    develop    OJ 题库维护工具（开发脚本 + 题目源数据，约 300 KB）。
+               网站运行不依赖它，删掉不影响任何功能。
 
   .env 打包与否你自己决定：
     - 打包  ---- 别人打开就能用 AI，但用的是【你的】Key，等于共享额度。
@@ -102,14 +104,14 @@
   打包方法（在 c------ 的上一级目录执行）：
 
   方法一 - PowerShell（推荐给 Windows 用户，实测可用）：
-    $src = (Get-ChildItem '.\c------' -Force | Where-Object { $_.Name -notin @('.cache','.git','.env') }).FullName
+    $src = (Get-ChildItem '.\c------' -Force | Where-Object { $_.Name -notin @('.cache','.git','.env','develop') }).FullName
     Compress-Archive -Path $src -DestinationPath .\CodeMaster.zip -Force
     注意这两点，否则会报错或漏排除：
       - Windows PowerShell 5.1 里 -Exclude 对目录路径不生效，要用 Where-Object
       - Compress-Archive 不能直接接收其他目录下的对象，必须先取 .FullName 变成字符串
 
   方法二 - 用 Windows 自带 tar（要发给 macOS / Linux 的人时用这条）：
-    tar -a -c -f CodeMaster.zip --exclude ".cache" --exclude ".git" --exclude ".env" -C ".\c------" .
+    tar -a -c -f CodeMaster.zip --exclude ".cache" --exclude ".git" --exclude ".env" --exclude "develop" -C ".\c------" .
     原因：方法一生成的压缩包内部用反斜杠分隔，
           在 macOS / Linux 上解压可能出现带反斜杠的怪文件名；
           这条生成的是规范正斜杠路径，两边都正常。
@@ -136,5 +138,11 @@
 
   - 想清空编译器缓存重新下载
       -> 删除项目下的 .cache 目录。
+
+  - 想改 OJ 题库（题目、测试点、参考答案）
+      -> 题目源数据在 develop/data/batch-*.js。改完后在 develop 目录下依次执行
+         check-structure.mjs、run.mjs verify-all.mjs、build-data.mjs，
+         由 build-data.mjs 重新生成 assets/js/oj-data.js（网站加载的就是它）。
+         细节见 develop/README.md；平时使用网站不需要碰这个目录。
 
 ========================================

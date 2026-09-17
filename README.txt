@@ -97,4 +97,10 @@
   - 想清空编译器缓存重新下载
       -> 删除项目下的 .cache 目录。
 
+  - 想改 OJ 题库（题目、测试点、参考答案）
+      -> 题目源数据在 develop/data/batch-*.js。改完后在 develop 目录下依次执行
+         check-structure.mjs、run.mjs verify-all.mjs、build-data.mjs，
+         由 build-data.mjs 重新生成 assets/js/oj-data.js（网站加载的就是它）。
+         细节见 develop/README.md；平时使用网站不需要碰这个目录。
+
 ========================================

@@ -15,9 +15,100 @@
        同源缓存后再次打开基本是秒开，所以超时给得宽松一些。 */
     const COMPILE_TIMEOUT_MS = 300000;
     const SERVER_HINT = '请先运行 start.bat（或 node server.js），再用 http://localhost:3000/oj.html 打开本页。';
+    const PASSED_KEY = 'cm_oj_passed';
+    const LESSON_SIZE = 3;
     let compilerPromise;
 
-    /* 依次尝试多个来源，返回 { mod, url } */
+    /* ============================================================
+       题库：9 个课程专题 × 5 节课 × 每节 3 题（由 assets/js/oj-data.js 提供）
+       ============================================================ */
+    const COURSES = typeof OJ_COURSES !== 'undefined' ? OJ_COURSES : [];
+    const CHAPTER_TITLES = typeof OJ_CHAPTER_TITLES !== 'undefined'
+        ? OJ_CHAPTER_TITLES
+        : ['核心概念与基本模型', '常见写法与执行过程', '数据变化与边界情况', '调试方法与代码质量', '综合练习与迁移应用'];
+    const problems = (typeof OJ_PROBLEMS !== 'undefined' ? OJ_PROBLEMS : []).map(function (item, index) {
+        return Object.assign({}, item, { order: index });
+    });
+    const courseById = {};
+    COURSES.forEach(function (course) { courseById[course.id] = course; });
+
+    /* 把题目按「课程 → 课节」折叠成组，每组固定 3 题 */
+    const groups = [];
+    const groupIndexById = {};
+    problems.forEach(function (problem) {
+        const key = problem.courseId + '#' + problem.chapter;
+        let group = groupIndexById[key];
+        if (!group) {
+            const course = courseById[problem.courseId] || { id: problem.courseId, title: problem.courseId, icon: '📘', accent: '#00d4ff' };
+            group = {
+                key: key,
+                courseId: problem.courseId,
+                course: course,
+                chapter: problem.chapter,
+                lesson: problem.lesson || CHAPTER_TITLES[problem.chapter - 1] || '',
+                problems: []
+            };
+            groupIndexById[key] = group;
+            groups.push(group);
+        }
+        group.problems.push(problem);
+    });
+    const problemIndexById = {};
+    problems.forEach(function (problem, index) { problemIndexById[problem.id] = index; });
+
+    /* 首次加载时清掉旧版本（只有 6 题）留下的通过记录：数字对不上会误导统计 */
+    const PASSED_VERSION_KEY = 'cm_oj_passed_v2';
+    function loadPassed() {
+        try {
+            if (localStorage.getItem(PASSED_VERSION_KEY) !== '2') {
+                localStorage.removeItem(PASSED_KEY);
+                localStorage.setItem(PASSED_VERSION_KEY, '2');
+                return [];
+            }
+            const stored = JSON.parse(localStorage.getItem(PASSED_KEY) || '[]');
+            return Array.isArray(stored) ? stored.filter(function (id) { return problemIndexById[id] !== undefined; }) : [];
+        } catch (error) {
+            return [];
+        }
+    }
+    function savePassed() {
+        try { localStorage.setItem(PASSED_KEY, JSON.stringify(state.passed)); } catch (error) { /* 忽略隐私模式 */ }
+    }
+
+    /* URL 参数：oj.html?course=basics&chapter=3&id=7（课程中心「练」按钮会带上 course） */
+    function readQuery() {
+        const params = new URLSearchParams(location.search);
+        const courseId = params.get('course');
+        const chapter = Number(params.get('chapter'));
+        const id = Number(params.get('id'));
+        return {
+            courseId: courseId && courseById[courseId] ? courseId : null,
+            chapter: chapter >= 1 && chapter <= 5 ? chapter : null,
+            id: problemIndexById[id] !== undefined ? id : null
+        };
+    }
+
+    const initial = readQuery();
+    const startProblemId = initial.id
+        || (problems.find(function (p) { return initial.courseId && p.courseId === initial.courseId; }) || problems[0] || {}).id;
+
+    const state = {
+        current: startProblemId,
+        filter: initial.courseId || 'all',
+        passed: loadPassed(),
+        expanded: {},
+        solvedBefore: 0
+    };
+    if (initial.courseId) {
+        const key = initial.courseId + '#' + (initial.chapter || (problems.find(function (p) { return p.id === startProblemId; }) || {}).chapter || 1);
+        state.expanded[key] = true;
+    }
+
+    const $ = selector => document.querySelector(selector);
+
+    /* ============================================================
+       编译器加载
+       ============================================================ */
     async function importFirst(urls) {
         let lastError;
         for (const url of urls) {
@@ -29,17 +120,6 @@
         }
         throw lastError || new Error('无法加载模块');
     }
-
-    const problems = [
-        { id: 1, title: '你好，C语言！', level: 'easy', label: '入门', description: '输出一行 Hello, CodeMaster!，熟悉 C 语言程序的基本结构。', input: '无', output: 'Hello, CodeMaster!', publicCases: [{ input: '无', output: 'Hello, CodeMaster!' }], hiddenCases: [{ input: '无', output: 'Hello, CodeMaster!' }], starter: '#include <stdio.h>\n\nint main(void) {\n    // 在这里写下你的代码\n    return 0;\n}' },
-        { id: 2, title: '两数之和', level: 'easy', label: '入门', description: '读入两个整数，输出它们的和。', input: '一行包含两个整数 a 和 b。', output: '输出 a + b。', publicCases: [{ input: '1 2', output: '3' }, { input: '-5 8', output: '3' }], hiddenCases: [{ input: '0 0', output: '0' }, { input: '100000 -23456', output: '76544' }], starter: '#include <stdio.h>\n\nint main(void) {\n    int a, b;\n    scanf("%d %d", &a, &b);\n    printf("%d\\n", a + b);\n    return 0;\n}' },
-        { id: 3, title: '成绩分级', level: 'medium', label: '进阶', description: '输入一个 0 到 100 的成绩，按照区间输出等级：90 分及以上为 A，60 分及以上为 B，否则为 C。', input: '一行包含一个整数 score。', output: '输出对应的等级字母。', publicCases: [{ input: '95', output: 'A' }, { input: '75', output: 'B' }], hiddenCases: [{ input: '90', output: 'A' }, { input: '59', output: 'C' }], starter: '#include <stdio.h>\n\nint main(void) {\n    int score;\n    scanf("%d", &score);\n    // 使用 if / else 完成分级\n    return 0;\n}' },
-        { id: 4, title: '统计数组中的最大值', level: 'medium', label: '进阶', description: '读入 n 个整数，找出其中的最大值。', input: '第一行是 n，第二行是 n 个整数。', output: '输出最大值。', publicCases: [{ input: '5\\n3 8 2 9 1', output: '9' }, { input: '3\\n-4 -1 -7', output: '-1' }], hiddenCases: [{ input: '1\\n42', output: '42' }, { input: '4\\n7 7 7 7', output: '7' }], starter: '#include <stdio.h>\n\nint main(void) {\n    int n, value, max;\n    scanf("%d", &n);\n    // 读入数据并找出最大值\n    return 0;\n}' },
-        { id: 5, title: '回文字符串', level: 'hard', label: '挑战', description: '判断一个只包含小写字母的字符串是否是回文串。', input: '输入一个长度不超过 100 的字符串。', output: '是回文串输出 YES，否则输出 NO。', publicCases: [{ input: 'level', output: 'YES' }, { input: 'hello', output: 'NO' }], hiddenCases: [{ input: 'a', output: 'YES' }, { input: 'abccba', output: 'YES' }], starter: '#include <stdio.h>\n#include <string.h>\n\nint main(void) {\n    char s[101];\n    scanf("%100s", s);\n    // 判断字符串是否正读反读都相同\n    return 0;\n}' },
-        { id: 6, title: '斐波那契数列', level: 'hard', label: '挑战', description: '输入 n，输出斐波那契数列的第 n 项（从 F0 = 0，F1 = 1 开始）。', input: '一行包含一个 0 到 30 的整数 n。', output: '输出 Fn。', publicCases: [{ input: '0', output: '0' }, { input: '6', output: '8' }], hiddenCases: [{ input: '1', output: '1' }, { input: '30', output: '832040' }], starter: '#include <stdio.h>\n\nint main(void) {\n    int n;\n    scanf("%d", &n);\n    // 用循环计算第 n 项\n    return 0;\n}' }
-    ];
-    const state = { current: 1, filter: 'all', passed: JSON.parse(localStorage.getItem('cm_oj_passed') || '[]') };
-    const $ = selector => document.querySelector(selector);
     function setCompilerStatus(label, ready) {
         const status = $('#compilerStatus');
         if (!status) return;
@@ -71,20 +151,221 @@
         }
         return compilerPromise;
     }
-    function visibleProblems() { return problems.filter(p => state.filter === 'all' || p.level === state.filter); }
+
+    /* ============================================================
+       左侧题目列表：每三题一组，点击展开
+       ============================================================ */
+    function visibleGroups() {
+        return state.filter === 'all'
+            ? groups
+            : groups.filter(function (group) { return group.courseId === state.filter; });
+    }
+    function groupSolvedCount(group) {
+        return group.problems.filter(function (problem) { return state.passed.includes(problem.id); }).length;
+    }
+    /* 当前筛选范围内的课程 + 通过情况，显示在列表顶部 */
+    function renderCourseSummary() {
+        const node = $('#courseSummary');
+        if (!node) return;
+        if (state.filter === 'all') { node.innerHTML = ''; node.hidden = true; return; }
+        const course = courseById[state.filter];
+        const list = visibleGroups();
+        const total = list.reduce(function (sum, group) { return sum + group.problems.length; }, 0);
+        const solved = list.reduce(function (sum, group) { return sum + groupSolvedCount(group); }, 0);
+        const percent = total ? Math.round(solved / total * 100) : 0;
+        node.hidden = false;
+        node.innerHTML = `<strong>${course.icon} ${course.title}</strong>
+            <span class="bar"><i style="width:${percent}%"></i></span>
+            <em>${solved}/${total}</em>`;
+    }
+    function currentCourseId() {
+        const problem = problems[problemIndexById[state.current]];
+        return problem ? problem.courseId : (COURSES[0] || {}).id;
+    }
+
+    function renderCourseTabs() {
+        /* 始终显示全部 9 个课程，方便跨课程跳转；点击后只显示该课程的题目 */
+        const tabs = ['<button class="filter-tab ' + (state.filter === 'all' ? 'active' : '') + '" data-filter="all">全部课程</button>'];
+        COURSES.forEach(function (course) {
+            const active = state.filter === course.id ? ' active' : '';
+            tabs.push(`<button class="filter-tab${active}" data-filter="${course.id}"><span class="tab-icon">${course.icon}</span>${course.title}</button>`);
+        });
+        $('#courseFilter').innerHTML = tabs.join('');
+        $('#courseFilter').querySelectorAll('.filter-tab').forEach(function (tab) {
+            tab.addEventListener('click', function () { setFilter(tab.dataset.filter); });
+        });
+    }
+
     function renderList() {
-        $('#problemList').innerHTML = visibleProblems().map(p => `<button class="problem-item ${p.id === state.current ? 'active' : ''}" data-id="${p.id}"><span class="problem-number">${String(p.id).padStart(2, '0')}</span><span class="problem-name">${p.title}</span><span class="difficulty ${p.level}"></span>${state.passed.includes(p.id) ? '<span class="passed-mark">✓</span>' : ''}</button>`).join('');
-        document.querySelectorAll('.problem-item').forEach(item => item.addEventListener('click', () => { state.current = Number(item.dataset.id); render(); }));
+        const list = visibleGroups();
+        let html = '';
+        list.forEach(function (group) {
+            const solved = groupSolvedCount(group);
+            const expanded = !!state.expanded[group.key];
+            const activeInside = group.problems.some(function (problem) { return problem.id === state.current; });
+            html += `<section class="lesson-group${expanded ? ' expanded' : ''}${activeInside ? ' has-active' : ''}${solved === group.problems.length ? ' is-clear' : ''}" data-key="${group.key}" style="--lesson-accent:${group.course.accent}">
+                <button class="lesson-head" data-key="${group.key}" aria-expanded="${expanded}">
+                    <span class="lesson-caret" aria-hidden="true">▸</span>
+                    <span class="lesson-head-main">
+                        <span class="lesson-head-title">第 ${group.chapter} 节 · ${group.lesson}</span>
+                        <span class="lesson-head-sub">${group.course.icon} ${group.course.title}</span>
+                    </span>
+                    <span class="lesson-track" aria-hidden="true"><i style="width:${Math.round(solved / group.problems.length * 100)}%"></i></span>
+                    <span class="lesson-badge${solved === group.problems.length ? ' done' : ''}">${solved}/${group.problems.length}</span>
+                </button>
+                <div class="lesson-body"><div class="lesson-items">`;
+            group.problems.forEach(function (problem) {
+                const passed = state.passed.includes(problem.id);
+                const justChecked = state.justChecked === problem.id ? ' just-checked' : '';
+                html += `<button class="problem-item${problem.id === state.current ? ' active' : ''}${passed ? ' solved' : ''}" data-id="${problem.id}">
+                    <span class="problem-number">${String(group.problems.indexOf(problem) + 1).padStart(2, '0')}</span>
+                    <span class="problem-name">${problem.title}</span>
+                    <span class="problem-tag ${problem.level}">${problem.label}</span>
+                    <span class="passed-mark${justChecked}">${passed ? '✓' : ''}</span>
+                </button>`;
+            });
+            html += `</div></div></section>`;
+        });
+        const panel = $('#problemList');
+        panel.innerHTML = html || '<div class="list-empty">该课程暂无题目</div>';
+        renderCourseSummary();
+        panel.querySelectorAll('.lesson-head').forEach(function (head) {
+            head.addEventListener('click', function () { toggleLesson(head.dataset.key); });
+        });
+        panel.querySelectorAll('.problem-item').forEach(function (item) {
+            item.addEventListener('click', function () { selectProblem(Number(item.dataset.id)); });
+        });
+        const meta = $('#panelCount');
+        if (meta) {
+            meta.textContent = `${problems.length} problems · ${groups.length} lessons`;
+        }
     }
+
+    function toggleLesson(key, force) {
+        const next = typeof force === 'boolean' ? force : !state.expanded[key];
+        state.expanded[key] = next;
+        const node = document.querySelector(`.lesson-group[data-key="${key}"]`);
+        if (node) {
+            node.classList.toggle('expanded', next);
+            const head = node.querySelector('.lesson-head');
+            if (head) head.setAttribute('aria-expanded', String(next));
+        }
+    }
+    function expandAll(expand) {
+        visibleGroups().forEach(function (group) { state.expanded[group.key] = expand; });
+        document.querySelectorAll('.lesson-group').forEach(function (node) {
+            node.classList.toggle('expanded', expand);
+            const head = node.querySelector('.lesson-head');
+            if (head) head.setAttribute('aria-expanded', String(expand));
+        });
+        const button = $('#toggleAll');
+        if (button) button.textContent = expand ? '▴ 收起全部' : '▾ 展开全部';
+    }
+
+    function setFilter(filter) {
+        state.filter = filter;
+        renderCourseTabs();
+        const list = visibleGroups();
+        if (!list.some(function (group) { return group.problems.some(function (problem) { return problem.id === state.current; }); })) {
+            const first = list[0];
+            if (first) {
+                state.expanded[first.key] = true;
+                state.current = first.problems[0].id;
+            }
+        }
+        render();
+    }
+
+    function selectProblem(id) {
+        const problem = problems[problemIndexById[id]];
+        if (!problem) return;
+        state.current = id;
+        state.justChecked = null;
+        try { localStorage.setItem('cm_oj_last', String(id)); } catch (error) { /* 忽略隐私模式 */ }
+        let reveal = null;
+        groups.forEach(function (group) {
+            if (group.problems.some(function (item) { return item.id === id; })) {
+                state.expanded[group.key] = true;
+                reveal = group.key;
+            }
+        });
+        render();
+        if (reveal) {
+            const node = document.querySelector(`.lesson-group[data-key="${reveal}"]`);
+            if (node && node.scrollIntoView) node.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }
+
+    /* 同步地址栏，刷新或分享链接后仍能回到同一题 */
+    function syncUrl(problem) {
+        if (!history.replaceState) return;
+        const query = `?course=${problem.courseId}&chapter=${problem.chapter}&id=${problem.id}`;
+        history.replaceState(null, '', location.pathname + query);
+    }
+
+    /* ============================================================
+       右侧题目详情
+       ============================================================ */
     function renderDetail() {
-        const p = problems.find(item => item.id === state.current) || problems[0];
-        const publicCases = p.publicCases || [{ input: p.input, output: p.output }];
-        const casePreview = publicCases.map((item, index) => `<span class="example"><b>公开 ${index + 1}</b> 输入：${item.input} · 输出：${item.output}</span>`).join('');
-        $('#problemDetail').innerHTML = `<div class="detail-meta"><b>#${String(p.id).padStart(3, '0')}</b><span>${p.label}</span><span>·</span><span>标准输入输出</span></div><h2>${p.title}</h2><p>${p.description}</p><div class="examples">${casePreview}<span class="example hidden-case">隐藏测试点：${p.hiddenCases.length} 个</span></div>`;
-        $('#codeEditor').value = p.starter;
+        const problem = problems[problemIndexById[state.current]] || problems[0];
+        if (!problem) return;
+        const group = groupIndexById[problem.courseId + '#' + problem.chapter];
+        const siblings = group ? group.problems : [problem];
+        const publicCases = problem.publicCases || [{ input: problem.input, output: problem.output }];
+        const casePreview = publicCases.map(function (item, index) {
+            return `<span class="example"><b>公开 ${index + 1}</b> 输入：${escapeHtml(item.input)} · 输出：${escapeHtml(item.output)}</span>`;
+        }).join('');
+        const switcher = siblings.map(function (item) {
+            const passed = state.passed.includes(item.id);
+            return `<button class="lesson-chip${item.id === problem.id ? ' active' : ''}${passed ? ' solved' : ''}" data-id="${item.id}">
+                <b>第 ${siblings.indexOf(item) + 1} 题</b><span>${item.label}</span><i>${passed ? '✓ 已通过' : item.title}</i>
+            </button>`;
+        }).join('');
+        $('#problemDetail').innerHTML = `
+            <div class="detail-meta"><b>#${String(problem.id).padStart(3, '0')}</b><span>${problem.label}</span><span>·</span><span>标准输入输出</span></div>
+            <div class="lesson-strip">
+                <span class="lesson-strip-label">${group ? group.course.icon + ' ' + group.course.title : ''} · 第 ${problem.chapter} 节 ${problem.lesson}</span>
+                <div class="lesson-switch">${switcher}</div>
+            </div>
+            <h2>${problem.title}</h2>
+            <p>${problem.description}</p>
+            <div class="examples">${casePreview}<span class="example hidden-case">隐藏测试点：${(problem.hiddenCases || []).length} 个</span></div>
+            <div class="io-spec">
+                <div><b>输入格式</b><span>${escapeHtml(problem.input)}</span></div>
+                <div><b>输出格式</b><span>${escapeHtml(problem.output)}</span></div>
+            </div>`;
+        $('#problemDetail').querySelectorAll('.lesson-chip').forEach(function (chip) {
+            chip.addEventListener('click', function () { selectProblem(Number(chip.dataset.id)); });
+        });
+        $('#editorFileName').textContent = 'main.c';
+        $('#codeEditor').value = problem.starter;
         $('#resultBox').innerHTML = '<div class="result-placeholder"><span>⌁</span><div><strong>准备好了吗？</strong><p>点击“提交并运行”，浏览器会加载 Wasm 编译器并运行全部测试点。</p></div></div>';
+        syncUrl(problem);
     }
-    function render() { renderList(); renderDetail(); $('#solvedCount').textContent = state.passed.length; }
+
+    function escapeHtml(text) {
+        return String(text === undefined || text === null ? '' : text)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function renderProgress() {
+        $('#solvedCount').textContent = state.passed.length;
+        $('#solvedTotal').textContent = problems.length;
+        const bar = $('#solvedBar');
+        if (bar) {
+            const percent = problems.length ? Math.round(state.passed.length / problems.length * 100) : 0;
+            bar.style.width = percent + '%';
+        }
+    }
+    function render() {
+        renderList();
+        renderDetail();
+        renderProgress();
+    }
+
+    /* ============================================================
+       判题
+       ============================================================ */
     function normalizeOutput(output) {
         return output.replace(/\r\n/g, '\n').trim();
     }
@@ -123,17 +404,24 @@
         const code = stripComments(source);
         const syntaxError = checkStructure(source);
         if (syntaxError) return { ok: false, status: 'Compile Error', mode: 'structure', message: syntaxError };
-        const checks = {
-            1: [[/printf\s*\(\s*"Hello,\s*CodeMaster!/i, '必须输出 Hello, CodeMaster!。']],
-            2: [[/scanf\s*\(\s*"%d\s+%d"/, '必须读取两个整数。'], [/printf\s*\([^;]*\+[^;]*\)/, '输出必须使用两个数的加法结果。']],
-            3: [[/scanf\s*\(\s*"%d"/, '必须读取成绩。'], [/(>=\s*90|90\s*<=)/, '必须处理 90 分及以上。'], [/(>=\s*60|60\s*<=)/, '必须处理 60 分及以上。'], [/printf\s*\([^;]*"A/, '缺少 A 等级输出。'], [/printf\s*\([^;]*"B/, '缺少 B 等级输出。'], [/printf\s*\([^;]*"C/, '缺少 C 等级输出。']],
-            4: [[/scanf\s*\(\s*"%d"/, '必须读取数组长度。'], [/(for|while)\s*\(/, '必须循环读取数组元素。'], [/[A-Za-z_]\w*\s*>\s*[A-Za-z_]\w*/, '必须比较当前值和最大值。'], [/printf\s*\([^;]*%d/, '必须输出最大值。']],
-            5: [[/#include\s*[<"]string\.h[>"]/, '必须引入 string.h。'], [/(for|while)\s*\(/, '必须遍历字符串。'], [/(==|strcmp\s*\()/, '必须比较字符或字符串。'], [/printf\s*\([^;]*"YES/, '缺少 YES 输出。'], [/printf\s*\([^;]*"NO/, '缺少 NO 输出。']],
-            6: [[/scanf\s*\(\s*"%d"/, '必须读取 n。'], [/(for|while)\s*\(/, '必须循环计算数列。'], [/[A-Za-z_]\w*\s*=\s*[A-Za-z_]\w*\s*\+\s*[A-Za-z_]\w*/, '必须使用前两项相加。'], [/printf\s*\([^;]*%d/, '必须输出数列结果。']]
-        };
-        const failed = checks[problem.id].find(([pattern]) => !pattern.test(code));
+        const checks = Array.isArray(problem.checks) ? problem.checks : [];
+        const failed = checks.find(function (item) {
+            const pattern = String(item[0]).replace(/^\//, '').replace(/\/[gimsuy]*$/, '');
+            let regex;
+            try {
+                regex = new RegExp(pattern);
+            } catch (error) {
+                return false;
+            }
+            return !regex.test(code);
+        });
         if (failed) return { ok: false, status: 'Wrong Answer', mode: 'structure', message: `${failed[1]}\n结构检查未通过，未计入通过题目。` };
-        return { ok: true, status: 'Structure Accepted', mode: 'structure', message: `已通过 ${problem.publicCases.length} 个公开规则和 ${problem.hiddenCases.length} 个隐藏规则。\n当前为 JS 严格结构检查模式，未执行 C 代码。\n${reason}` };
+        return {
+            ok: true,
+            status: 'Structure Accepted',
+            mode: 'structure',
+            message: `已通过 ${problem.publicCases.length} 个公开规则和 ${problem.hiddenCases.length} 个隐藏规则。\n当前为 JS 严格结构检查模式，未执行 C 代码。\n${reason}`
+        };
     }
     async function runModule(module, input, runtime) {
         let output = '';
@@ -171,13 +459,26 @@
             const actual = normalizeOutput(await runModule(compiled.module, testCase.input, runtime));
             const expected = normalizeOutput(testCase.output);
             if (actual !== expected) {
-                return { ok: false, status: 'Wrong Answer', message: `${testCase.hidden ? '隐藏' : '公开'}测试点 ${testCase.hidden ? hiddenPassed + 1 : publicPassed + 1} 未通过。\n期望输出：${expected || '（空）'}\n实际输出：${actual || '（空）'}\n公开测试点 ${publicPassed}/${problem.publicCases.length}，隐藏测试点 ${hiddenPassed}/${problem.hiddenCases.length}。` };
+                return { ok: false, status: 'Wrong Answer', message: `${testCase.hidden ? '隐藏' : '公开'}测试点 ${testCase.hidden ? hiddenPassed + 1 : publicPassed + 1} 未通过。\n输入：${testCase.input}\n期望输出：${expected || '（空）'}\n实际输出：${actual || '（空）'}\n公开测试点 ${publicPassed}/${problem.publicCases.length}，隐藏测试点 ${hiddenPassed}/${problem.hiddenCases.length}。` };
             }
             if (testCase.hidden) hiddenPassed += 1;
             else publicPassed += 1;
         }
         return { ok: true, status: 'Accepted', message: `公开测试点 ${publicPassed}/${problem.publicCases.length}，隐藏测试点 ${hiddenPassed}/${problem.hiddenCases.length}。\n代码已在浏览器内通过真实 C11 编译和运行。` };
     }
+    function markPassed(problem) {
+        if (state.passed.includes(problem.id)) return;
+        state.passed.push(problem.id);
+        savePassed();
+        state.justChecked = problem.id;
+        renderList();
+        renderProgress();
+        renderDetail();
+    }
+
+    /* ============================================================
+       自由编程区
+       ============================================================ */
     async function runFreeCode() {
         const source = $('#freeCodeEditor').value;
         const input = $('#freeCodeInput').value;
@@ -205,55 +506,77 @@
             button.textContent = '▶ 运行代码';
         }
     }
+
     async function submit() {
-        const p = problems.find(item => item.id === state.current);
+        const problem = problems[problemIndexById[state.current]];
         const source = $('#codeEditor').value;
         $('#submitCode').disabled = true;
         $('#submitCode').textContent = '⏳ 判题中...';
-        $('#resultBox').innerHTML = '<div class="result-placeholder"><span>⌁</span><div><strong>正在检查代码</strong><p>判题器正在分析输入、处理逻辑和输出结构。</p></div></div>';
+        $('#resultBox').innerHTML = '<div class="result-placeholder"><span>⌁</span><div><strong>正在检查代码</strong><p>判题器正在编译代码并运行公开与隐藏测试点。</p></div></div>';
         try {
-            if (!p) {
-                throw new Error('题目不存在');
-            }
-            const result = await judgeWithCompiler(source, p, status => {
+            if (!problem) throw new Error('题目不存在');
+            const result = await judgeWithCompiler(source, problem, status => {
                 $('#resultBox').innerHTML = `<div class="result-placeholder"><span>⌁</span><div><strong>正在判题</strong><p>${status}</p></div></div>`;
             });
-            const success = result.ok;
-            $('#resultBox').innerHTML = success
-                ? `<div class="result-success result-title">✓ ${result.mode === 'structure' ? 'Structure Accepted · 结构检查通过' : 'Accepted · 通过测试'}</div><pre>${result.message}\n${result.mode === 'structure' ? 'Wasm 编译器不可用，已切换为 JS 严格结构检查。' : '本页面使用浏览器内 Wasm 编译器完成判题。'}</pre>`
-                : `<div class="result-fail result-title">× ${result.status} · 未通过</div><pre>${result.message}</pre>`;
-            if (success && !state.passed.includes(p.id)) { state.passed.push(p.id); localStorage.setItem('cm_oj_passed', JSON.stringify(state.passed)); renderList(); $('#solvedCount').textContent = state.passed.length; }
+            $('#resultBox').innerHTML = result.ok
+                ? `<div class="result-success result-title">✓ ${result.mode === 'structure' ? 'Structure Accepted · 结构检查通过' : 'Accepted · 通过测试'}</div><pre>${escapeHtml(result.message)}\n${result.mode === 'structure' ? 'Wasm 编译器不可用，已切换为 JS 严格结构检查。' : '本页面使用浏览器内 Wasm 编译器完成判题。'}</pre>`
+                : `<div class="result-fail result-title">× ${result.status} · 未通过</div><pre>${escapeHtml(result.message)}</pre>`;
+            if (result.ok) markPassed(problem);
         } catch (error) {
-            const fallback = judgeStructure(source, p, error.message || 'Wasm 编译器未能完成初始化。');
+            const fallback = judgeStructure(source, problem, error.message || 'Wasm 编译器未能完成初始化。');
             $('#resultBox').innerHTML = fallback.ok
-                ? `<div class="result-success result-title">✓ Structure Accepted · 结构检查通过</div><pre>${fallback.message}\nWasm 编译器不可用，已切换为 JS 严格结构检查。</pre>`
-                : `<div class="result-fail result-title">× ${fallback.status} · 未通过</div><pre>${fallback.message}\nWasm 判题失败原因：${error.message || '未知错误'}</pre>`;
-            if (fallback.ok && !state.passed.includes(p.id)) { state.passed.push(p.id); localStorage.setItem('cm_oj_passed', JSON.stringify(state.passed)); renderList(); $('#solvedCount').textContent = state.passed.length; }
+                ? `<div class="result-success result-title">✓ Structure Accepted · 结构检查通过</div><pre>${escapeHtml(fallback.message)}\nWasm 编译器不可用，已切换为 JS 严格结构检查。</pre>`
+                : `<div class="result-fail result-title">× ${fallback.status} · 未通过</div><pre>${escapeHtml(fallback.message)}\nWasm 判题失败原因：${escapeHtml(error.message || '未知错误')}</pre>`;
+            if (fallback.ok) markPassed(problem);
         } finally {
             $('#submitCode').disabled = false;
             $('#submitCode').textContent = '▶ 提交并运行';
         }
     }
-    document.addEventListener('DOMContentLoaded', () => {
+
+    /* ============================================================
+       初始化
+       ============================================================ */
+    function initStars() {
         const starField = document.querySelector('#starField');
-        if (starField) {
-            for (let index = 0; index < 60; index += 1) {
-                const star = document.createElement('span');
-                star.style.left = `${Math.random() * 100}%`;
-                star.style.top = `${Math.random() * 100}%`;
-                star.style.animationDelay = `${Math.random() * 3}s`;
-                star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
-                const size = Math.random() * 2 + 1;
-                star.style.width = `${size}px`;
-                star.style.height = `${size}px`;
-                starField.appendChild(star);
-            }
+        if (!starField) return;
+        for (let index = 0; index < 60; index += 1) {
+            const star = document.createElement('span');
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            star.style.opacity = `${Math.random() * 0.5 + 0.1}`;
+            const size = Math.random() * 2 + 1;
+            star.style.width = `${size}px`;
+            star.style.height = `${size}px`;
+            starField.appendChild(star);
         }
-        document.querySelectorAll('.filter-tab').forEach(tab => tab.addEventListener('click', () => { document.querySelector('.filter-tab.active').classList.remove('active'); tab.classList.add('active'); state.filter = tab.dataset.filter; if (!visibleProblems().some(p => p.id === state.current)) state.current = visibleProblems()[0].id; render(); }));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initStars();
+        if (!problems.length) {
+            setCompilerStatus('题库数据加载失败', false);
+            return;
+        }
+        renderCourseTabs();
         $('#submitCode').addEventListener('click', submit);
-        $('#resetCode').addEventListener('click', renderDetail);
+        $('#resetCode').addEventListener('click', () => { $('#codeEditor').value = problems[problemIndexById[state.current]].starter; });
         $('#runFreeCode').addEventListener('click', runFreeCode);
         $('#clearFreeCode').addEventListener('click', () => { $('#freeCodeOutput').className = ''; $('#freeCodeOutput').textContent = '点击“运行代码”查看输出。'; });
+        const toggleAll = $('#toggleAll');
+        if (toggleAll) {
+            toggleAll.addEventListener('click', () => {
+                const allOpen = visibleGroups().every(group => state.expanded[group.key]);
+                expandAll(!allOpen);
+            });
+        }
         render();
+        /* 从课程中心「练」按钮进来时，把当前课节滚进视野 */
+        const group = groupIndexById[problems[problemIndexById[state.current]].courseId + '#' + problems[problemIndexById[state.current]].chapter];
+        if (group && initial.courseId) {
+            const node = document.querySelector(`.lesson-group[data-key="${group.key}"]`);
+            if (node && node.scrollIntoView) node.scrollIntoView({ block: 'center' });
+        }
     });
 })();
