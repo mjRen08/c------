@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>截图跳转</title>
+<script>
+/* 截图辅助页：按 ?to=<url>&w=<宽>&h=<高> 跳到目标页面，用于给 Chrome 一次性
+   --screenshot 提供「不同尺寸」的启动目标（file:// 页面可以正常跳转到 http://）。 */
+(function () {
+  const params = new URLSearchParams(location.search);
+  const to = params.get('to');
+  if (!to) { document.body.textContent = '缺少 to 参数'; return; }
+  location.replace(to);
+})();
+</script>
+</head>
+<body>正在跳转到目标页面…</body>
+</html>

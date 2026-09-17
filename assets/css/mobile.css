@@ -520,7 +520,11 @@ body.nav-open .ai-window {
        "登录"按钮点不到。改成可滚动、顶部对齐。 */
     body.auth-page,
     .auth-page {
-        overflow: auto;
+        /* 只放开纵向滚动。写成 overflow:auto 会同时放开横向，
+           窄屏下登录/注册/个人中心的装饰光晕（.auth-page::after 的
+           right:-10%）会把页面撑宽 70~104px，出现左右晃动的横向滚动条。 */
+        overflow-y: auto;
+        overflow-x: hidden;
         align-items: flex-start;
         padding: 88px 16px 48px;
     }

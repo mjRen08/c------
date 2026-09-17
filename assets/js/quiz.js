@@ -78,17 +78,25 @@ function renderQuestion() {
 }
 
 //上一题
-document.getElementById("prev-btn").onclick = function () {
-    if (currentQ > 0) {
-        currentQ--;
-        renderQuestion();
+//注意：小测首页（未进入答题）时 #prev-btn / #next-btn 还不存在于 DOM 中，
+//直接取 .onclick 会抛 "Cannot set properties of null"，因此先判空绑定。
+const prevBtnEl = document.getElementById("prev-btn");
+if (prevBtnEl) {
+    prevBtnEl.onclick = function () {
+        if (currentQ > 0) {
+            currentQ--;
+            renderQuestion();
+        }
     }
 }
 //下一题
-document.getElementById("next-btn").onclick = function () {
-    if (currentQ < quizList.length - 1) {
-        currentQ++;
-        renderQuestion();
+const nextBtnEl = document.getElementById("next-btn");
+if (nextBtnEl) {
+    nextBtnEl.onclick = function () {
+        if (currentQ < quizList.length - 1) {
+            currentQ++;
+            renderQuestion();
+        }
     }
 }
 
@@ -134,7 +142,19 @@ function showResultPopup() {
 }
 
 // 查看成绩按钮点击事件
-document.getElementById("showResultBtn").onclick = showResultPopup;
+// ============================================================
+// 页面级绑定统一走这个辅助函数：
+// quiz.js 同时被 quiz.html（专题选择页，页面里没有答题 DOM）和
+// test/quizN-*.html（答题卷页面）加载。早期写法直接取 .onclick，
+// 在 quiz.html 上会抛 "Cannot set properties of null"，导致后续
+// 顶层语句全部中断。改为判空绑定，缺失的控件直接跳过。
+// ============================================================
+function bindClick(id, handler) {
+    const el = document.getElementById(id);
+    if (el) el.onclick = handler;
+}
+
+bindClick("showResultBtn", showResultPopup);
 
 // 清除当前试卷记录，恢复可编辑状态
 function resetQuiz() {
@@ -155,10 +175,10 @@ function resetQuiz() {
     renderQuestion();
 }
 
-document.getElementById("resetQuizBtn").onclick = resetQuiz;
+bindClick("resetQuizBtn", resetQuiz);
 
 //提交试卷：保存本次答题记录
-document.getElementById("submit-btn").onclick = function () {
+bindClick("submit-btn", function () {
     //检查有没有漏答
     const emptyIndexes = [];
     userSelect.forEach(function (item, idx) {
@@ -264,9 +284,9 @@ function closeUnansweredPopup() {
     document.body.style.overflow = '';
 }
 //返回在线小测专题页
-document.getElementById("back-home").onclick = function () {
+bindClick("back-home", function () {
     window.location.href = window.location.pathname.includes('/test/') ? "../quiz.html" : "quiz.html";
-}
+});
 
 // 更新首页：已经做完的试卷小圆标绿色（首页调用）
 function refreshHomeMark() {
