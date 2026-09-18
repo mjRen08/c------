@@ -23,7 +23,18 @@
 }
 
 /* ========== 通用页面背景与视觉统一 ========== */
-body.home-page-bg,
+/* 首页：亮暗交替渐变（首页专属） */
+body.home-page-bg {
+    background:
+        radial-gradient(circle at 12% 8%, rgba(0, 212, 255, 0.10), transparent 32%),
+        radial-gradient(circle at 88% 20%, rgba(123, 44, 191, 0.10), transparent 36%),
+        radial-gradient(circle at 50% 100%, rgba(0, 212, 255, 0.06), transparent 40%),
+        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* 其他所有页面：统一明亮纯色 */
 body.course-page-bg,
 body.detail-page-bg,
 body.profile-page-bg,
@@ -31,25 +42,9 @@ body.team-page-bg,
 body.quiz-home-page,
 body.game-page-bg,
 body.auth-page {
-    background:
-        radial-gradient(circle at 12% 8%, rgba(0,212,255,0.10), transparent 32%),
-        radial-gradient(circle at 88% 20%, rgba(123,44,191,0.10), transparent 36%),
-        radial-gradient(circle at 50% 100%, rgba(0,212,255,0.06), transparent 40%),
-        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
+    background: #101c3d;
     min-height: 100vh;
     overflow-x: hidden;
-}
-
-body.course-page-bg,
-body.detail-page-bg,
-body.profile-page-bg,
-body.team-page-bg,
-body.game-page-bg {
-    background:
-        radial-gradient(circle at 10% 10%, rgba(0,212,255,0.08), transparent 30%),
-        radial-gradient(circle at 90% 20%, rgba(123,44,191,0.08), transparent 35%),
-        radial-gradient(circle at 50% 90%, rgba(0,212,255,0.05), transparent 40%),
-        linear-gradient(180deg, #0a0f1f 0%, #0d1430 45%, #0a0f1f 100%);
 }
 
 body.auth-page {
@@ -84,8 +79,17 @@ body.quiz-home-page {
 }
 
 @keyframes twinkle {
-    0%,100% { opacity: 0.15; transform: scale(0.8); }
-    50% { opacity: 0.9; transform: scale(1.2); }
+
+    0%,
+    100% {
+        opacity: 0.15;
+        transform: scale(0.8);
+    }
+
+    50% {
+        opacity: 0.9;
+        transform: scale(1.2);
+    }
 }
 
 .auth-orb {
@@ -99,7 +103,7 @@ body.quiz-home-page {
 .auth-orb.orb-a {
     width: 480px;
     height: 480px;
-    background: rgba(0,212,255,0.18);
+    background: rgba(0, 212, 255, 0.18);
     top: -120px;
     left: -120px;
     animation: orbFloat 14s ease-in-out infinite;
@@ -108,15 +112,22 @@ body.quiz-home-page {
 .auth-orb.orb-b {
     width: 420px;
     height: 420px;
-    background: rgba(123,44,191,0.16);
+    background: rgba(123, 44, 191, 0.16);
     bottom: -140px;
     right: -100px;
     animation: orbFloat 18s ease-in-out infinite reverse;
 }
 
 @keyframes orbFloat {
-    0%,100% { transform: translate(0,0) scale(1); }
-    50% { transform: translate(40px,-30px) scale(1.08); }
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    50% {
+        transform: translate(40px, -30px) scale(1.08);
+    }
 }
 
 #scrollProgress {
@@ -128,7 +139,7 @@ body.quiz-home-page {
     background: linear-gradient(90deg, #00d4ff, #7b2cbf, #00ff88);
     z-index: 2000;
     transition: width 0.1s ease-out;
-    box-shadow: 0 0 12px rgba(0,212,255,0.8);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.8);
 }
 
 /* ========== 通用工具类 ========== */
@@ -157,10 +168,10 @@ body.quiz-home-page {
     box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
-    }
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+}
 
 .btn-outline {
     border: 2px solid var(--primary);
@@ -168,20 +179,20 @@ body.quiz-home-page {
     background: transparent;
 }
 
-    .btn-outline:hover {
-        background: var(--primary);
-        color: var(--bg-dark);
-    }
+.btn-outline:hover {
+    background: var(--primary);
+    color: var(--bg-dark);
+}
 
 .btn-ghost {
     color: var(--text-secondary);
     background: transparent;
 }
 
-    .btn-ghost:hover {
-        color: var(--primary);
-        background: rgba(0, 212, 255, 0.1);
-    }
+.btn-ghost:hover {
+    color: var(--primary);
+    background: rgba(0, 212, 255, 0.1);
+}
 
 .card {
     background: var(--gradient-card);
@@ -191,11 +202,11 @@ body.quiz-home-page {
     transition: var(--transition);
 }
 
-    .card:hover {
-        border-color: var(--primary);
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-glow);
-    }
+.card:hover {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow);
+}
 
 .section-title {
     font-size: 32px;
@@ -269,28 +280,28 @@ body.quiz-home-page {
     white-space: nowrap;
 }
 
-    .nav-links a {
-        color: var(--text-secondary);
-        font-weight: 500;
-        transition: var(--transition);
-        position: relative;
-    }
+.nav-links a {
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: var(--transition);
+    position: relative;
+}
 
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: var(--primary);
-        }
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary);
+}
 
-            .nav-links a.active::after {
-                content: '';
-                position: absolute;
-                bottom: -6px;
-                left: 0;
-                right: 0;
-                height: 2px;
-                background: var(--gradient-primary);
-                border-radius: 2px;
-            }
+.nav-links a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
 
 /* ========== 导航右侧动作区（宽高都锁定） ========== */
 .nav-actions {
@@ -328,10 +339,10 @@ body.quiz-home-page {
     flex-shrink: 0;
 }
 
-    .user-avatar:hover {
-        transform: scale(1.1);
-        box-shadow: var(--shadow-glow);
-    }
+.user-avatar:hover {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-glow);
+}
 
 /* ========== 移动端汉堡菜单 ========== */
 .nav-toggle {
@@ -348,6 +359,7 @@ body.quiz-home-page {
     flex-shrink: 0;
     z-index: 1002;
 }
+
 .nav-toggle span {
     position: absolute;
     left: 50%;
@@ -357,24 +369,37 @@ body.quiz-home-page {
     border-radius: 2px;
     transform: translateX(-50%);
     transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-    box-shadow: 0 0 6px rgba(100,210,255,0.6);
+    box-shadow: 0 0 6px rgba(100, 210, 255, 0.6);
 }
-.nav-toggle span:nth-child(1) { top: 12px; }
-.nav-toggle span:nth-child(2) { top: 19px; }
-.nav-toggle span:nth-child(3) { top: 26px; }
+
+.nav-toggle span:nth-child(1) {
+    top: 12px;
+}
+
+.nav-toggle span:nth-child(2) {
+    top: 19px;
+}
+
+.nav-toggle span:nth-child(3) {
+    top: 26px;
+}
+
 .nav-toggle:hover {
     background: rgba(0, 212, 255, 0.18);
     border-color: #00d4ff;
-    box-shadow: 0 0 14px rgba(0,212,255,0.4);
+    box-shadow: 0 0 14px rgba(0, 212, 255, 0.4);
 }
+
 .nav-toggle.active span:nth-child(1) {
     top: 19px;
     transform: translateX(-50%) rotate(45deg);
 }
+
 .nav-toggle.active span:nth-child(2) {
     opacity: 0;
     transform: translateX(-50%) scaleX(0);
 }
+
 .nav-toggle.active span:nth-child(3) {
     top: 19px;
     transform: translateX(-50%) rotate(-45deg);
@@ -388,9 +413,9 @@ body.quiz-home-page {
     width: min(320px, 82vw);
     height: 100vh;
     padding: 92px 22px 32px;
-    background: linear-gradient(180deg, rgba(10,14,26,0.98), rgba(13,20,48,0.98));
+    background: linear-gradient(180deg, rgba(10, 14, 26, 0.98), rgba(13, 20, 48, 0.98));
     border-left: 1px solid rgba(0, 212, 255, 0.25);
-    box-shadow: -20px 0 60px rgba(0,0,0,0.7);
+    box-shadow: -20px 0 60px rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     z-index: 998;
@@ -399,9 +424,11 @@ body.quiz-home-page {
     overflow-y: auto;
     display: none;
 }
+
 .nav-drawer.active {
     transform: translateX(0);
 }
+
 .nav-drawer .nav-links {
     display: flex !important;
     flex-direction: column;
@@ -415,10 +442,12 @@ body.quiz-home-page {
     transform: none;
     white-space: normal;
 }
+
 .nav-drawer .nav-links li {
     width: 100%;
     list-style: none;
 }
+
 .nav-drawer .nav-links a {
     display: block;
     padding: 14px 16px;
@@ -430,18 +459,21 @@ body.quiz-home-page {
     transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
     position: relative;
 }
+
 .nav-drawer .nav-links a:hover {
     background: rgba(0, 212, 255, 0.08);
     color: #64d2ff;
-    border-left-color: rgba(0,212,255,0.5);
+    border-left-color: rgba(0, 212, 255, 0.5);
     transform: translateX(4px);
 }
+
 .nav-drawer .nav-links a.active {
     background: rgba(0, 212, 255, 0.12);
     color: #64d2ff;
     border-left-color: #64d2ff;
-    box-shadow: inset 0 0 20px rgba(0,212,255,0.08);
+    box-shadow: inset 0 0 20px rgba(0, 212, 255, 0.08);
 }
+
 .nav-drawer .nav-links a::after,
 .nav-drawer .nav-links a::before {
     display: none !important;
@@ -464,12 +496,13 @@ body.quiz-home-page {
     font-family: inherit;
     letter-spacing: 0.5px;
 }
+
 .nav-drawer-logout:hover {
     background: rgba(255, 71, 87, 0.2);
     border-color: #ff4757;
     color: #ff4757;
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(255,71,87,0.25);
+    box-shadow: 0 8px 20px rgba(255, 71, 87, 0.25);
 }
 
 /* 遮罩 */
@@ -485,6 +518,7 @@ body.quiz-home-page {
     transition: opacity 0.35s;
     display: none;
 }
+
 .nav-overlay.active {
     opacity: 1;
     pointer-events: auto;
@@ -504,29 +538,29 @@ body.nav-open {
     overflow: hidden;
 }
 
-    .hero::before {
-        content: '';
-        position: absolute;
-        top: 20%;
-        right: -10%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 20%;
+    right: -10%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
 
-    .hero::after {
-        content: '';
-        position: absolute;
-        bottom: -20%;
-        left: -10%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(123, 44, 191, 0.15) 0%, transparent 70%);
-        border-radius: 50%;
-        pointer-events: none;
-    }
+.hero::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(123, 44, 191, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
 
 .hero-content {
     position: relative;
@@ -556,12 +590,12 @@ body.nav-open {
     color: var(--text-primary);
 }
 
-    .hero h1 span {
-        background: var(--gradient-primary);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
+.hero h1 span {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
 .hero p {
     font-size: 18px;
@@ -673,12 +707,12 @@ body.nav-open {
     position: relative;
 }
 
-    .course-cover::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to bottom, transparent 50%, rgba(20, 27, 45, 0.8));
-    }
+.course-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(20, 27, 45, 0.8));
+}
 
 .course-level {
     position: absolute;
@@ -718,10 +752,10 @@ body.nav-open {
     border-top: 1px solid var(--border);
 }
 
-    .course-meta span {
-        font-size: 13px;
-        color: var(--text-muted);
-    }
+.course-meta span {
+    font-size: 13px;
+    color: var(--text-muted);
+}
 
 .course-favorite {
     padding: 0;
@@ -827,27 +861,27 @@ body.nav-open {
     overflow: hidden;
 }
 
-    .auth-page::before {
-        content: '';
-        position: absolute;
-        top: -20%;
-        left: -10%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
+.auth-page::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
 
-    .auth-page::after {
-        content: '';
-        position: absolute;
-        bottom: -20%;
-        right: -10%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(123, 44, 191, 0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
+.auth-page::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(123, 44, 191, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
 
 .auth-card {
     position: relative;
@@ -862,78 +896,78 @@ body.nav-open {
     margin-bottom: 32px;
 }
 
-    .auth-header .logo {
-        justify-content: center;
-        margin-bottom: 16px;
-    }
+.auth-header .logo {
+    justify-content: center;
+    margin-bottom: 16px;
+}
 
-    .auth-header h2 {
-        font-size: 28px;
-        margin-bottom: 8px;
-        color: var(--text-primary);
-    }
+.auth-header h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
 
-    .auth-header p {
-        color: var(--text-secondary);
-        font-size: 14px;
-    }
+.auth-header p {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
 
 .form-group {
     margin-bottom: 20px;
 }
 
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-secondary);
-    }
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
 
-    .form-group input {
-        width: 100%;
-        padding: 14px 16px;
-        background: var(--bg-dark);
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        color: var(--text-primary);
-        font-size: 14px;
-        transition: var(--transition);
-    }
+.form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 14px;
+    transition: var(--transition);
+}
 
-        .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
-        }
+.form-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+}
 
-    .password-field {
-        position: relative;
-    }
+.password-field {
+    position: relative;
+}
 
-    .password-field input {
-        padding-right: 48px;
-    }
+.password-field input {
+    padding-right: 48px;
+}
 
-    .password-toggle {
-        position: absolute;
-        top: 50%;
-        right: 12px;
-        width: 28px;
-        height: 28px;
-        padding: 0;
-        transform: translateY(-50%);
-        border: 0;
-        background: transparent;
-        color: var(--text-secondary);
-        font-size: 17px;
-        line-height: 28px;
-        cursor: pointer;
-    }
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 17px;
+    line-height: 28px;
+    cursor: pointer;
+}
 
-    .password-toggle:hover,
-    .password-toggle:focus {
-        color: var(--primary);
-    }
+.password-toggle:hover,
+.password-toggle:focus {
+    color: var(--primary);
+}
 
 .form-error {
     min-height: 18px;
@@ -980,10 +1014,10 @@ body.nav-open {
     color: var(--text-secondary);
 }
 
-    .auth-footer a {
-        color: var(--primary);
-        font-weight: 500;
-    }
+.auth-footer a {
+    color: var(--primary);
+    font-weight: 500;
+}
 
 /* ========== 个人主页 ========== */
 .profile-page {
@@ -1032,16 +1066,16 @@ body.nav-open {
     text-align: center;
 }
 
-    .profile-stat .num {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--primary);
-    }
+.profile-stat .num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
 
-    .profile-stat .label {
-        font-size: 13px;
-        color: var(--text-muted);
-    }
+.profile-stat .label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
 
 .profile-sections {
     display: grid;
@@ -1049,11 +1083,11 @@ body.nav-open {
     gap: 24px;
 }
 
-.profile-sections > .profile-section {
+.profile-sections>.profile-section {
     grid-column: 1 / -1;
 }
 
-.profile-sections > div:last-child {
+.profile-sections>div:last-child {
     display: grid;
     grid-column: 1 / -1;
     grid-template-columns: 2fr 1fr;
@@ -1199,9 +1233,9 @@ body.nav-open {
     flex: 0 0 180px;
 }
 
-    .learning-item:hover {
-        background: var(--bg-card-hover);
-    }
+.learning-item:hover {
+    background: var(--bg-card-hover);
+}
 
 .learning-icon {
     width: 38px;
@@ -1219,17 +1253,17 @@ body.nav-open {
     flex: 1;
 }
 
-    .learning-info h4 {
-        font-size: 13px;
-        margin-bottom: 4px;
-        color: var(--text-primary);
-    }
+.learning-info h4 {
+    font-size: 13px;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
 
-    .learning-info .progress-text {
-        font-size: 12px;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-    }
+.learning-info .progress-text {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+}
 
 /* ========== 小测页面 ========== */
 .quiz-page {
@@ -1246,11 +1280,11 @@ body.nav-open {
     margin-bottom: 40px;
 }
 
-    .quiz-header h2 {
-        font-size: 32px;
-        margin-bottom: 8px;
-        color: var(--text-primary);
-    }
+.quiz-header h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
 
 .quiz-progress {
     display: flex;
@@ -1259,10 +1293,10 @@ body.nav-open {
     margin-bottom: 32px;
 }
 
-    .quiz-progress .progress-bar {
-        flex: 1;
-        margin: 0;
-    }
+.quiz-progress .progress-bar {
+    flex: 1;
+    margin: 0;
+}
 
 .question-card {
     padding: 40px;
@@ -1301,21 +1335,21 @@ body.nav-open {
     line-height: 1.6;
 }
 
-    .code-block .keyword {
-        color: #ff7b72;
-    }
+.code-block .keyword {
+    color: #ff7b72;
+}
 
-    .code-block .string {
-        color: #a5d6ff;
-    }
+.code-block .string {
+    color: #a5d6ff;
+}
 
-    .code-block .comment {
-        color: #8b949e;
-    }
+.code-block .comment {
+    color: #8b949e;
+}
 
-    .code-block .function {
-        color: #d2a8ff;
-    }
+.code-block .function {
+    color: #d2a8ff;
+}
 
 .options-list {
     display: flex;
@@ -1335,25 +1369,25 @@ body.nav-open {
     gap: 12px;
 }
 
-    .option-item:hover {
-        border-color: var(--primary);
-        background: rgba(0, 212, 255, 0.05);
-    }
+.option-item:hover {
+    border-color: var(--primary);
+    background: rgba(0, 212, 255, 0.05);
+}
 
-    .option-item.selected {
-        border-color: var(--primary);
-        background: rgba(0, 212, 255, 0.1);
-    }
+.option-item.selected {
+    border-color: var(--primary);
+    background: rgba(0, 212, 255, 0.1);
+}
 
-    .option-item.correct {
-        border-color: var(--success);
-        background: rgba(0, 255, 136, 0.1);
-    }
+.option-item.correct {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.1);
+}
 
-    .option-item.wrong {
-        border-color: var(--danger);
-        background: rgba(255, 71, 87, 0.1);
-    }
+.option-item.wrong {
+    border-color: var(--danger);
+    background: rgba(255, 71, 87, 0.1);
+}
 
 .option-letter {
     width: 28px;
@@ -1449,9 +1483,9 @@ body.nav-open {
     margin-bottom: 20px;
 }
 
-    .breadcrumb a {
-        color: var(--primary);
-    }
+.breadcrumb a {
+    color: var(--primary);
+}
 
 .course-detail-header h1 {
     font-size: 36px;
@@ -1481,13 +1515,13 @@ body.nav-open {
     transition: var(--transition);
 }
 
-    .chapter-item:hover {
-        border-color: var(--primary);
-    }
+.chapter-item:hover {
+    border-color: var(--primary);
+}
 
-    .chapter-item.completed {
-        border-color: var(--success);
-    }
+.chapter-item.completed {
+    border-color: var(--success);
+}
 
 .chapter-title {
     display: flex;
@@ -1504,15 +1538,15 @@ body.nav-open {
     margin-left: auto;
 }
 
-    .chapter-status.completed {
-        background: rgba(0, 255, 136, 0.1);
-        color: var(--success);
-    }
+.chapter-status.completed {
+    background: rgba(0, 255, 136, 0.1);
+    color: var(--success);
+}
 
-    .chapter-status.locked {
-        background: rgba(113, 128, 150, 0.1);
-        color: var(--text-muted);
-    }
+.chapter-status.locked {
+    background: rgba(113, 128, 150, 0.1);
+    color: var(--text-muted);
+}
 
 /* ========== 页脚 ========== */
 .footer {
@@ -1545,15 +1579,15 @@ body.nav-open {
     margin-bottom: 10px;
 }
 
-    .footer-col ul li a {
-        color: var(--text-secondary);
-        font-size: 14px;
-        transition: var(--transition);
-    }
+.footer-col ul li a {
+    color: var(--text-secondary);
+    font-size: 14px;
+    transition: var(--transition);
+}
 
-        .footer-col ul li a:hover {
-            color: var(--primary);
-        }
+.footer-col ul li a:hover {
+    color: var(--primary);
+}
 
 .footer-bottom {
     padding-top: 30px;
@@ -1577,7 +1611,7 @@ body.nav-open {
         grid-template-columns: 1fr;
     }
 
-    .profile-sections > div:last-child {
+    .profile-sections>div:last-child {
         grid-template-columns: 1fr 1fr;
     }
 
@@ -1590,11 +1624,22 @@ body.nav-open {
     }
 
     /* 显示汉堡按钮，抽屉启用 */
-    .nav-toggle { display: block; }
-    .nav-drawer { display: block; }
-    .nav-overlay { display: block; }
+    .nav-toggle {
+        display: block;
+    }
+
+    .nav-drawer {
+        display: block;
+    }
+
+    .nav-overlay {
+        display: block;
+    }
+
     /* 主导航的链接在移动端隐藏，由抽屉提供 */
-    .nav-container > .nav-links { display: none; }
+    .nav-container>.nav-links {
+        display: none;
+    }
 }
 
 @media (max-width: 640px) {
@@ -1616,7 +1661,7 @@ body.nav-open {
         text-align: center;
     }
 
-    .profile-sections > div:last-child {
+    .profile-sections>div:last-child {
         grid-template-columns: 1fr;
     }
 
@@ -1647,7 +1692,7 @@ body.nav-open {
     }
 
     /* 移动端导航栏：退出按钮改为占位隐藏 */
-    .nav-actions > .btn-ghost#logoutBtn {
+    .nav-actions>.btn-ghost#logoutBtn {
         display: none;
     }
 
@@ -1664,18 +1709,44 @@ body.nav-open {
 }
 
 @media (max-width: 480px) {
-    .nav-container { padding: 0 14px; }
-    .logo span { font-size: 18px; }
-    .logo-icon { width: 32px; height: 32px; font-size: 16px; }
-    .user-avatar { width: 34px; height: 34px; }
-    .nav-drawer { width: min(280px, 86vw); padding: 86px 16px 24px; }
-    .hero h1 { font-size: 28px; }
-    .section-title { font-size: 24px; }
+    .nav-container {
+        padding: 0 14px;
+    }
+
+    .logo span {
+        font-size: 18px;
+    }
+
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 16px;
+    }
+
+    .user-avatar {
+        width: 34px;
+        height: 34px;
+    }
+
+    .nav-drawer {
+        width: min(280px, 86vw);
+        padding: 86px 16px 24px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .section-title {
+        font-size: 24px;
+    }
 }
 
 /* ========== 动画 ========== */
 @keyframes float {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
 
@@ -1685,7 +1756,9 @@ body.nav-open {
 }
 
 @keyframes pulse-glow {
-    0%, 100% {
+
+    0%,
+    100% {
         box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
     }
 
@@ -1730,7 +1803,8 @@ body.nav-open {
     z-index: 10;
 }
 
-.hud-left, .hud-right {
+.hud-left,
+.hud-right {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -1839,11 +1913,11 @@ body.nav-open {
     margin-bottom: 20px;
 }
 
-    .battle-header h3 {
-        color: var(--danger);
-        font-size: 22px;
-        margin-bottom: 8px;
-    }
+.battle-header h3 {
+    color: var(--danger);
+    font-size: 22px;
+    margin-bottom: 8px;
+}
 
 .battle-enemy {
     font-size: 48px;
@@ -1886,20 +1960,20 @@ body.nav-open {
     font-size: 14px;
 }
 
-    .battle-option:hover {
-        border-color: var(--primary);
-        background: rgba(0, 212, 255, 0.1);
-    }
+.battle-option:hover {
+    border-color: var(--primary);
+    background: rgba(0, 212, 255, 0.1);
+}
 
-    .battle-option.correct {
-        border-color: var(--success);
-        background: rgba(0, 255, 136, 0.1);
-    }
+.battle-option.correct {
+    border-color: var(--success);
+    background: rgba(0, 255, 136, 0.1);
+}
 
-    .battle-option.wrong {
-        border-color: var(--danger);
-        background: rgba(255, 71, 87, 0.1);
-    }
+.battle-option.wrong {
+    border-color: var(--danger);
+    background: rgba(255, 71, 87, 0.1);
+}
 
 /* 商店面板 */
 .shop-panel {
@@ -1911,12 +1985,12 @@ body.nav-open {
     width: 90%;
 }
 
-    .shop-panel h3 {
-        color: var(--warning);
-        text-align: center;
-        font-size: 22px;
-        margin-bottom: 8px;
-    }
+.shop-panel h3 {
+    color: var(--warning);
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
 
 .shop-subtitle {
     text-align: center;
@@ -2022,26 +2096,26 @@ body.nav-open {
     transition: all 0.2s;
 }
 
-    .level-btn:hover {
-        border-color: var(--primary);
-    }
+.level-btn:hover {
+    border-color: var(--primary);
+}
 
-    .level-btn.locked {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
+.level-btn.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
 
-    .level-btn .level-num {
-        font-size: 24px;
-        font-weight: 700;
-        color: var(--primary);
-        margin-bottom: 4px;
-    }
+.level-btn .level-num {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 4px;
+}
 
-    .level-btn .level-name {
-        font-size: 11px;
-        color: var(--text-muted);
-    }
+.level-btn .level-name {
+    font-size: 11px;
+    color: var(--text-muted);
+}
 
 .controls-hint {
     position: absolute;
@@ -2064,11 +2138,11 @@ body.nav-open {
     backdrop-filter: blur(5px);
 }
 
-    .pause-menu h3 {
-        color: var(--text-primary);
-        font-size: 28px;
-        margin-bottom: 20px;
-    }
+.pause-menu h3 {
+    color: var(--text-primary);
+    font-size: 28px;
+    margin-bottom: 20px;
+}
 
 /* 关卡完成 */
 .level-complete {
@@ -2082,11 +2156,11 @@ body.nav-open {
     z-index: 40;
 }
 
-    .level-complete h2 {
-        font-size: 42px;
-        color: var(--success);
-        margin-bottom: 16px;
-    }
+.level-complete h2 {
+    font-size: 42px;
+    color: var(--success);
+    margin-bottom: 16px;
+}
 
 .stats-row {
     display: flex;
@@ -2098,16 +2172,16 @@ body.nav-open {
     text-align: center;
 }
 
-    .stat-col .num {
-        font-size: 28px;
-        color: var(--primary);
-        font-weight: 700;
-    }
+.stat-col .num {
+    font-size: 28px;
+    color: var(--primary);
+    font-weight: 700;
+}
 
-    .stat-col .label {
-        font-size: 13px;
-        color: var(--text-muted);
-    }
+.stat-col .label {
+    font-size: 13px;
+    color: var(--text-muted);
+}
 
 .learning-heading {
     display: flex;
@@ -2212,36 +2286,46 @@ body.nav-open {
     overflow: hidden;
     transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .btn::before {
     content: '';
     position: absolute;
-    top: 50%; left: 50%;
-    width: 0; height: 0;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
     border-radius: 50%;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255, 255, 255, 0.25);
     transform: translate(-50%, -50%);
     transition: width 0.5s ease, height 0.5s ease;
     pointer-events: none;
 }
+
 .btn:active::before {
-    width: 300px; height: 300px;
+    width: 300px;
+    height: 300px;
     transition: width 0s, height 0s;
     opacity: 0;
 }
+
 .btn:active {
     transform: scale(0.97);
 }
+
 .btn-primary:hover {
     transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 32px rgba(0,212,255,0.55), 0 0 20px rgba(0,212,255,0.3);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.55), 0 0 20px rgba(0, 212, 255, 0.3);
 }
+
 .btn-outline {
     position: relative;
 }
+
 .btn-outline:hover {
     transform: translateY(-3px);
-    box-shadow: 0 12px 28px rgba(0,212,255,0.35);
+    box-shadow: 0 12px 28px rgba(0, 212, 255, 0.35);
 }
+
 .btn-ghost:hover {
     transform: translateY(-2px);
 }
@@ -2249,29 +2333,41 @@ body.nav-open {
 /* ---------- 2. 全局卡片增强 ---------- */
 .card {
     transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                border-color 0.35s, box-shadow 0.4s, background 0.35s;
+        border-color 0.35s, box-shadow 0.4s, background 0.35s;
     position: relative;
     overflow: hidden;
 }
+
 .card::after {
     content: '';
     position: absolute;
-    top: 0; left: -100%;
-    width: 100%; height: 100%;
-    background: linear-gradient(120deg, transparent 30%, rgba(0,212,255,0.08) 50%, transparent 70%);
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent 30%, rgba(0, 212, 255, 0.08) 50%, transparent 70%);
     transition: left 0.7s ease;
     pointer-events: none;
 }
-.card:hover::after { left: 100%; }
+
+.card:hover::after {
+    left: 100%;
+}
 
 /* ---------- 3. 全局输入框增强 ---------- */
-input, textarea, select {
+input,
+textarea,
+select {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
-input:hover, textarea:hover {
-    border-color: rgba(0,212,255,0.4);
+
+input:hover,
+textarea:hover {
+    border-color: rgba(0, 212, 255, 0.4);
 }
-input:focus, textarea:focus {
+
+input:focus,
+textarea:focus {
     transform: translateY(-1px);
 }
 
@@ -2281,20 +2377,25 @@ input:focus, textarea:focus {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 6px 2px;
 }
+
 .nav-links a::before {
     content: '';
     position: absolute;
-    left: 50%; bottom: -2px;
-    width: 0; height: 2px;
+    left: 50%;
+    bottom: -2px;
+    width: 0;
+    height: 2px;
     background: linear-gradient(90deg, #00d4ff, #7b2cbf);
     border-radius: 2px;
     transform: translateX(-50%);
     transition: width 0.35s ease;
 }
+
 .nav-links a:hover::before,
 .nav-links a.active::before {
     width: 100%;
 }
+
 .nav-links a:hover {
     transform: translateY(-1px);
 }
@@ -2304,6 +2405,7 @@ input:focus, textarea:focus {
     transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
     position: relative;
 }
+
 .user-avatar::after {
     content: '';
     position: absolute;
@@ -2315,28 +2417,40 @@ input:focus, textarea:focus {
     transition: opacity 0.3s;
     animation: avatarSpin 4s linear infinite;
 }
+
 .user-avatar:hover::after {
     opacity: 1;
 }
+
 @keyframes avatarSpin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
 }
+
 .user-avatar:hover {
     transform: scale(1.12);
-    box-shadow: 0 0 24px rgba(0,212,255,0.6);
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.6);
 }
 
 /* ---------- 6. 徽章 / 标签增强 ---------- */
 .achievement-item {
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
 .achievement-item:hover {
     transform: translateY(-6px) scale(1.02);
 }
 
 /* ---------- 7. 全局交互光标 ---------- */
-button, .btn, a, [onclick] {
+button,
+.btn,
+a,
+[onclick] {
     cursor: pointer;
 }
 
@@ -2344,18 +2458,26 @@ button, .btn, a, [onclick] {
 body {
     animation: bodyFadeIn 0.55s ease both;
 }
+
 @keyframes bodyFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 /* ---------- 9. Logo 交互 ---------- */
 .logo {
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
 .logo:hover {
     transform: scale(1.05);
 }
+
 .logo-icon {
     position: relative;
     overflow: hidden;
@@ -2364,20 +2486,30 @@ body {
     font-weight: 800;
     letter-spacing: -0.5px;
 }
+
 .logo:hover .logo-icon {
-    box-shadow: 0 0 24px rgba(0,212,255,0.6);
+    box-shadow: 0 0 24px rgba(0, 212, 255, 0.6);
 }
+
 .logo-icon::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
+    background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.45) 50%, transparent 70%);
     transform: translateX(-100%);
     animation: logoShine 3.5s infinite;
 }
+
 @keyframes logoShine {
-    0%, 60% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+
+    0%,
+    60% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* ---------- 10. 页面滚动条增强（已存在则覆盖） ---------- */
@@ -2385,14 +2517,17 @@ body {
     width: 10px;
     height: 10px;
 }
+
 ::-webkit-scrollbar-track {
-    background: rgba(10,14,26,0.5);
+    background: rgba(10, 14, 26, 0.5);
 }
+
 ::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #00d4ff, #7b2cbf);
     border-radius: 5px;
-    border: 2px solid rgba(10,14,26,0.5);
+    border: 2px solid rgba(10, 14, 26, 0.5);
 }
+
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #64d2ff, #a78bfa);
 }
@@ -2400,22 +2535,43 @@ body {
 /* ---------- 11. 页面切换进度条 ---------- */
 #pageProgressBar {
     position: fixed;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     height: 3px;
     width: 0%;
     background: linear-gradient(90deg, #00d4ff, #7b2cbf, #00ff88);
-    box-shadow: 0 0 12px rgba(0,212,255,0.8);
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.8);
     z-index: 9999;
     transition: width 0.25s ease, opacity 0.4s;
     opacity: 0;
     pointer-events: none;
 }
-#pageProgressBar.active { opacity: 1; }
+
+#pageProgressBar.active {
+    opacity: 1;
+}
 
 /* ---------- 12. 响应式统一 ---------- */
 @media (max-width: 968px) {
-    .bento-grid { grid-template-columns: 1fr 1fr; }
+    .bento-grid {
+        grid-template-columns: 1fr 1fr;
+    }
 }
+
 @media (max-width: 640px) {
-    .bento-grid { grid-template-columns: 1fr; }
+    .bento-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 非首页：把 html 的背景也换成统一色，
+   避免 body 背景不传播时，滚动到底部露出 html 的 #0a0e1a */
+html:has(body.course-page-bg),
+html:has(body.detail-page-bg),
+html:has(body.profile-page-bg),
+html:has(body.team-page-bg),
+html:has(body.quiz-home-page),
+html:has(body.game-page-bg),
+html:has(body.auth-page) {
+    background: #101c3d;
 }
