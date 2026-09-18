@@ -13,8 +13,15 @@
     <link rel="stylesheet" href="assets/css/2048.css">
     <style>
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .game-container {
@@ -52,15 +59,28 @@
             animation: fadeUp 0.6s ease both;
         }
 
-        .game-choice:nth-child(1) { animation-delay: 0.05s; }
-        .game-choice:nth-child(2) { animation-delay: 0.1s; }
-        .game-choice:nth-child(3) { animation-delay: 0.15s; }
-        .game-choice:nth-child(4) { animation-delay: 0.2s; }
+        .game-choice:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .game-choice:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .game-choice:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .game-choice:nth-child(4) {
+            animation-delay: 0.2s;
+        }
 
         .game-choice::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 2px;
             background: linear-gradient(90deg, transparent, var(--primary), transparent);
             opacity: 0;
@@ -84,7 +104,9 @@
             box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
         }
 
-        .game-choice-info { flex: 1; }
+        .game-choice-info {
+            flex: 1;
+        }
 
         .game-choice strong {
             display: block;
@@ -108,15 +130,24 @@
             transform: translateY(-4px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 212, 255, 0.15);
         }
-        .game-choice:hover::before { opacity: 1; }
-        .game-choice:hover strong { color: var(--primary); }
+
+        .game-choice:hover::before {
+            opacity: 1;
+        }
+
+        .game-choice:hover strong {
+            color: var(--primary);
+        }
 
         .game-choice.active {
             border-color: #00d4ff;
             background: rgba(0, 212, 255, 0.1);
             box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
         }
-        .game-choice.active::before { opacity: 1; }
+
+        .game-choice.active::before {
+            opacity: 1;
+        }
 
         .game-stage-wrap {
             background: linear-gradient(145deg, #1a2338 0%, #141b2d 100%);
@@ -145,7 +176,9 @@
 
         .game-hud {
             position: absolute;
-            top: 20px; left: 20px; right: 20px;
+            top: 20px;
+            left: 20px;
+            right: 20px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
@@ -153,7 +186,8 @@
             z-index: 10;
         }
 
-        .hud-left, .hud-right {
+        .hud-left,
+        .hud-right {
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -189,9 +223,11 @@
 
         .dialog-box {
             position: absolute;
-            bottom: 30px; left: 50%;
+            bottom: 30px;
+            left: 50%;
             transform: translateX(-50%);
-            width: 85%; max-width: 700px;
+            width: 85%;
+            max-width: 700px;
             background: rgba(10, 14, 26, 0.95);
             border: 2px solid var(--primary);
             border-radius: 12px;
@@ -245,13 +281,33 @@
         }
 
         @keyframes battleIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
-        .battle-header { text-align: center; margin-bottom: 20px; }
-        .battle-header h3 { color: var(--danger); font-size: 22px; margin-bottom: 8px; }
-        .battle-enemy { font-size: 48px; margin-bottom: 10px; }
+        .battle-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .battle-header h3 {
+            color: var(--danger);
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .battle-enemy {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
         .battle-question {
             font-size: 17px;
             color: var(--text-primary);
@@ -259,7 +315,12 @@
             line-height: 1.6;
         }
 
-        .battle-options { display: flex; flex-direction: column; gap: 10px; }
+        .battle-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         .battle-option {
             padding: 14px 18px;
             background: var(--bg-dark);
@@ -271,9 +332,21 @@
             text-align: left;
             font-size: 14px;
         }
-        .battle-option:hover { border-color: var(--primary); background: rgba(0, 212, 255, 0.1); }
-        .battle-option.correct { border-color: var(--success); background: rgba(0, 255, 136, 0.1); }
-        .battle-option.wrong { border-color: var(--danger); background: rgba(255, 71, 87, 0.1); }
+
+        .battle-option:hover {
+            border-color: var(--primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .battle-option.correct {
+            border-color: var(--success);
+            background: rgba(0, 255, 136, 0.1);
+        }
+
+        .battle-option.wrong {
+            border-color: var(--danger);
+            background: rgba(255, 71, 87, 0.1);
+        }
 
         .shop-panel {
             background: var(--bg-card);
@@ -283,8 +356,21 @@
             max-width: 500px;
             width: 90%;
         }
-        .shop-panel h3 { color: var(--warning); text-align: center; font-size: 22px; margin-bottom: 8px; }
-        .shop-subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 24px; font-size: 14px; }
+
+        .shop-panel h3 {
+            color: var(--warning);
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .shop-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+
         .shop-item {
             display: flex;
             align-items: center;
@@ -295,12 +381,38 @@
             margin-bottom: 12px;
             border: 1px solid var(--border);
         }
-        .shop-item-icon { font-size: 32px; width: 50px; text-align: center; }
-        .shop-item-info { flex: 1; }
-        .shop-item-name { color: var(--text-primary); font-weight: 600; margin-bottom: 4px; }
-        .shop-item-desc { color: var(--text-muted); font-size: 12px; }
-        .shop-item-price { color: var(--warning); font-weight: 700; margin-right: 12px; }
-        .shop-close { width: 100%; margin-top: 16px; }
+
+        .shop-item-icon {
+            font-size: 32px;
+            width: 50px;
+            text-align: center;
+        }
+
+        .shop-item-info {
+            flex: 1;
+        }
+
+        .shop-item-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .shop-item-desc {
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        .shop-item-price {
+            color: var(--warning);
+            font-weight: 700;
+            margin-right: 12px;
+        }
+
+        .shop-close {
+            width: 100%;
+            margin-top: 16px;
+        }
 
         .start-screen {
             position: absolute;
@@ -323,7 +435,12 @@
             margin-bottom: 8px;
             text-shadow: 0 0 40px rgba(0, 212, 255, 0.5);
         }
-        .game-subtitle { color: var(--text-secondary); margin-bottom: 40px; font-size: 16px; }
+
+        .game-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
 
         .start-menu {
             display: flex;
@@ -341,7 +458,8 @@
             max-width: 90%;
         }
 
-        .pause-menu, .level-complete {
+        .pause-menu,
+        .level-complete {
             position: absolute;
             inset: 0;
             background: rgba(0, 0, 0, 0.85);
@@ -354,28 +472,95 @@
             backdrop-filter: blur(5px);
         }
 
-        .pause-menu h3 { color: var(--text-primary); font-size: 28px; margin-bottom: 20px; }
-        .level-complete h2 { font-size: 42px; color: var(--success); margin-bottom: 16px; }
-        .stats-row { display: flex; gap: 40px; margin-bottom: 30px; }
-        .stat-col { text-align: center; }
-        .stat-col .num { font-size: 28px; color: var(--primary); font-weight: 700; }
-        .stat-col .label { font-size: 13px; color: var(--text-muted); }
+        .pause-menu h3 {
+            color: var(--text-primary);
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .level-complete h2 {
+            font-size: 42px;
+            color: var(--success);
+            margin-bottom: 16px;
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+
+        .stat-col {
+            text-align: center;
+        }
+
+        .stat-col .num {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .stat-col .label {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
 
         /* 响应式：中等屏幕两列，小屏幕一列 */
         @media (max-width: 968px) {
-            .game-picker { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .game-picker {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
         }
+
         @media (max-width: 768px) {
-            .game-container { padding: 100px 16px 40px; }
-            .game-choice { padding: 16px; gap: 12px; }
-            .game-choice img { width: 64px; height: 64px; padding: 4px; }
-            .game-choice strong { font-size: 14px; margin-bottom: 4px; }
-            .game-choice span { font-size: 11px; }
-            .game-title { font-size: 32px; }
-            .game-subtitle { font-size: 14px; }
+            .game-container {
+                padding: 100px 16px 40px;
+            }
+
+            .game-choice {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .game-choice img {
+                width: 64px;
+                height: 64px;
+                padding: 4px;
+            }
+
+            .game-choice strong {
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+
+            .game-choice span {
+                font-size: 11px;
+            }
+
+            .game-title {
+                font-size: 32px;
+            }
+
+            .game-subtitle {
+                font-size: 14px;
+            }
         }
+
         @media (max-width: 480px) {
-            .game-picker { grid-template-columns: 1fr; }
+            .game-picker {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ============================================================
+           C 2048 开始界面：操作提示改为跟在菜单下方（只影响这一个）
+           ============================================================ */
+        #g2048StartScreen .controls-hint {
+            position: static;
+            margin-top: 28px;
+            max-width: 80%;
+            text-align: center;
         }
     </style>
     <link rel="stylesheet" href="assets/css/mobile.css">
@@ -464,7 +649,8 @@
                         </div>
                         <div class="hud-item">
                             <span id="scoreIcon">🪙</span> <span id="coinCount">0</span>
-                            <span id="comboDisplay" style="color: #ffcc00; display: none; margin-left: 8px;">连击 x2!</span>
+                            <span id="comboDisplay" style="color: #ffcc00; display: none; margin-left: 8px;">连击
+                                x2!</span>
                         </div>
                     </div>
                     <div class="hud-right">
@@ -564,7 +750,8 @@
 
                 <div class="level-complete" id="levelComplete">
                     <h2>🎉 关卡完成！</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 24px;" id="completeMessage">你成功净化了这片区域的Bug！</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 24px;" id="completeMessage">你成功净化了这片区域的Bug！
+                    </p>
                     <div class="stats-row">
                         <div class="stat-col">
                             <div class="num" id="statCoins">0</div>
@@ -594,7 +781,8 @@
                 style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; color: var(--text-secondary); font-size: 14px;">
                 <div>
                     <h4 style="color: var(--primary); margin-bottom: 8px;">🎮 基础操作</h4>
-                    <p>← → 方向键移动<br>空格键跳跃 · Shift 二段跳<br>Q 冲刺 · E 护盾 · L 减速<br>F 键与 NPC/机关交互<br>鼠标左键射击 · J 取消/关闭弹窗<br>ESC 暂停游戏</p>
+                    <p>← → 方向键移动<br>空格键跳跃 · Shift 二段跳<br>Q 冲刺 · E 护盾 · L 减速<br>F 键与 NPC/机关交互<br>鼠标左键射击 · J
+                        取消/关闭弹窗<br>ESC 暂停游戏</p>
                 </div>
                 <div>
                     <h4 style="color: var(--primary); margin-bottom: 8px;">⚔️ 战斗系统</h4>
@@ -714,19 +902,19 @@
 
                 document.getElementById('gamePageTitle').textContent =
                     isRam ? '🧠 内存大逃杀' :
-                    isBit ? '🔢 位运算推箱子' :
-                    isG2048 ? '🔢 C 2048' :
-                    '⚔️ 代码勇者：C语言传说';
+                        isBit ? '🔢 位运算推箱子' :
+                            isG2048 ? '🔢 C 2048' :
+                                '⚔️ 代码勇者：C语言传说';
                 document.getElementById('gamePageSubtitle').textContent =
                     isRam ? '指针操作 · 内存漂移 · 波次生存' :
-                    isBit ? '移位掩码 · 关卡推位 · 位运算思维' :
-                    isG2048 ? '类型合并 · 无限模式 · 从 char 到 __int128' :
-                    '横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界';
+                        isBit ? '移位掩码 · 关卡推位 · 位运算思维' :
+                            isG2048 ? '类型合并 · 无限模式 · 从 char 到 __int128' :
+                                '横板跳跃闯关 · 答题战斗 · 探索收集 · 用代码拯救世界';
                 document.getElementById('levelName').textContent =
                     isRam ? '内存大逃杀 · 等待开始' :
-                    isBit ? '位运算推箱子 · 等待开始' :
-                    isG2048 ? 'C 2048 · 等待开始' :
-                    '箱庭冒险 · 等待开始';
+                        isBit ? '位运算推箱子 · 等待开始' :
+                            isG2048 ? 'C 2048 · 等待开始' :
+                                '箱庭冒险 · 等待开始';
                 document.getElementById('scoreIcon').textContent = '🪙';
                 document.getElementById('coinCount').textContent = '0';
                 document.getElementById('comboDisplay').style.display = 'none';
@@ -766,7 +954,7 @@
             `;
             }
 
-            function scrollToInstructions() { document.getElementById('instructionsTitle').scrollIntoView({behavior: 'smooth', block: 'start'}); }
+            function scrollToInstructions() { document.getElementById('instructionsTitle').scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 
             function pauseGame() { gameState = GameState.PAUSED; document.getElementById('pauseMenu').style.display = 'flex'; }
             function resumeGame() { gameState = GameState.PLAYING; document.getElementById('pauseMenu').style.display = 'none'; }
