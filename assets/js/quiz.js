@@ -225,7 +225,7 @@ bindClick("submit-btn", function () {
     document.getElementById("submit-btn").style.display = "none";
     document.getElementById("showResultBtn").style.display = "inline-block";
     document.getElementById("resetQuizBtn").style.display = "inline-block";
-}
+});
 
 //关闭弹窗
 function closeModal() {
