@@ -51,55 +51,16 @@ const visualTopics = [
         ]
     },
     {
-        tag: '07 · 冒泡排序', title: '冒泡排序怎样交换元素？', description: '相邻元素两两比较，把较大的值逐步交换到右侧。每一轮结束，末尾都会多一个有序元素。', visual: 'BUBBLE SORT', visualType: 'bars', keywords: ['compare', 'swap', '双重循环', 'O(n²)'], code: ['for (int i = 0; i < n - 1; i++) {', '    for (int j = 0; j < n - i - 1; j++) {', '        if (a[j] > a[j + 1]) {', '            swap(&a[j], &a[j + 1]);', '        }', '    }', '}'], steps: [
-            { line: 0, title: '准备第 1 轮', description: '外层循环 i = 0，暂时还没有元素确定位置。', counter: 'i = 0', output: '[7, 3, 8, 2, 5, 1, 6, 4]', memory: [{ name: '已排序', value: '0 个', type: 'right side' }], bars: [7, 3, 8, 2, 5, 1, 6, 4], active: [] },
-            { line: 2, title: '比较 7 和 3', description: '7 大于 3，条件成立，交换这两个相邻元素。', counter: 'j = 0 · swap', output: '[3, 7, 8, 2, 5, 1, 6, 4]', memory: [{ name: '比较', value: '7 > 3', type: 'true' }], bars: [3, 7, 8, 2, 5, 1, 6, 4], active: [0, 1] },
-            { line: 2, title: '比较 7 和 8', description: '7 小于 8，不交换，继续向右检查。', counter: 'j = 1 · keep', output: '[3, 7, 8, 2, 5, 1, 6, 4]', memory: [{ name: '比较', value: '7 < 8', type: 'false' }], bars: [3, 7, 8, 2, 5, 1, 6, 4], active: [1, 2] },
-            { line: 3, title: '8 继续向右移动', description: '8 大于 2，交换后继续向右，较大值正在"冒泡"。', counter: 'j = 2 · swap', output: '[3, 7, 2, 8, 5, 1, 6, 4]', memory: [{ name: '交换次数', value: '2', type: 'pass 1' }], bars: [3, 7, 2, 8, 5, 1, 6, 4], active: [2, 3] },
-            { line: 3, title: '第 1 轮继续交换', description: '8 依次和 5、1、6、4 比较，最终移动到最右端。', counter: 'j = 3..6', output: '[3, 7, 2, 5, 1, 6, 4, 8]', memory: [{ name: '有序尾部', value: '8', type: 'locked' }], bars: [3, 7, 2, 5, 1, 6, 4, 8], active: [6, 7] },
-            { line: 0, title: '准备第 2 轮', description: 'i = 1，最右侧的 8 已经有序，比较范围缩小。', counter: 'i = 1', output: 'ignore index 7', memory: [{ name: '有序尾部', value: '[8]', type: 'locked' }], bars: [3, 7, 2, 5, 1, 6, 4, 8], active: [7] },
-            { line: 3, title: '小数值向左移动', description: '2、1 等较小值通过多次交换逐渐靠近左侧。', counter: 'swap adjacent', output: '[2, 3, 1, 5, 6, 4, 7, 8]', memory: [{ name: '有序尾部', value: '[7, 8]', type: 'locked' }], bars: [2, 3, 1, 5, 6, 4, 7, 8], active: [1, 2] },
-            { line: 1, title: '重复比较剩余区间', description: '每完成一轮，右侧都会多一个确定的最大值。', counter: 'i = 2..6', output: '[1, 2, 3, 4, 5, 6, 7, 8]', memory: [{ name: '轮次', value: '完成', type: 'n - 1' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] },
-            { line: 6, title: '排序完成', description: '所有相邻逆序对都消失，数组已经从小到大排列。', counter: 'done', output: '[1, 2, 3, 4, 5, 6, 7, 8]', memory: [{ name: '复杂度', value: 'O(n²)', type: '比较型排序' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] }
-        ]
+        tag: '07 · 冒泡排序', title: '冒泡排序怎样交换元素？', description: '相邻元素两两比较，把较大的值逐步交换到右侧。每一轮结束，末尾都会多一个有序元素。', visual: 'BUBBLE SORT', visualType: 'bars', sortType: 'bubble', defaultSize: 8, keywords: ['compare', 'swap', '双重循环', 'O(n²)'], code: ['for (int i = 0; i < n - 1; i++) {', '    for (int j = 0; j < n - i - 1; j++) {', '        if (a[j] > a[j + 1]) {', '            swap(&a[j], &a[j + 1]);', '        }', '    }', '}'], steps: []
     },
     {
-        tag: '08 · 选择排序', title: '选择排序如何寻找最小值？', description: '每一轮从未排序区间找到最小值，再把它放到区间开头。', visual: 'SELECTION SORT', visualType: 'bars', keywords: ['minIndex', '选择', '交换', 'O(n²)'], code: ['for (int i = 0; i < n - 1; i++) {', '    int min = i;', '    for (int j = i + 1; j < n; j++)', '        if (a[j] < a[min]) min = j;', '    swap(&a[i], &a[min]);', '}'], steps: [
-            { line: 1, title: '选择第 0 个位置', description: '先假设 9 是未排序区间中的最小值。', counter: 'i = 0 · min = 0', output: '[9, 4, 7, 2, 8, 1, 6, 3]', memory: [{ name: '已排序', value: '[]', type: 'prefix' }], bars: [9, 4, 7, 2, 8, 1, 6, 3], active: [0] },
-            { line: 3, title: '发现更小的 2', description: '扫描到 2，比当前候选 9 小，min 改为下标 3。', counter: 'min = 3 · value = 2', output: 'new minimum: 2', memory: [{ name: 'minIndex', value: '3', type: 'scan' }], bars: [9, 4, 7, 2, 8, 1, 6, 3], active: [0, 3] },
-            { line: 3, title: '发现更小的 1', description: '继续扫描发现 1，它比 2 还小，更新最小值位置。', counter: 'min = 5 · value = 1', output: 'new minimum: 1', memory: [{ name: 'minIndex', value: '5', type: 'scan' }], bars: [9, 4, 7, 2, 8, 1, 6, 3], active: [3, 5] },
-            { line: 4, title: '把 1 换到最前', description: '扫描结束，把最小值 1 与第 0 个元素交换。', counter: 'swap(0, 5)', output: '[1, 4, 7, 2, 8, 9, 6, 3]', memory: [{ name: '已排序', value: '[1]', type: 'prefix' }], bars: [1, 4, 7, 2, 8, 9, 6, 3], active: [0, 5] },
-            { line: 1, title: '第二轮从下标 1 开始', description: '下标 0 已经确定，新的未排序区间从 4 开始。', counter: 'i = 1 · min = 1', output: 'prefix: [1]', memory: [{ name: '已排序', value: '[1]', type: 'prefix' }], bars: [1, 4, 7, 2, 8, 9, 6, 3], active: [1] },
-            { line: 3, title: '找到第二小的 2', description: '在 [4, 7, 2, 8, 9, 6, 3] 中找到 2。', counter: 'min = 3 · value = 2', output: 'new minimum: 2', memory: [{ name: 'minIndex', value: '3', type: 'scan' }], bars: [1, 4, 7, 2, 8, 9, 6, 3], active: [1, 3] },
-            { line: 4, title: '继续放置最小值', description: '交换后，前缀 [1, 2] 有序，范围再次缩小。', counter: 'swap(1, 3)', output: '[1, 2, 7, 4, 8, 9, 6, 3]', memory: [{ name: '已排序', value: '[1, 2]', type: 'prefix' }], bars: [1, 2, 7, 4, 8, 9, 6, 3], active: [1] },
-            { line: 5, title: '重复选择直到结束', description: '每一轮只做一次最终交换，逐渐建立有序前缀。', counter: 'i = 2..6', output: '[1, 2, 3, 4, 6, 7, 8, 9]', memory: [{ name: '有序前缀', value: '7 个', type: 'growing' }], bars: [1, 2, 3, 4, 6, 7, 8, 9], active: [] },
-            { line: 5, title: '排序完成', description: '每个位置都选择了剩余元素中的最小值。', counter: 'done', output: '[1, 2, 3, 4, 6, 7, 8, 9]', memory: [{ name: '复杂度', value: 'O(n²)', type: '选择型排序' }], bars: [1, 2, 3, 4, 6, 7, 8, 9], active: [] }
-        ]
+        tag: '08 · 选择排序', title: '选择排序如何寻找最小值？', description: '每一轮从未排序区间找到最小值，再把它放到区间开头。', visual: 'SELECTION SORT', visualType: 'bars', sortType: 'selection', defaultSize: 8, keywords: ['minIndex', '选择', '交换', 'O(n²)'], code: ['for (int i = 0; i < n - 1; i++) {', '    int min = i;', '    for (int j = i + 1; j < n; j++)', '        if (a[j] < a[min]) min = j;', '    swap(&a[i], &a[min]);', '}'], steps: []
     },
     {
-        tag: '09 · 插入排序', title: '插入排序如何整理手里的牌？', description: '把当前元素取出，向左寻找位置并移动更大的元素，像整理扑克牌一样逐步建立有序区。', visual: 'INSERTION SORT', visualType: 'bars', keywords: ['key', 'shift', '有序区', 'O(n²)'], code: ['for (int i = 1; i < n; i++) {', '    int key = a[i];', '    int j = i - 1;', '    while (j >= 0 && a[j] > key) {', '        a[j + 1] = a[j];', '        j--;', '    }', '    a[j + 1] = key;', '}'], steps: [
-            { line: 0, title: '从第二张牌开始', description: '下标 0 的 8 可以看作已经排好，从 i = 1 取出下一张牌。', counter: 'i = 1', output: '[8, 3, 7, 2, 6, 1, 5, 4]', memory: [{ name: '有序区', value: '[8]', type: 'left' }], bars: [8, 3, 7, 2, 6, 1, 5, 4], active: [0, 1] },
-            { line: 1, title: '取出 key = 3', description: '把 3 暂存起来，当前位置暂时变成一个空位。', counter: 'key = 3', output: 'hold key: 3', memory: [{ name: 'key', value: '3', type: 'temporary' }], bars: [8, 3, 7, 2, 6, 1, 5, 4], active: [1] },
-            { line: 4, title: '向右移动 8', description: '8 大于 key，向右移动一格，为 3 腾出位置。', counter: 'a[1] = a[0]', output: '[8, 8, 7, 2, 6, 1, 5, 4]', memory: [{ name: '空位', value: '0', type: 'insert' }], bars: [8, 8, 7, 2, 6, 1, 5, 4], active: [0, 1] },
-            { line: 7, title: '插入 3', description: '没有更小的前项了，把 key 放到下标 0。', counter: 'a[0] = key', output: '[3, 8, 7, 2, 6, 1, 5, 4]', memory: [{ name: '有序区', value: '[3, 8]', type: 'left' }], bars: [3, 8, 7, 2, 6, 1, 5, 4], active: [0, 1] },
-            { line: 1, title: '取出 key = 7', description: '7 比 8 小，向左移动 8，再把 7 插入空位。', counter: 'key = 7', output: '[3, 7, 8, 2, 6, 1, 5, 4]', memory: [{ name: '有序区', value: '[3, 7, 8]', type: 'left' }], bars: [3, 7, 8, 2, 6, 1, 5, 4], active: [1, 2] },
-            { line: 1, title: '取出 key = 2', description: '2 比 8、7、3 都小，三个元素依次右移。', counter: 'key = 2', output: '[2, 3, 7, 8, 6, 1, 5, 4]', memory: [{ name: '移动次数', value: '3', type: 'shift' }], bars: [2, 3, 7, 8, 6, 1, 5, 4], active: [0, 1, 2, 3] },
-            { line: 3, title: '依次插入剩余元素', description: '6、1、5、4 重复取出、移动和插入，有序区逐步扩大。', counter: 'i = 4..7', output: '[1, 2, 3, 4, 5, 6, 7, 8]', memory: [{ name: '有序区', value: '8 个', type: 'left' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] },
-            { line: 9, title: '排序完成', description: '所有元素都被插入到左侧有序区，排序结束。', counter: 'done', output: '[1, 2, 3, 4, 5, 6, 7, 8]', memory: [{ name: '复杂度', value: 'O(n²)', type: '插入型排序' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] }
-        ]
+        tag: '09 · 插入排序', title: '插入排序如何整理手里的牌？', description: '把当前元素取出，向左寻找位置并移动更大的元素，像整理扑克牌一样逐步建立有序区。', visual: 'INSERTION SORT', visualType: 'bars', sortType: 'insertion', defaultSize: 8, keywords: ['key', 'shift', '有序区', 'O(n²)'], code: ['for (int i = 1; i < n; i++) {', '    int key = a[i];', '    int j = i - 1;', '    while (j >= 0 && a[j] > key) {', '        a[j + 1] = a[j];', '        j--;', '    }', '    a[j + 1] = key;', '}'], steps: []
     },
     {
-        tag: '10 · 快速排序', title: '快速排序如何分治？', description: '选择基准值，把更小和更大的元素分到两侧，再递归处理两个子区间。', visual: 'QUICK SORT', visualType: 'bars', keywords: ['pivot', 'partition', '递归', 'O(n log n)'], code: ['int quicksort(int a[], int lo, int hi) {', '    int pivot = a[hi];', '    int p = partition(a, lo, hi, pivot);', '    quicksort(a, lo, p - 1);', '    quicksort(a, p + 1, hi);', '}'], steps: [
-            { line: 1, title: '选择第一个 pivot', description: '当前区间 [7, 2, 6, 3, 5, 1, 8, 4]，选末尾 4 做基准。', counter: 'pivot = 4', output: 'partition [0..7]', memory: [{ name: 'pivot', value: '4', type: 'baseline' }], bars: [7, 2, 6, 3, 5, 1, 8, 4], active: [7] },
-            { line: 2, title: '检查 7', description: '7 大于 pivot，暂时留在右侧，大元素区等待处理。', counter: 'j = 0 · 7 > 4', output: 'keep right', memory: [{ name: '左区', value: '[]', type: '< pivot' }], bars: [7, 2, 6, 3, 5, 1, 8, 4], active: [0, 7] },
-            { line: 2, title: '交换 2 到左侧', description: '2 小于 pivot，放入左侧分区。', counter: 'swap(0, 1)', output: '[2, 7, 6, 3, 5, 1, 8, 4]', memory: [{ name: '左区', value: '[2]', type: '< pivot' }], bars: [2, 7, 6, 3, 5, 1, 8, 4], active: [0, 1] },
-            { line: 2, title: '继续扫描并交换', description: '3 和 1 也小于 4，依次被交换到左侧。', counter: 'swap 3, 1', output: '[2, 3, 1, 7, 5, 6, 8, 4]', memory: [{ name: '左区', value: '[2, 3, 1]', type: '< pivot' }], bars: [2, 3, 1, 7, 5, 6, 8, 4], active: [1, 2] },
-            { line: 2, title: 'pivot 放回中间', description: '扫描完成，把 4 放到左右分区的中间位置。', counter: 'pivot index = 3', output: '[2, 3, 1, 4, 5, 6, 8, 7]', memory: [{ name: 'pivot', value: 'index 3', type: 'fixed' }], bars: [2, 3, 1, 4, 5, 6, 8, 7], active: [3] },
-            { line: 3, title: '递归处理左区间', description: '左区间 [2, 3, 1] 独立排序，不再碰右边元素。', counter: 'quicksort(0, 2)', output: 'left recursive call', memory: [{ name: '区间', value: '[2, 3, 1]', type: 'recursive' }], bars: [2, 3, 1, 4, 5, 6, 8, 7], active: [0, 1, 2] },
-            { line: 4, title: '递归处理右区间', description: '右区间 [5, 6, 8, 7] 同样选择 pivot 并继续分区。', counter: 'quicksort(4, 7)', output: 'right recursive call', memory: [{ name: '区间', value: '[5, 6, 8, 7]', type: 'recursive' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [4, 5, 6, 7] },
-            { line: 5, title: '递归到单元素', description: '区间缩小到一个元素时天然有序，递归开始返回。', counter: 'lo >= hi', output: 'base case reached', memory: [{ name: '递归', value: 'return', type: 'base case' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] },
-            { line: 5, title: '排序完成', description: '所有子区间都完成分区，数组整体有序。', counter: 'done', output: '[1, 2, 3, 4, 5, 6, 7, 8]', memory: [{ name: '复杂度', value: 'O(n log n)', type: 'average' }], bars: [1, 2, 3, 4, 5, 6, 7, 8], active: [] }
-        ]
+        tag: '10 · 快速排序', title: '快速排序如何分治？', description: '选择基准值，把更小和更大的元素分到两侧，再递归处理两个子区间。', visual: 'QUICK SORT', visualType: 'bars', sortType: 'quick', defaultSize: 8, keywords: ['pivot', 'partition', '递归', 'O(n log n)'], code: ['int quicksort(int a[], int lo, int hi) {', '    int pivot = a[hi];', '    int p = partition(a, lo, hi, pivot);', '    quicksort(a, lo, p - 1);', '    quicksort(a, p + 1, hi);', '}'], steps: []
     },
     {
         tag: '11 · 栈与队列', title: '栈和队列怎样管理顺序？', description: '栈遵循后进先出，队列遵循先进先出。观察 push、pop、enqueue 和 dequeue 对数据顺序的影响。', visual: 'STACK & QUEUE', visualType: 'stack', keywords: ['push', 'pop', 'peek', 'enqueue', 'dequeue', 'FIFO / LIFO'], code: ['typedef struct {', '    int data[5];', '    int top;', '} Stack;', '', 'void push(Stack *s, int value) {', '    s->data[++s->top] = value;', '}', '', 'int pop(Stack *s) {', '    return s->data[s->top--];', '}', '', 'push(&stack, 10);', 'push(&stack, 20);', 'peek(&stack);', 'pop(&stack);', '', 'enqueue(&queue, 30);', 'enqueue(&queue, 40);', 'dequeue(&queue);'], steps: [
@@ -125,6 +86,375 @@ const visualTopics = [
     }
 ];
 
+/* =========================================================
+   排序实验：按规模动态生成步骤
+   ========================================================= */
+const SORT_PATTERNS = {
+    6: [5, 2, 6, 3, 1, 4],
+    8: [7, 3, 8, 2, 5, 1, 6, 4],
+    10: [9, 3, 10, 2, 5, 1, 8, 4, 7, 6]
+};
+
+function generateSortSteps(type, size) {
+    const initial = SORT_PATTERNS[size] || SORT_PATTERNS[8];
+    if (type === 'bubble') return bubbleSteps(initial);
+    if (type === 'selection') return selectionSteps(initial);
+    if (type === 'insertion') return insertionSteps(initial);
+    if (type === 'quick') return quickSteps(initial);
+    return [];
+}
+
+/* ---------- 冒泡排序 ---------- */
+function bubbleSteps(initial) {
+    const steps = [];
+    const arr = [...initial];
+    const n = arr.length;
+    let sorted = 0;
+
+    steps.push({
+        line: 0,
+        title: '准备第 1 轮',
+        description: `外层循环 i = 0，${n} 个元素需要 ${n - 1} 轮比较。`,
+        counter: 'i = 0',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '已排序', value: '0 个', type: 'right side' }],
+        bars: [...arr],
+        active: []
+    });
+
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            const shouldSwap = arr[j] > arr[j + 1];
+            steps.push({
+                line: 2,
+                title: `比较 a[${j}]=${arr[j]} 与 a[${j + 1}]=${arr[j + 1]}`,
+                description: shouldSwap
+                    ? `${arr[j]} 大于 ${arr[j + 1]}，需要交换。`
+                    : `${arr[j]} 小于 ${arr[j + 1]}，顺序正确，不交换。`,
+                counter: `j = ${j}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [
+                    { name: '当前比较', value: `${arr[j]} vs ${arr[j + 1]}`, type: shouldSwap ? 'swap needed' : 'keep' },
+                    { name: '已排序', value: `${sorted} 个`, type: 'right side' }
+                ],
+                bars: [...arr],
+                active: [j, j + 1]
+            });
+
+            if (shouldSwap) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                steps.push({
+                    line: 3,
+                    title: `交换 a[${j}] ⇄ a[${j + 1}]`,
+                    description: '交换后较小值左移，较大值向右"冒泡"。',
+                    counter: `j = ${j} · swap`,
+                    output: `[${arr.join(', ')}]`,
+                    memory: [
+                        { name: '交换', value: 'done', type: 'swap' },
+                        { name: '已排序', value: `${sorted} 个`, type: 'right side' }
+                    ],
+                    bars: [...arr],
+                    active: [j, j + 1]
+                });
+            }
+        }
+        sorted++;
+        if (i < n - 2) {
+            steps.push({
+                line: 0,
+                title: `第 ${i + 1} 轮结束`,
+                description: `第 ${i + 1} 大的元素已归位到索引 ${n - 1 - i}。`,
+                counter: `i = ${i + 1}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '已排序', value: `${sorted} 个`, type: 'right side' }],
+                bars: [...arr],
+                active: []
+            });
+        }
+    }
+
+    steps.push({
+        line: 6,
+        title: '排序完成',
+        description: '所有相邻逆序对都消失，数组已经从小到大排列。',
+        counter: 'done',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '复杂度', value: 'O(n²)', type: '比较型排序' }],
+        bars: [...arr],
+        active: []
+    });
+
+    return steps;
+}
+
+/* ---------- 选择排序 ---------- */
+function selectionSteps(initial) {
+    const steps = [];
+    const arr = [...initial];
+    const n = arr.length;
+
+    steps.push({
+        line: 1,
+        title: '选择第 0 个位置',
+        description: `先假设 a[0]=${arr[0]} 是未排序区间中的最小值。`,
+        counter: 'i = 0 · min = 0',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '已排序', value: '[]', type: 'prefix' }],
+        bars: [...arr],
+        active: [0]
+    });
+
+    for (let i = 0; i < n - 1; i++) {
+        let minIdx = i;
+        if (i > 0) {
+            steps.push({
+                line: 1,
+                title: `第 ${i + 1} 轮：假设 a[${i}]=${arr[i]} 为最小`,
+                description: `下标 ${i} 之前已经确定排序，从剩余区间寻找最小值。`,
+                counter: `i = ${i} · min = ${i}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '已排序', value: `前 ${i} 个`, type: 'prefix' }],
+                bars: [...arr],
+                active: [i]
+            });
+        }
+
+        for (let j = i + 1; j < n; j++) {
+            const isSmaller = arr[j] < arr[minIdx];
+            steps.push({
+                line: 3,
+                title: `比较 a[${j}]=${arr[j]} 与当前最小 a[${minIdx}]=${arr[minIdx]}`,
+                description: isSmaller
+                    ? `${arr[j]} 更小，更新最小值为 a[${j}]。`
+                    : `${arr[j]} 不小于当前最小值，保持不变。`,
+                counter: `j = ${j}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [
+                    { name: 'minIndex', value: `${minIdx}`, type: 'scan' },
+                    { name: 'minValue', value: `${arr[minIdx]}`, type: 'current' }
+                ],
+                bars: [...arr],
+                active: [minIdx, j]
+            });
+            if (isSmaller) minIdx = j;
+        }
+
+        if (minIdx !== i) {
+            [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+            steps.push({
+                line: 4,
+                title: `交换 a[${i}] 与 a[${minIdx}]`,
+                description: `把找到的最小值 ${arr[i]} 放到下标 ${i} 处。`,
+                counter: `swap(${i}, ${minIdx})`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '已排序', value: `前 ${i + 1} 个`, type: 'prefix' }],
+                bars: [...arr],
+                active: [i, minIdx]
+            });
+        } else {
+            steps.push({
+                line: 4,
+                title: `a[${i}] 已是最小值，无需交换`,
+                description: `第 ${i + 1} 轮的最小值已经在下标 ${i} 处。`,
+                counter: `i = ${i} · no swap`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '已排序', value: `前 ${i + 1} 个`, type: 'prefix' }],
+                bars: [...arr],
+                active: [i]
+            });
+        }
+    }
+
+    steps.push({
+        line: 5,
+        title: '排序完成',
+        description: '每个位置都选择了剩余元素中的最小值。',
+        counter: 'done',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '复杂度', value: 'O(n²)', type: '选择型排序' }],
+        bars: [...arr],
+        active: []
+    });
+
+    return steps;
+}
+
+/* ---------- 插入排序 ---------- */
+function insertionSteps(initial) {
+    const steps = [];
+    const arr = [...initial];
+    const n = arr.length;
+
+    steps.push({
+        line: 0,
+        title: '从第二张牌开始',
+        description: `下标 0 处的 ${arr[0]} 可以看作已排好序，从 i = 1 取出下一张牌。`,
+        counter: 'i = 1',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '有序区', value: `[${arr[0]}]`, type: 'left' }],
+        bars: [...arr],
+        active: [0, 1]
+    });
+
+    for (let i = 1; i < n; i++) {
+        const key = arr[i];
+        steps.push({
+            line: 1,
+            title: `取出 key = ${key}`,
+            description: `把 a[${i}]=${key} 暂存起来，当前位置暂时变成空位。`,
+            counter: `key = ${key}`,
+            output: `[${arr.join(', ')}]`,
+            memory: [{ name: 'key', value: `${key}`, type: 'temporary' }],
+            bars: [...arr],
+            active: [i]
+        });
+
+        let j = i - 1;
+        while (j >= 0 && arr[j] > key) {
+            steps.push({
+                line: 4,
+                title: `a[${j}]=${arr[j]} 右移`,
+                description: `${arr[j]} 大于 key=${key}，向右移动一格。`,
+                counter: `a[${j + 1}] = a[${j}]`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '移动', value: `${arr[j]} → a[${j + 1}]`, type: 'shift' }],
+                bars: [...arr],
+                active: [j, j + 1]
+            });
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+        steps.push({
+            line: 7,
+            title: `插入 key = ${key}`,
+            description: `${key} 放入下标 ${j + 1} 处，有序区扩展到 ${i + 1} 个元素。`,
+            counter: `a[${j + 1}] = key`,
+            output: `[${arr.join(', ')}]`,
+            memory: [{ name: '有序区', value: `前 ${i + 1} 个`, type: 'left' }],
+            bars: [...arr],
+            active: [j + 1]
+        });
+    }
+
+    steps.push({
+        line: 8,
+        title: '排序完成',
+        description: '所有元素都被插入到左侧有序区，排序结束。',
+        counter: 'done',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '复杂度', value: 'O(n²)', type: '插入型排序' }],
+        bars: [...arr],
+        active: []
+    });
+
+    return steps;
+}
+
+/* ---------- 快速排序 ---------- */
+function quickSteps(initial) {
+    const steps = [];
+    const arr = [...initial];
+    const n = arr.length;
+
+    function partition(lo, hi) {
+        const pivot = arr[hi];
+        steps.push({
+            line: 1,
+            title: `选择 pivot = ${pivot}`,
+            description: `区间 [${lo}..${hi}] 选择末尾元素 ${pivot} 作为基准。`,
+            counter: `pivot = ${pivot}`,
+            output: `[${arr.join(', ')}]`,
+            memory: [{ name: 'pivot', value: `${pivot}`, type: 'baseline' }],
+            bars: [...arr],
+            active: [hi]
+        });
+
+        let i = lo - 1;
+        for (let j = lo; j < hi; j++) {
+            const isSmaller = arr[j] < pivot;
+            steps.push({
+                line: 2,
+                title: `比较 a[${j}]=${arr[j]} 与 pivot=${pivot}`,
+                description: isSmaller
+                    ? `${arr[j]} < ${pivot}，放入左侧分区。`
+                    : `${arr[j]} ≥ ${pivot}，留在右侧。`,
+                counter: `j = ${j}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '左区', value: `[${arr.slice(lo, i + 1).join(', ')}]`, type: '< pivot' }],
+                bars: [...arr],
+                active: [j, hi]
+            });
+            if (isSmaller) {
+                i++;
+                if (i !== j) {
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                    steps.push({
+                        line: 2,
+                        title: `交换 a[${i}] 与 a[${j}]`,
+                        description: `把较小的 ${arr[i]} 移到左区。`,
+                        counter: `swap(${i}, ${j})`,
+                        output: `[${arr.join(', ')}]`,
+                        memory: [{ name: '左区', value: `[${arr.slice(lo, i + 1).join(', ')}]`, type: '< pivot' }],
+                        bars: [...arr],
+                        active: [i, j]
+                    });
+                }
+            }
+        }
+        [arr[i + 1], arr[hi]] = [arr[hi], arr[i + 1]];
+        steps.push({
+            line: 2,
+            title: `pivot 归位到下标 ${i + 1}`,
+            description: '所有小于 pivot 的在左侧，大于的在右侧。',
+            counter: `pivot index = ${i + 1}`,
+            output: `[${arr.join(', ')}]`,
+            memory: [{ name: 'pivot', value: `index ${i + 1}`, type: 'fixed' }],
+            bars: [...arr],
+            active: [i + 1]
+        });
+        return i + 1;
+    }
+
+    function quicksort(lo, hi) {
+        if (lo > hi) return;
+        if (lo === hi) {
+            steps.push({
+                line: 5,
+                title: `区间 [${lo}] 天然有序`,
+                description: '单元素区间不需要排序，递归返回。',
+                counter: `lo = hi = ${lo}`,
+                output: `[${arr.join(', ')}]`,
+                memory: [{ name: '递归', value: 'return', type: 'base case' }],
+                bars: [...arr],
+                active: [lo]
+            });
+            return;
+        }
+        const p = partition(lo, hi);
+        quicksort(lo, p - 1);
+        quicksort(p + 1, hi);
+    }
+
+    quicksort(0, n - 1);
+
+    steps.push({
+        line: 5,
+        title: '排序完成',
+        description: '所有子区间都完成分区，数组整体有序。',
+        counter: 'done',
+        output: `[${arr.join(', ')}]`,
+        memory: [{ name: '复杂度', value: 'O(n log n)', type: 'average' }],
+        bars: [...arr],
+        active: []
+    });
+
+    return steps;
+}
+
+/* =========================================================
+   状态 & 渲染
+   ========================================================= */
 const progressKey = 'cm_visual_completed_topics_v2';
 let storedTopics = [];
 try {
@@ -144,6 +474,9 @@ const state = {
     speed: 1,
     completedTopics: [...new Set(storedTopics)]
 };
+
+let lastBarsState = {};
+let lastBarsTopicIndex = -1;
 
 const select = selector => document.querySelector(selector);
 
@@ -212,13 +545,10 @@ function renderCode(topic, step) {
 
     select('#stepLabel').textContent = `步骤 ${state.stepIndex + 1} / ${topic.steps.length}`;
     select('#previousButton').disabled = state.stepIndex === 0;
-    select('#nextButton').disabled = state.stepIndex === topic.steps.length - 1;
+    select('#nextButton').disabled = false;
 }
 
-/* =========================================================
-   柱状图渲染 —— 柱子原地平滑升降
-   柱子不移动，只做高度的自然增长/缩短
-   ========================================================= */
+/* ---------- 柱状图渲染（增强版） ---------- */
 function renderBars(topic, step) {
     const visualization = select('#visualization');
     let chart = visualization.querySelector('.bar-chart');
@@ -228,10 +558,14 @@ function renderBars(topic, step) {
         chart = visualization.querySelector('.bar-chart');
     }
 
+    if (lastBarsTopicIndex !== state.topicIndex) {
+        lastBarsState = {};
+        lastBarsTopicIndex = state.topicIndex;
+    }
+
     const bars = step.bars;
     const existingBars = [...chart.querySelectorAll('.bar-item')];
 
-    // 补充柱子（如果现有数量不足）
     while (existingBars.length < bars.length) {
         const item = document.createElement('div');
         item.className = 'bar-item';
@@ -239,30 +573,54 @@ function renderBars(topic, step) {
         chart.appendChild(item);
         existingBars.push(item);
     }
-    // 移除多余柱子（如果有）
     while (existingBars.length > bars.length) {
         existingBars.pop().remove();
     }
 
-    // 按位置更新每根柱子：高度平滑过渡、数值更新、高亮切换
+    // 宽度随规模自适应
+    chart.style.setProperty('--bar-count', bars.length);
+
+    const maxVal = Math.max(...bars, 1);
+    const minVal = Math.min(...bars, 0);
+    const range = Math.max(maxVal - minVal, 1);
+
+    const sortedRef = [...bars].sort((a, b) => a - b);
+    const lockedIndexes = bars
+        .map((v, i) => (v === sortedRef[i] ? i : -1))
+        .filter(i => i !== -1 && !step.active.includes(i));
+
     bars.forEach((value, index) => {
         const item = existingBars[index];
         const bar = item.querySelector('i');
         const strong = item.querySelector('strong');
         const label = item.querySelector('span');
 
-        // 高度变化：CSS transition 自动补间
-        bar.style.setProperty('--bar-height', `${value * 25}px`);
+        const prevValue = lastBarsState[index];
+        const changed = prevValue !== undefined && prevValue !== value;
 
-        // 数值标签
+        bar.style.setProperty('--bar-height', `${value * 25}px`);
+        item.style.setProperty('--bar-height', `${value * 25}px`);   // ← 新增：给父元素也挂一份
+        const ratio = (value - minVal) / range;
+        bar.style.setProperty('--bar-hue', `${185 + ratio * 95}`);
+
         if (strong.textContent !== String(value)) {
             strong.textContent = value;
         }
         label.textContent = `a[${index}]`;
 
-        // 高亮状态
-        item.classList.toggle('active', step.active.includes(index));
+        const isActive = step.active.includes(index);
+        item.classList.toggle('active', isActive);
+        item.classList.toggle('locked', lockedIndexes.includes(index) && !isActive);
+
+        if (changed) {
+            item.classList.remove('swapped');
+            void item.offsetWidth;
+            item.classList.add('swapped');
+        }
     });
+
+    lastBarsState = {};
+    bars.forEach((value, index) => { lastBarsState[index] = value; });
 }
 
 function renderVisualization(topic, step) {
@@ -274,19 +632,26 @@ function renderVisualization(topic, step) {
     }
 
     if (topic.visualType === 'stack') {
-        const stack = step.stack.map((value, index) =>
-            `<div class="stack-item ${index === step.stack.length - 1 ? 'active' : ''}">${value}</div>`
-        ).join('');
+        const stackLen = step.stack.length;
+        const stack = step.stack.map((value, index) => {
+            const isTop = index === stackLen - 1;
+            return `<div class="stack-item ${isTop ? 'top' : ''}" style="--delay:${index * 0.06}s">${value}</div>`;
+        }).join('');
 
-        const queue = step.queue.length
-            ? step.queue.map(value => `<div class="stack-item active">${value}</div>`).join('')
-            : '<div class="stack-item">空</div>';
+        const queueLen = step.queue.length;
+        const queue = queueLen
+            ? step.queue.map((value, index) => {
+                const isFront = index === 0;
+                const isRear = index === queueLen - 1;
+                return `<div class="stack-item ${isFront ? 'front' : ''} ${isRear ? 'rear' : ''}" style="--delay:${index * 0.06}s">${value}</div>`;
+            }).join('')
+            : '<div class="stack-item empty">空</div>';
 
         visualization.innerHTML = `
             <div class="visual-stage-title">${topic.visual}</div>
             <div class="stack-visual">
                 <div>
-                    <div class="stack-column">${stack || '<div class="stack-item">空</div>'}</div>
+                    <div class="stack-column">${stack || '<div class="stack-item empty">空</div>'}</div>
                     <div class="stack-caption">栈 · LIFO</div>
                 </div>
                 <div class="flow-arrow">→</div>
@@ -299,11 +664,15 @@ function renderVisualization(topic, step) {
     }
 
     if (topic.visualType === 'list') {
+        const len = step.list.length;
         visualization.innerHTML = `
             <div class="visual-stage-title">${topic.visual}</div>
-            <div class="flow-map">${step.list.map((item, index) =>
-                `<div class="flow-node ${index === 0 ? 'round' : ''} ${index === state.stepIndex % step.list.length ? 'active' : ''}">${item}</div>${index < step.list.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
-            ).join('')}</div>`;
+            <div class="flow-map">${step.list.map((item, index) => {
+            const isHead = index === 0;
+            const isActive = index === state.stepIndex % len;
+            return `<div class="flow-node ${isHead ? 'round' : ''} ${isActive ? 'active' : ''}" style="--delay:${index * 0.08}s">${item}</div>` +
+                (index < len - 1 ? '<span class="flow-arrow">→</span>' : '');
+        }).join('')}</div>`;
         return;
     }
 
@@ -311,17 +680,17 @@ function renderVisualization(topic, step) {
     visualization.innerHTML = `
         <div class="visual-stage-title">${topic.visual}</div>
         <div class="flow-map">${map.map((item, index) =>
-            `<div class="flow-node ${index === state.stepIndex % map.length ? 'active' : ''} ${index === 0 || index === map.length - 1 ? 'round' : ''}">${item}</div>${index < map.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
-        ).join('')}</div>`;
+        `<div class="flow-node ${index === state.stepIndex % map.length ? 'active' : ''} ${index === 0 || index === map.length - 1 ? 'round' : ''}">${item}</div>${index < map.length - 1 ? '<span class="flow-arrow">→</span>' : ''}`
+    ).join('')}</div>`;
 
     if (!topic.map) {
         visualization.innerHTML = `
             <div class="visual-stage-title">${topic.visual}</div>
             <div class="memory-visual">${step.memory.map((item, index) =>
-                `<div class="memory-cell ${index === state.stepIndex % step.memory.length ? 'active' : ''}">
+            `<div class="memory-cell ${index === state.stepIndex % step.memory.length ? 'active' : ''}">
                     <span>${item.name}</span><strong>${item.value}</strong><em>${item.type}</em>
                 </div>`
-            ).join('')}</div>`;
+        ).join('')}</div>`;
     }
 }
 
@@ -345,6 +714,26 @@ function render() {
         `<div class="memory-row"><span>${item.name}</span><strong>${item.value}</strong></div>`
     ).join('');
 
+        // 规模下拉框：只在排序实验（有 sortType）显示
+    const sizeWrap = select('#sizeSelectWrap');
+    if (sizeWrap) {
+        if (topic.sortType) {
+            sizeWrap.style.display = '';
+            sizeWrap.removeAttribute('hidden');
+
+            // 关键：把下拉框的值同步到当前实验的 defaultSize
+            const sizeSelect = select('#sizeSelect');
+            if (sizeSelect) {
+                const want = String(topic.defaultSize || 8);
+                if (sizeSelect.value !== want) {
+                    sizeSelect.value = want;
+                }
+            }
+        } else {
+            sizeWrap.style.display = 'none';
+        }
+    }
+
     renderTopics();
     renderCode(topic, step);
     renderVisualization(topic, step);
@@ -354,13 +743,9 @@ function nextStep() {
     const topic = visualTopics[state.topicIndex];
     if (state.stepIndex < topic.steps.length - 1) {
         state.stepIndex += 1;
-    } else if (state.topicIndex < visualTopics.length - 1) {
-        completeCurrentTopic();
-        state.topicIndex += 1;
-        state.stepIndex = 0;
     } else {
         completeCurrentTopic();
-        stopPlaying();
+        state.stepIndex = 0;
     }
     render();
 }
@@ -387,6 +772,13 @@ function togglePlaying() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 为排序实验生成默认步骤
+    visualTopics.forEach(topic => {
+        if (topic.sortType) {
+            topic.steps = generateSortSteps(topic.sortType, topic.defaultSize || 8);
+        }
+    });
+
     const starField = document.querySelector('#starField');
     if (starField) {
         for (let index = 0; index < 60; index += 1) {
@@ -416,6 +808,20 @@ document.addEventListener('DOMContentLoaded', () => {
             state.timer = setInterval(nextStep, 2600 / state.speed);
         }
     });
+
+    // 规模选择器：仅对 7-10 排序实验生效
+    const sizeSelect = select('#sizeSelect');
+    if (sizeSelect) {
+        sizeSelect.addEventListener('change', () => {
+            const topic = visualTopics[state.topicIndex];
+            if (!topic.sortType) return;
+            const size = Number(sizeSelect.value);
+            topic.steps = generateSortSteps(topic.sortType, size);
+            stopPlaying();
+            state.stepIndex = 0;
+            render();
+        });
+    }
 
     select('#resetButton').addEventListener('click', () => {
         stopPlaying();

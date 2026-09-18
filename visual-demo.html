@@ -63,12 +63,22 @@
                     </div>
                     <div class="stage-actions">
                         <button class="icon-button btn btn-ghost" id="resetButton" type="button" title="重置实验">↺</button>
+
+                        <!-- 规模选择器：仅 7-10 排序实验显示 -->
+                        <label class="speed-control" for="sizeSelect" id="sizeSelectWrap" style="display:none;">规模
+                            <select id="sizeSelect">
+                                <option value="6">小 · 6</option>
+                                <option value="8" selected>中 · 8</option>
+                                <option value="10">大 · 10</option>
+                            </select>
+                        </label>
+
                         <label class="speed-control" for="speedSelect">速度
                             <select id="speedSelect">
-                                <option value="0.6">慢速</option>
-                                <option value="1" selected>标准</option>
-                                <option value="1.8">快速</option>
-                                <option value="3">极速</option>
+                                <option value="1">慢速</option>
+                                <option value="2" selected>标准</option>
+                                <option value="4">快速</option>
+                                <option value="8">极速</option>
                             </select>
                         </label>
                         <button class="play-button btn btn-primary" id="playButton" type="button"><span id="playIcon">▶</span><span id="playText">播放过程</span></button>
