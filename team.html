@@ -12,6 +12,10 @@
             from { opacity: 0; transform: translateY(28px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
         .team-container {
             position: relative;
@@ -202,7 +206,7 @@
             position: relative;
             width: 100%;
             max-width: 900px;
-            height: 460px;
+            height: 520px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -213,8 +217,8 @@
 
         .team-card-stack {
             position: relative;
-            width: 520px;
-            height: 320px;
+            width: 100%;
+            height: 100%;
             transition: transform .55s cubic-bezier(0.34,1.56,0.64,1);
         }
 
@@ -236,16 +240,22 @@
 
         .team-card {
             position: absolute;
-            width: 300px;
-            height: 400px;
+            left: 50%;
+            top: 50%;
+            width: 240px;
+            height: 350px;
+            --tx: -50%;
+            --ty: -50%;
+            --sc: 1;
+            transform: translate(var(--tx), var(--ty)) scale(var(--sc));
+            transform-origin: center center;
             background: linear-gradient(145deg, #0f172a 0%, #0a0f1f 100%);
             border: 2px solid var(--card-color);
             border-radius: 16px;
             cursor: pointer;
             transition:
                 transform .5s cubic-bezier(0.34,1.56,0.64,1),
-                box-shadow .3s,
-                left .5s cubic-bezier(0.34,1.56,0.64,1);
+                box-shadow .3s;
             box-shadow: 0 8px 20px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,0.03);
             user-select: none;
             overflow: hidden;
@@ -264,11 +274,37 @@
             opacity: 0.7;
         }
 
-        .team-card-0 { left: 0;   z-index: 1; }
-        .team-card-1 { left: 40px; z-index: 2; }
-        .team-card-2 { left: 80px; z-index: 3; }
-        .team-card-3 { left: 120px; z-index: 4; }
-        .team-card-4 { left: 160px; z-index: 5; }
+        /* 多米诺骨牌：中心轴对齐，从左到右依次增大，间距紧凑 */
+        .team-card-0 {
+            --tx: calc(-50% - 140px);
+            --ty: -50%;
+            --sc: 0.78;
+            z-index: 1;
+        }
+        .team-card-1 {
+            --tx: calc(-50% - 70px);
+            --ty: -50%;
+            --sc: 0.86;
+            z-index: 2;
+        }
+        .team-card-2 {
+            --tx: -50%;
+            --ty: -50%;
+            --sc: 0.94;
+            z-index: 3;
+        }
+        .team-card-3 {
+            --tx: calc(-50% + 70px);
+            --ty: -50%;
+            --sc: 1.02;
+            z-index: 4;
+        }
+        .team-card-4 {
+            --tx: calc(-50% + 140px);
+            --ty: -50%;
+            --sc: 1.10;
+            z-index: 5;
+        }
 
         /* 卡片竖排名字 */
         .team-card-name {
@@ -288,11 +324,11 @@
             pointer-events: none;
         }
 
-        /* 卡片序号装饰 */
+        /* 卡片序号装饰（左上角） */
         .team-card-index {
             position: absolute;
             top: 12px;
-            right: 16px;
+            left: 16px;
             font-size: 42px;
             font-weight: 900;
             font-family: 'JetBrains Mono', monospace;
@@ -367,16 +403,17 @@
             border: 3px solid var(--card-color);
         }
 
+        /* 卡片里的字整体调小 */
         .team-card-detail h4 {
-            font-size: 20px;
-            margin-bottom: 6px;
+            font-size: 14px;
+            margin-bottom: 5px;
             color: #fff;
             letter-spacing: 1px;
         }
         .team-card-detail .role {
             color: var(--card-color);
-            font-size: 12px;
-            margin-bottom: 14px;
+            font-size: 9px;
+            margin-bottom: 10px;
             font-weight: 600;
             line-height: 1.6;
             letter-spacing: 0.5px;
@@ -385,31 +422,33 @@
             width: 40px;
             height: 2px;
             background: var(--card-color);
-            margin: 0 auto 14px;
+            margin: 0 auto 10px;
             border-radius: 2px;
             box-shadow: 0 0 8px var(--card-color);
         }
         .team-card-detail .desc {
             color: #cbd5e1;
-            font-size: 11px;
-            line-height: 1.75;
+            font-size: 8px;
+            line-height: 1.7;
             text-align: justify;
         }
 
         /* 悬停效果 */
         .team-card:hover {
-            transform: translateY(-12px) translateX(4px);
+            transform:
+                translate(var(--tx), calc(var(--ty) - 8px))
+                scale(calc(var(--sc) * 1.04));
             box-shadow:
                 0 16px 32px rgba(0,0,0,.55),
                 0 0 0 4px var(--card-color),
                 0 0 30px var(--card-color);
         }
 
-        /* 抽中放大状态 */
+        /* 抽中放大状态（更大） */
         .team-card.picked {
-            left: 600px !important;
-            top: 50% !important;
-            transform: translateY(-50%) scale(2) !important;
+            --tx: calc(-50% + 320px);
+            --ty: -60%;
+            --sc: 2.0;
             z-index: 999;
             box-shadow:
                 0 24px 60px rgba(0,0,0,.7),
@@ -435,10 +474,13 @@
         }
 
         .team-card-area:has(.picked) .team-card-stack {
-            transform: translateX(-80px);
+            transform: translateX(-100px);
         }
 
+        /* 提示文字：只做 opacity 动画，让 translateX 左移能生效 */
         .team-tip-text {
+            position: relative;
+            z-index: 1000;
             text-align: center;
             margin-top: 20px;
             font-size: 15px;
@@ -446,10 +488,10 @@
             min-height: 40px;
             transform: translateX(0);
             transition: transform .5s ease;
-            animation: fadeUp 0.7s 0.35s ease both;
+            animation: fadeIn 0.7s 0.35s ease both;
         }
         .team-card-area.has-picked + .team-tip-text {
-            transform: translateX(-180px);
+            transform: translateX(-280px);
         }
         .team-tip-text strong {
             color: #ffcc00;
@@ -662,7 +704,7 @@
         @media (max-width: 968px) {
             .team-stats { grid-template-columns: repeat(3, 1fr); }
             .contact-section { grid-template-columns: 1fr; }
-            .team-card-area { transform: scale(0.85); height: 420px; }
+            .team-card-area { transform: scale(0.85); height: 460px; }
             .team-hero h2 { font-size: 34px; }
         }
         @media (max-width: 640px) {
@@ -744,7 +786,7 @@
                 <div class="lbl">团队成员</div>
             </div>
             <div class="team-stat-card">
-                <div class="num">8000+</div>
+                <div class="num">40000+</div>
                 <div class="lbl">代码行数</div>
             </div>
             <div class="team-stat-card">
